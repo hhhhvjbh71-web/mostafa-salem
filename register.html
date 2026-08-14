@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Redirecting...</title>
+</head>
+<body>
+<script>
+  const params = new URLSearchParams(location.search);
+  params.set('tab', 'register');
+  window.location.replace('login.html?' + params.toString());
+</script>
+<p>Redirecting to <a href="login.html?tab=register">Sign Up</a>...</p>
+</body>
+</html>

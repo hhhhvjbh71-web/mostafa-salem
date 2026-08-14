@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#38BDF8">
+<title>Login / Sign Up | Mostafa Salem English Academy</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#121212">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:        #121212;
+    --bg2:       #1F1F24;
+    --card:      #24242B;
+    --primary:   #38BDF8;
+    --gold:      #D4A017;
+    --bronze:    #9A6A2F;
+    --text:      #F8FAFC;
+    --text2:     #94A3B8;
+    --border:    #30363D;
+    --success:   #22C55E;
+    --danger:    #EF4444;
+    --radius:    16px;
+    --shadow:    0 8px 32px rgba(0,0,0,0.4);
+    --shadow-lg: 0 24px 64px rgba(0,0,0,0.5);
+    --glow-sky:  0 0 40px rgba(56,189,248,0.25);
+  }
+  [data-theme="light"] {
+    --bg:   #F0F4F8;
+    --bg2:  #E8EEF5;
+    --card: #FFFFFF;
+    --text: #0F172A;
+    --text2:#475569;
+    --border:#CBD5E1;
+    --shadow: 0 8px 32px rgba(0,0,0,0.1);
+    --shadow-lg: 0 24px 64px rgba(0,0,0,0.15);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Poppins', 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(56,189,248,0.12), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(212,160,23,0.10), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    position: relative;
+    z-index: 5;
+  }
+  .brand-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .brand-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), #0EA5E9);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: var(--glow-sky);
+  }
+  .brand-text { display:flex; flex-direction:column; line-height:1.1; }
+  .brand-text .b1 { font-weight:900; font-size:18px; letter-spacing:1px; }
+  .brand-text .b2 { font-size:11px; color:var(--text2); font-weight:600; }
+
+  .theme-toggle {
+    width: 52px; height: 28px;
+    border-radius: 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    display:flex; align-items:center;
+  }
+  .theme-toggle-knob {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--gold));
+    position:absolute; left:2px;
+    display:flex; align-items:center; justify-content:center;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+  }
+  [data-theme="light"] .theme-toggle-knob { transform: translateX(24px); }
+
+  /* ===== MAIN ===== */
+  .wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px 60px;
+    position: relative;
+    z-index: 2;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: 36px 32px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .auth-card::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+    background-size: 200% 100%;
+    animation: shift 4s linear infinite;
+  }
+  @keyframes shift { 0%{background-position:0% 0;} 100%{background-position:200% 0;} }
+
+  .auth-head { text-align:center; margin-bottom: 24px; }
+  .auth-emoji { font-size: 40px; margin-bottom: 8px; }
+  .auth-title { font-size: 22px; font-weight:800; margin-bottom:4px; }
+  .auth-sub { font-size: 13px; color: var(--text2); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 0;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), #0EA5E9);
+    color: #061018;
+    box-shadow: 0 6px 18px rgba(56,189,248,0.35);
+  }
+
+  form { display: none; flex-direction: column; gap: 16px; }
+  form.active { display: flex; }
+
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label { font-size: 12px; font-weight:700; color: var(--text2); letter-spacing:0.3px; }
+  .input-wrap { position: relative; }
+  .input-wrap span.ic {
+    position:absolute; top:50%; left:14px; transform:translateY(-50%);
+    font-size:15px; opacity:0.7; pointer-events:none;
+  }
+  .field input, .field select {
+    width:100%;
+    padding: 13px 14px 13px 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+  }
+  .toggle-pass {
+    position:absolute; top:50%; right:14px; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer; font-size:15px; color:var(--text2);
+  }
+
+  .row-inline { display:flex; align-items:center; justify-content:space-between; font-size:12px; }
+  .row-inline label { display:flex; align-items:center; gap:6px; color: var(--text2); cursor:pointer; }
+  .row-inline a { color: var(--primary); text-decoration:none; font-weight:600; }
+  .row-inline a:hover { text-decoration:underline; }
+
+  .submit-btn {
+    margin-top: 6px;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 0;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--primary), #0EA5E9);
+    color: #061018;
+    box-shadow: 0 10px 26px rgba(56,189,248,0.3);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(56,189,248,0.4); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+  .divider { display:flex; align-items:center; gap:10px; margin: 20px 0 4px; color: var(--text2); font-size:12px; }
+  .divider::before, .divider::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  .switch-line { text-align:center; font-size:13px; color: var(--text2); margin-top: 18px; }
+  .switch-line a { color: var(--primary); font-weight:700; text-decoration:none; cursor:pointer; }
+  .switch-line a:hover { text-decoration:underline; }
+
+  .alert {
+    display:none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    align-items:center;
+    gap:8px;
+  }
+  .alert.show { display:flex; }
+  .alert.error { background: rgba(239,68,68,0.12); color:#F87171; border:1px solid rgba(239,68,68,0.3); }
+  .alert.success { background: rgba(34,197,94,0.12); color:#4ADE80; border:1px solid rgba(34,197,94,0.3); }
+
+  .back-home {
+    display:inline-flex; align-items:center; gap:6px;
+    color: var(--text2); text-decoration:none; font-size:13px; font-weight:600;
+  }
+  .back-home:hover { color: var(--primary); }
+
+  footer.mini {
+    text-align:center;
+    padding: 18px 20px 26px;
+    color: var(--text2);
+    font-size: 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width:480px){
+    .auth-card { padding: 28px 20px 24px; }
+    .topbar { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="brand-link">
+    <div class="brand-icon">🦆</div>
+    <div class="brand-text">
+      <span class="b1">MUSTAFA SALEM</span>
+      <span class="b2" data-i18n="brand_sub">Mr. Mostafa Salem</span>
+    </div>
+  </a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button onclick="toggleLanguage()" title="Switch language / تغيير اللغة" style="width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">
+      <span id="langToggleLabel">EN</span>
+    </button>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+      <div class="theme-toggle-knob" id="themeKnob">🌙</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="auth-card">
+
+    <div class="auth-head">
+      <div class="auth-emoji">🦆</div>
+      <div class="auth-title" id="cardTitle" data-i18n="auth_title_login">Welcome Back</div>
+      <div class="auth-sub" id="cardSub" data-i18n="auth_sub_login">Sign in to continue your journey to the top</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLoginBtn" data-i18n="tab_login" onclick="switchTab('login')">🔑 Login</button>
+      <button class="tab-btn" id="tabRegisterBtn" data-i18n="tab_register" onclick="switchTab('register')">✨ Sign Up</button>
+    </div>
+
+    <div class="alert error" id="alertError"></div>
+    <div class="alert success" id="alertSuccess"></div>
+
+    <!-- LOGIN FORM -->
+    <form id="loginForm" class="active">
+      <div class="field">
+        <label data-i18n="label_phone">Phone Number</label>
+        <div class="input-wrap">
+          <span class="ic">📱</span>
+          <input type="tel" id="loginPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" required>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_password">Password</label>
+        <div class="input-wrap">
+          <span class="ic">🔒</span>
+          <input type="password" id="loginPassword" data-i18n-placeholder="placeholder_password" placeholder="Enter your password" required>
+          <button type="button" class="toggle-pass" onclick="togglePass('loginPassword', this)">👁️</button>
+        </div>
+      </div>
+      <div class="row-inline">
+        <label><input type="checkbox" id="rememberMe"> <span data-i18n="remember_me">Remember me</span></label>
+        <a onclick="alert(t('forgot_password_alert'))" data-i18n="forgot_password">Forgot password?</a>
+      </div>
+      <button type="submit" class="submit-btn" id="loginBtn" data-i18n="btn_login">🚀 Login</button>
+    </form>
+
+    <!-- REGISTER FORM -->
+    <form id="registerForm">
+      <div class="field">
+        <label data-i18n="label_fullname">Full Name</label>
+        <div class="input-wrap">
+          <span class="ic">👤</span>
+          <input type="text" id="regName" data-i18n-placeholder="placeholder_fullname" placeholder="Your full name" required>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_phone">Phone Number</label>
+        <div class="input-wrap">
+          <span class="ic">📱</span>
+          <input type="tel" id="regPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" required>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_parent_phone">Parent's Phone Number</label>
+        <div class="input-wrap">
+          <span class="ic">👨‍👩‍👧</span>
+          <input type="tel" id="regParentPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" required>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_grade">Grade / Level</label>
+        <div class="input-wrap">
+          <span class="ic">🎓</span>
+          <select id="regGrade" required>
+            <option value="" disabled selected data-i18n="select_grade_default">Select your grade</option>
+            <option value="prep1">1st Prep — الأول الإعدادي</option>
+            <option value="prep2">2nd Prep — الثاني الإعدادي</option>
+            <option value="prep3">3rd Prep — الثالث الإعدادي</option>
+            <option value="1">1st Secondary — الأول الثانوي</option>
+            <option value="2">2nd Secondary — الثاني الثانوي</option>
+            <option value="3">3rd Secondary — الثالث الثانوي</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_password">Password</label>
+        <div class="input-wrap">
+          <span class="ic">🔒</span>
+          <input type="password" id="regPassword" data-i18n-placeholder="placeholder_password_min" placeholder="At least 6 characters" minlength="6" required>
+          <button type="button" class="toggle-pass" onclick="togglePass('regPassword', this)">👁️</button>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="label_confirm_password">Confirm Password</label>
+        <div class="input-wrap">
+          <span class="ic">🔒</span>
+          <input type="password" id="regPassword2" data-i18n-placeholder="placeholder_password_again" placeholder="Re-enter password" minlength="6" required>
+        </div>
+      </div>
+      <div class="row-inline">
+        <label><input type="checkbox" id="agreeTerms" required> <span data-i18n="agree_terms">I agree to the Terms & Conditions</span></label>
+      </div>
+      <button type="submit" class="submit-btn" id="registerBtn" data-i18n="btn_register">🎉 Create Account</button>
+    </form>
+
+    <div class="divider" data-i18n="divider_or">or</div>
+    <div class="switch-line" id="switchLine">
+      <span data-i18n="switch_to_register">Don't have an account? </span><a onclick="switchTab('register')" data-i18n="switch_to_register_link">Sign up now</a>
+    </div>
+  </div>
+</div>
+
+<footer class="mini">
+  <a href="index.html" class="back-home" data-i18n="back_home">← Back to Home</a>
+  &nbsp;·&nbsp; <span data-i18n="footer_tagline">© 2026 Mostafa Salem English Academy — Never Give Up</span>
+</footer>
+
+<!-- ===== Firebase (live database — students, auth) ===== -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="i18n.js"></script>
+<script>
+  // ========================================
+  // THEME
+  // ========================================
+  function toggleTheme(){
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') !== 'light';
+    const newTheme = isDark ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    document.getElementById('themeKnob').textContent = newTheme === 'light' ? '☀️' : '🌙';
+    localStorage.setItem('mostafa_salem_theme', newTheme);
+  }
+  const savedTheme = localStorage.getItem('mostafa_salem_theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('themeKnob').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+  }
+
+  // ========================================
+  // TAB SWITCHING
+  // ========================================
+  function switchTab(tab){
+    hideAlerts();
+    const isLogin = tab === 'login';
+    document.getElementById('tabLoginBtn').classList.toggle('active', isLogin);
+    document.getElementById('tabRegisterBtn').classList.toggle('active', !isLogin);
+    document.getElementById('loginForm').classList.toggle('active', isLogin);
+    document.getElementById('registerForm').classList.toggle('active', !isLogin);
+    document.getElementById('cardTitle').setAttribute('data-i18n', isLogin ? 'auth_title_login' : 'auth_title_register');
+    document.getElementById('cardSub').setAttribute('data-i18n', isLogin ? 'auth_sub_login' : 'auth_sub_register');
+    document.getElementById('switchLine').innerHTML = isLogin
+      ? `<span data-i18n="switch_to_register">${t('switch_to_register')}</span><a onclick="switchTab('register')" data-i18n="switch_to_register_link">${t('switch_to_register_link')}</a>`
+      : `<span data-i18n="switch_to_login">${t('switch_to_login')}</span><a onclick="switchTab('login')" data-i18n="switch_to_login_link">${t('switch_to_login_link')}</a>`;
+    applyLanguage(mostafaSalemGetLang());
+    {
+      const params = new URLSearchParams(location.search);
+      const qs = params.toString();
+      const base = isLogin ? 'login.html' : 'register.html';
+      history.replaceState(null, '', qs ? base + '?' + qs : base);
+    }
+  }
+
+  // Open on the right tab depending on entry file / query
+  (function initTab(){
+    const params = new URLSearchParams(location.search);
+    const path = location.pathname.toLowerCase();
+    if (path.endsWith('register.html') || params.get('tab') === 'register') {
+      switchTab('register');
+    }
+  })();
+
+  function getNextUrl(fallback){
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next');
+    return next ? decodeURIComponent(next) : fallback;
+  }
+
+  function togglePass(id, btn){
+    const el = document.getElementById(id);
+    const show = el.type === 'password';
+    el.type = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁️';
+  }
+
+  function showError(msg){
+    hideAlerts();
+    const el = document.getElementById('alertError');
+    el.textContent = '⚠️ ' + msg;
+    el.classList.add('show');
+  }
+  function showSuccess(msg){
+    hideAlerts();
+    const el = document.getElementById('alertSuccess');
+    el.textContent = '✅ ' + msg;
+    el.classList.add('show');
+  }
+  function hideAlerts(){
+    document.getElementById('alertError').classList.remove('show');
+    document.getElementById('alertSuccess').classList.remove('show');
+  }
+
+  // ========================================
+  // LOCAL USER STORE (compatible with dashboard.html / lessons.html)
+  // ========================================
+  function getUsers(){ return JSON.parse(localStorage.getItem('alamin_users') || '[]'); }
+  function saveUsers(u){ localStorage.setItem('alamin_users', JSON.stringify(u)); }
+
+  function normalizePhone(p){ return String(p || '').trim(); }
+
+  // Simple non-cryptographic hash so raw passwords aren't stored in plain text in localStorage.
+  function hashPass(pass){
+    let h = 0;
+    const str = 'mostafa_salem_' + pass;
+    for (let i = 0; i < str.length; i++){
+      h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+    }
+    return 'h' + Math.abs(h).toString(36);
+  }
+
+  // ========================================
+  // ADMIN / EMPLOYEE ACCOUNTS (RBAC)
+  // ========================================
+  // دي حسابات الأدمن/الموظفين اللي ليها صلاحية دخول dashboard.html.
+  // ضيف حساباتك هنا بنفس الشكل: { phone, name, role, password: hashPass('...') }
+  // role ممكن تكون 'admin' (صلاحية كاملة) أو 'employee' (تقدر تحدد صلاحيات أقل لاحقًا في dashboard.html).
+  //
+  // عشان تولّد الباسورد المشفر: افتح Console في المتصفح وانت في صفحة login.html واكتب:
+  //   hashPass('الباسورد اللي عايزه')
+  // وحط الناتج بدل القيمة الحالية.
+  const ADMIN_ACCOUNTS = [
+    // مثال — امسح التعليق وحط بياناتك الحقيقية:
+    // { phone: '01096954340', name: 'Mr. Mostafa Salem', role: 'admin', password: hashPass('CHANGE_THIS_PASSWORD') }
+  ];
+
+  function findAdminAccount(phone, pass){
+    return ADMIN_ACCOUNTS.find(a => normalizePhone(a.phone) === phone && a.password === hashPass(pass));
+  }
+
+  async function syncStudentToFirebase(user){
+    if (!window.db) return;
+    try {
+      await window.db.collection('students').doc(String(user.phone)).set({
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        parentPhone: user.parentPhone || '',
+        grade: user.grade || '',
+        role: 'student',
+        enrolledCourses: user.enrolledCourses || [],
+        createdAt: user.createdAt || new Date().toISOString()
+      }, { merge: true });
+    } catch(e){
+      console.warn('[auth] Firebase sync failed (will retry from dashboard):', e.message);
+    }
+  }
+
+  async function fetchStudentFromFirebase(phone){
+    if (!window.db) return null;
+    try {
+      const snap = await window.db.collection('students').doc(String(phone)).get();
+      return snap.exists ? snap.data() : null;
+    } catch(e){
+      console.warn('[auth] Firebase fetch failed:', e.message);
+      return null;
+    }
+  }
+
+  // ========================================
+  // REGISTER
+  // ========================================
+  document.getElementById('registerForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    hideAlerts();
+
+    const name = document.getElementById('regName').value.trim();
+    const phone = normalizePhone(document.getElementById('regPhone').value);
+    const parentPhone = normalizePhone(document.getElementById('regParentPhone').value);
+    const grade = document.getElementById('regGrade').value;
+    const pass1 = document.getElementById('regPassword').value;
+    const pass2 = document.getElementById('regPassword2').value;
+
+    if (!/^01[0-9]{9}$/.test(phone)) return showError(t('err_invalid_phone'));
+    if (!/^01[0-9]{9}$/.test(parentPhone)) return showError(t('err_invalid_parent_phone'));
+    if (pass1.length < 6) return showError(t('err_password_length'));
+    if (pass1 !== pass2) return showError(t('err_password_mismatch'));
+
+    const users = getUsers();
+    if (users.some(u => normalizePhone(u.phone) === phone)) {
+      return showError(t('err_account_exists'));
+    }
+
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.textContent = t('btn_register_loading');
+
+    const newUser = {
+      id: 'stu_' + Date.now(),
+      name,
+      phone,
+      parentPhone,
+      grade,
+      password: hashPass(pass1),
+      role: 'student',
+      enrolledCourses: [],
+      createdAt: new Date().toISOString()
+    };
+
+    users.push(newUser);
+    saveUsers(users);
+    await syncStudentToFirebase(newUser);
+
+    localStorage.setItem('alamin_current', JSON.stringify(newUser));
+
+    btn.disabled = false; btn.textContent = t('btn_register');
+    showSuccess(t('msg_account_created'));
+    setTimeout(() => { window.location.href = getNextUrl('lessons.html'); }, 1200);
+  });
+
+  // ========================================
+  // LOGIN
+  // ========================================
+  document.getElementById('loginForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    hideAlerts();
+
+    const phone = normalizePhone(document.getElementById('loginPhone').value);
+    const pass = document.getElementById('loginPassword').value;
+    if (!phone || !pass) return showError(t('err_missing_credentials'));
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = t('btn_login_loading');
+
+    // Check admin/employee accounts first (RBAC)
+    const adminMatch = findAdminAccount(phone, pass);
+    if (adminMatch) {
+      const adminUser = {
+        id: 'staff_' + adminMatch.phone,
+        name: adminMatch.name,
+        phone: adminMatch.phone,
+        role: adminMatch.role || 'admin',
+        createdAt: new Date().toISOString()
+      };
+      localStorage.setItem('alamin_current', JSON.stringify(adminUser));
+      if (document.getElementById('rememberMe').checked) {
+        localStorage.setItem('alamin_remember', phone);
+      }
+      btn.disabled = false; btn.textContent = t('btn_login');
+      showSuccess(t('msg_welcome_back').replace('__NAME__', adminUser.name));
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+      return;
+    }
+
+    let users = getUsers();
+    let user = users.find(u => normalizePhone(u.phone) === phone);
+
+    // Fall back to Firebase if this device has no local record (e.g. new device)
+    if (!user) {
+      const remote = await fetchStudentFromFirebase(phone);
+      if (remote && remote.password) {
+        user = remote;
+        users.push(user);
+        saveUsers(users);
+      }
+    }
+
+    if (!user) {
+      btn.disabled = false; btn.textContent = t('btn_login');
+      return showError(t('err_no_account'));
+    }
+
+    if (user.password !== hashPass(pass)) {
+      btn.disabled = false; btn.textContent = t('btn_login');
+      return showError(t('err_wrong_password'));
+    }
+
+    localStorage.setItem('alamin_current', JSON.stringify(user));
+    if (document.getElementById('rememberMe').checked) {
+      localStorage.setItem('alamin_remember', phone);
+    }
+
+    btn.disabled = false; btn.textContent = t('btn_login');
+    showSuccess(t('msg_welcome_back').replace('__NAME__', user.name || 'Student'));
+    setTimeout(() => {
+      window.location.href = (user.role === 'admin') ? 'dashboard.html' : getNextUrl('lessons.html');
+    }, 1000);
+  });
+
+  // Pre-fill remembered phone number
+  (function(){
+    const remembered = localStorage.getItem('alamin_remember');
+    if (remembered) {
+      document.getElementById('loginPhone').value = remembered;
+      document.getElementById('rememberMe').checked = true;
+    }
+  })();
+
+  // If already logged in, offer quick redirect
+  (function(){
+    const current = JSON.parse(localStorage.getItem('alamin_current') || 'null');
+    if (current) {
+      showSuccess(t('msg_already_signed_in').replace('__NAME__', current.name || 'a student'));
+    }
+  })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

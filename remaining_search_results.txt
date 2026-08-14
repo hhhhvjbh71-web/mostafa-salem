@@ -1,0 +1,33 @@
+index.html:1664 [scorpion] => .cta-scorpion {
+index.html:1949 [scorpion] => /* Glitch text for SCORPION */
+index.html:2023 [scorpion] => <a href="#" id="mobLogoutBtn" style="display:none;" onclick="scorpionLogout();return false;" data-i18n="nav_logout">🚪 Lo...
+index.html:2024 [scorpion] => <a href="#" id="mobInstallAppBtn" style="display:none;" onclick="installScorpionApp();return false;" data-i18n="nav_inst...
+index.html:2273 [scorpion] => <div class="testi-text">"The best English teacher I've ever had! Mr. Mostafa explains everything so clearly. My grades w...
+index.html:2347 [scorpion] => <div class="cta-scorpion">MUSTAFA SALEM</div>
+index.html:2651 [scorpion] => localStorage.setItem('scorpion_theme', newTheme);
+index.html:2655 [scorpion] => const savedTheme = localStorage.getItem('scorpion_theme');
+index.html:2897 [scorpion] => function scorpionLogout() {
+index.html:2902 [scorpion] => window.scorpionLogout = scorpionLogout;
+index.html:2939 [scorpion] => const ADMIN_SESSION_KEY = 'scorpion_admin_ok';
+index.html:3011 [scorpion] => function installScorpionApp() {
+index.html:3022 [scorpion] => window.installScorpionApp = installScorpionApp;
+dashboard.html:836 [scorpion] => const ADMIN_SESSION_KEY = 'scorpion_admin_ok';
+dashboard.html:2432 [scorpion] => // لو المستخدم فتح كلمة المرور صح (scorpion_admin_ok في sessionStorage)، يدخل
+dashboard.html:2437 [scorpion] => try { _adminGateUnlocked = sessionStorage.getItem('scorpion_admin_ok') === 'true'; } catch (e) {}
+lessons.html:1205 [scorpion] => /* ===== SCORPION unified brand palette (overrides legacy vars) ===== */
+login.html:428 [scorpion] => localStorage.setItem('scorpion_theme', newTheme);
+login.html:430 [scorpion] => const savedTheme = localStorage.getItem('scorpion_theme');
+login.html:451 [scorpion] => applyLanguage(scorpionGetLang());
+login.html:510 [scorpion] => const str = 'scorpion_' + pass;
+i18n.js:12 [scorpion] => const SCORPION_DICT = {
+i18n.js:96 [scorpion] => function scorpionGetLang(){
+i18n.js:97 [scorpion] => return localStorage.getItem('scorpion_lang') || 'ar';
+i18n.js:106 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:111 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:118 [scorpion] => document.dispatchEvent(new CustomEvent('scorpion:langchange', { detail: { lang } }));
+i18n.js:122 [scorpion] => localStorage.setItem('scorpion_lang', lang);
+i18n.js:127 [scorpion] => setLanguage(scorpionGetLang() === 'ar' ? 'en' : 'ar');
+i18n.js:131 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:133 [scorpion] => return entry[scorpionGetLang()] || entry.ar;
+i18n.js:136 [scorpion] => document.addEventListener('DOMContentLoaded', () => applyLanguage(scorpionGetLang()));
+service-worker.js:10 [scorpion] => const CACHE_VERSION = 'scorpion-shell-v1';

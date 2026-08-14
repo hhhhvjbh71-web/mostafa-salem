@@ -1,0 +1,182 @@
+index.html:7 [fares] => <meta name="description" content="Scorpion English Academy - Master English with confidence. Join Mr. Fares Hany's premi...
+index.html:7 [hany] => <meta name="description" content="Scorpion English Academy - Master English with confidence. Join Mr. Fares Hany's premi...
+index.html:7 [scorpion] => <meta name="description" content="Scorpion English Academy - Master English with confidence. Join Mr. Fares Hany's premi...
+index.html:7 [together] => <meta name="description" content="Scorpion English Academy - Master English with confidence. Join Mr. Fares Hany's premi...
+index.html:8 [fares] => <meta name="keywords" content="Scorpion English Academy, Mr Fares Hany, English teacher, learn English, English courses,...
+index.html:8 [hany] => <meta name="keywords" content="Scorpion English Academy, Mr Fares Hany, English teacher, learn English, English courses,...
+index.html:8 [scorpion] => <meta name="keywords" content="Scorpion English Academy, Mr Fares Hany, English teacher, learn English, English courses,...
+index.html:9 [fares] => <meta name="author" content="Mr Fares Hany">
+index.html:9 [hany] => <meta name="author" content="Mr Fares Hany">
+index.html:10 [fares] => <meta property="og:title" content="Scorpion English Academy | Mr Fares Hany">
+index.html:10 [hany] => <meta property="og:title" content="Scorpion English Academy | Mr Fares Hany">
+index.html:10 [scorpion] => <meta property="og:title" content="Scorpion English Academy | Mr Fares Hany">
+index.html:11 [together] => <meta property="og:description" content="Master English With Confidence - Together To The Top">
+index.html:14 [fares] => <title>Scorpion English Academy | Mr Fares Hany - Together To The Top</title>
+index.html:14 [hany] => <title>Scorpion English Academy | Mr Fares Hany - Together To The Top</title>
+index.html:14 [scorpion] => <title>Scorpion English Academy | Mr Fares Hany - Together To The Top</title>
+index.html:14 [together] => <title>Scorpion English Academy | Mr Fares Hany - Together To The Top</title>
+index.html:22 [scorpion] => <meta name="apple-mobile-web-app-title" content="Scorpion">
+index.html:1664 [scorpion] => .cta-scorpion {
+index.html:1949 [scorpion] => /* Glitch text for SCORPION */
+index.html:1972 [scorpion] => <div class="splash-logo glitch" data-text="SCORPION">SCORPION</div>
+index.html:1975 [together] => <div class="splash-tagline">Together To The Top</div>
+index.html:1980 [fares] => <span>🔥 New courses just launched! Join 5000+ students mastering English with Mr. Fares Hany</span>
+index.html:1980 [hany] => <span>🔥 New courses just launched! Join 5000+ students mastering English with Mr. Fares Hany</span>
+index.html:1997 [🦂] => <div class="nav-logo-icon">🦂</div>
+index.html:1999 [scorpion] => <span class="brand">SCORPION</span>
+index.html:2000 [fares] => <span class="teacher" data-i18n="brand_sub">Mr. Fares Hany</span>
+index.html:2000 [hany] => <span class="teacher" data-i18n="brand_sub">Mr. Fares Hany</span>
+index.html:2023 [scorpion] => <a href="#" id="mobLogoutBtn" style="display:none;" onclick="scorpionLogout();return false;" data-i18n="nav_logout">🚪 Lo...
+index.html:2024 [scorpion] => <a href="#" id="mobInstallAppBtn" style="display:none;" onclick="installScorpionApp();return false;" data-i18n="nav_inst...
+index.html:2045 [scorpion] => <span data-i18n="hero_badge">🦂 Scorpion English Academy</span>
+index.html:2045 [🦂] => <span data-i18n="hero_badge">🦂 Scorpion English Academy</span>
+index.html:2051 [scorpion] => <p class="hero-subtitle-brand" data-i18n="hero_subtitle">Scorpion English Academy</p>
+index.html:2063 [fares] => <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQ...
+index.html:2063 [hany] => <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQ...
+index.html:2063 [scorpion] => <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQ...
+index.html:2175 [fares] => <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQ...
+index.html:2175 [hany] => <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQ...
+index.html:2177 [🦂] => <div class="teacher-img-badge">🦂 English Language Teacher</div>
+index.html:2184 [fares] => <span>Mr. Fares</span> Hany
+index.html:2184 [hany] => <span>Mr. Fares</span> Hany
+index.html:2186 [scorpion] => <div class="teacher-specialty">🎯 English Language Teacher · Scorpion English Academy</div>
+index.html:2188 [fares] => With over 7 years of dedicated teaching experience, Mr. Fares Hany has transformed
+index.html:2188 [hany] => With over 7 years of dedicated teaching experience, Mr. Fares Hany has transformed
+index.html:2191 [together] => and enjoyable for every student. His motto: <strong style="color:var(--gold)">"Together To The Top!"</strong>
+index.html:2229 [scorpion] => <div class="timeline-text">Founded Scorpion English Academy — started teaching with a vision to make English mastery acc...
+index.html:2273 [fares] => <div class="testi-text">"The best English teacher I've ever had! Mr. Fares explains everything so clearly. My grades wen...
+index.html:2273 [scorpion] => <div class="testi-text">"The best English teacher I've ever had! Mr. Fares explains everything so clearly. My grades wen...
+index.html:2286 [scorpion] => <div class="testi-text">"I was struggling with English for years. After joining Scorpion Academy, everything changed! Th...
+index.html:2299 [fares] => <div class="testi-text">"Together to the top — that's not just a slogan, it's reality! Mr. Fares genuinely cares about e...
+index.html:2299 [together] => <div class="testi-text">"Together to the top — that's not just a slogan, it's reality! Mr. Fares genuinely cares about e...
+index.html:2338 [fares] => <div class="faq-a-inner">Yes! We offer several free courses and trial lessons so you can experience the quality of Mr. F...
+index.html:2338 [hany] => <div class="faq-a-inner">Yes! We offer several free courses and trial lessons so you can experience the quality of Mr. F...
+index.html:2347 [scorpion] => <div class="cta-scorpion">SCORPION</div>
+index.html:2348 [together] => <div class="cta-tagline">Together To The Top 🦂</div>
+index.html:2348 [🦂] => <div class="cta-tagline">Together To The Top 🦂</div>
+index.html:2350 [scorpion] => Start your English journey today. Join 5000+ students who already trust Scorpion English Academy.
+index.html:2370 [scorpion] => <h2 class="section-title">Why <span class="purple">Scorpion</span> Academy?</h2>
+index.html:2410 [fares] => <div class="feature-desc">Interactive live classes where you can ask questions in real-time. Direct interaction with Mr....
+index.html:2410 [hany] => <div class="feature-desc">Interactive live classes where you can ask questions in real-time. Direct interaction with Mr....
+index.html:2429 [🦂] => <div class="footer-logo-icon">🦂</div>
+index.html:2431 [scorpion] => <div class="footer-logo-name">SCORPION</div>
+index.html:2436 [fares] => Master English with confidence under the guidance of Mr. Fares Hany.
+index.html:2436 [hany] => Master English with confidence under the guidance of Mr. Fares Hany.
+index.html:2438 [together] => Together To The Top! 🏆
+index.html:2474 [fares] => <span>© 2025 <span class="brand">Scorpion English Academy</span> · Mr. Fares Hany · All Rights Reserved</span>
+index.html:2474 [hany] => <span>© 2025 <span class="brand">Scorpion English Academy</span> · Mr. Fares Hany · All Rights Reserved</span>
+index.html:2474 [scorpion] => <span>© 2025 <span class="brand">Scorpion English Academy</span> · Mr. Fares Hany · All Rights Reserved</span>
+index.html:2475 [together] => <span>Together To The Top 🦂</span>
+index.html:2475 [🦂] => <span>Together To The Top 🦂</span>
+index.html:2485 [🦂] => <div style="font-size:34px;margin-bottom:8px;">🦂</div>
+index.html:2651 [scorpion] => localStorage.setItem('scorpion_theme', newTheme);
+index.html:2655 [scorpion] => const savedTheme = localStorage.getItem('scorpion_theme');
+index.html:2856 [fares] => <div class="course-teacher-badge">🦂 Mr. Fares Hany</div>
+index.html:2856 [hany] => <div class="course-teacher-badge">🦂 Mr. Fares Hany</div>
+index.html:2856 [🦂] => <div class="course-teacher-badge">🦂 Mr. Fares Hany</div>
+index.html:2897 [scorpion] => function scorpionLogout() {
+index.html:2902 [scorpion] => window.scorpionLogout = scorpionLogout;
+index.html:2939 [scorpion] => const ADMIN_SESSION_KEY = 'scorpion_admin_ok';
+index.html:3011 [scorpion] => function installScorpionApp() {
+index.html:3022 [scorpion] => window.installScorpionApp = installScorpionApp;
+dashboard.html:9 [scorpion] => <title>لوحة التحكم - Scorpion English Academy</title>
+dashboard.html:486 [scorpion] => /* ===== SCORPION unified brand palette (overrides legacy vars) ===== */
+dashboard.html:819 [🦂] => <div style="font-size:36px;margin-bottom:10px;">🦂</div>
+dashboard.html:836 [scorpion] => const ADMIN_SESSION_KEY = 'scorpion_admin_ok';
+dashboard.html:878 [scorpion] => <div class="sidebar-logo-text">SCORPION</div>
+dashboard.html:949 [fares] => <div class="admin-name">Mr. Fares Hany</div>
+dashboard.html:949 [hany] => <div class="admin-name">Mr. Fares Hany</div>
+dashboard.html:1750 [fares] => <input type="text" id="acHeaderTitle" placeholder="مثال: اللغة الإنجليزية - Mr. Fares Hany - الصف الثالث الثانوي">
+dashboard.html:1750 [hany] => <input type="text" id="acHeaderTitle" placeholder="مثال: اللغة الإنجليزية - Mr. Fares Hany - الصف الثالث الثانوي">
+dashboard.html:1875 [fares] => <div style="font-size:12px;font-weight:700;opacity:.92;">✓ مع Mr. Fares Hany</div>
+dashboard.html:1875 [hany] => <div style="font-size:12px;font-weight:700;opacity:.92;">✓ مع Mr. Fares Hany</div>
+dashboard.html:2432 [scorpion] => // لو المستخدم فتح كلمة المرور صح (scorpion_admin_ok في sessionStorage)، يدخل
+dashboard.html:2437 [scorpion] => try { _adminGateUnlocked = sessionStorage.getItem('scorpion_admin_ok') === 'true'; } catch (e) {}
+dashboard.html:2450 [fares] => currentUser.name = currentUser.name || 'Mr. Fares Hany';
+dashboard.html:2450 [hany] => currentUser.name = currentUser.name || 'Mr. Fares Hany';
+dashboard.html:2798 [scorpion] => document.getElementById('pageTitle').textContent = pageTitles[id] || 'Scorpion';
+dashboard.html:5351 [fares] => const teacherName = settings.teacherName || 'Mr. Fares Hany';
+dashboard.html:5351 [hany] => const teacherName = settings.teacherName || 'Mr. Fares Hany';
+dashboard.html:7293 [scorpion] => document.getElementById('settingPlatformName').value=settings.platformName||'Scorpion English Academy';
+dashboard.html:7294 [fares] => document.getElementById('settingTeacherName').value=settings.teacherName||'Mr. Fares Hany';
+dashboard.html:7294 [hany] => document.getElementById('settingTeacherName').value=settings.teacherName||'Mr. Fares Hany';
+dashboard.html:7897 [fares] => document.querySelector('.admin-name').textContent = currentUser.name || 'Mr. Fares Hany';
+dashboard.html:7897 [hany] => document.querySelector('.admin-name').textContent = currentUser.name || 'Mr. Fares Hany';
+lessons.html:22 [fares] => <title>كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany</title>
+lessons.html:22 [hany] => <title>كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany</title>
+lessons.html:22 [scorpion] => <title>كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany</title>
+lessons.html:28 [fares] => <meta name="description" content="شرح اللغة الإنجليزية مع Mr. Fares Hany — Scorpion English Academy. كورسات منظمة لأولى ...
+lessons.html:28 [hany] => <meta name="description" content="شرح اللغة الإنجليزية مع Mr. Fares Hany — Scorpion English Academy. كورسات منظمة لأولى ...
+lessons.html:28 [scorpion] => <meta name="description" content="شرح اللغة الإنجليزية مع Mr. Fares Hany — Scorpion English Academy. كورسات منظمة لأولى ...
+lessons.html:29 [fares] => <meta name="keywords" content="كورسات اللغة الإنجليزية, شرح انجليزي للثانوية العامة, دروس انجليزي, Scorpion English Acad...
+lessons.html:29 [hany] => <meta name="keywords" content="كورسات اللغة الإنجليزية, شرح انجليزي للثانوية العامة, دروس انجليزي, Scorpion English Acad...
+lessons.html:29 [scorpion] => <meta name="keywords" content="كورسات اللغة الإنجليزية, شرح انجليزي للثانوية العامة, دروس انجليزي, Scorpion English Acad...
+lessons.html:30 [fares] => <meta name="author" content="Mr. Fares Hany">
+lessons.html:30 [hany] => <meta name="author" content="Mr. Fares Hany">
+lessons.html:33 [fares] => <meta property="og:title" content="كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany">
+lessons.html:33 [hany] => <meta property="og:title" content="كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany">
+lessons.html:33 [scorpion] => <meta property="og:title" content="كورسات اللغة الإنجليزية | Scorpion English Academy — Mr. Fares Hany">
+lessons.html:43 [scorpion] => "name": "كورسات اللغة الإنجليزية — Scorpion English Academy",
+lessons.html:1205 [scorpion] => /* ===== SCORPION unified brand palette (overrides legacy vars) ===== */
+lessons.html:1530 [scorpion] => <span class="logo-main">SCORPION</span>
+lessons.html:1531 [fares] => <span class="logo-sub">Fares Hany</span>
+lessons.html:1531 [hany] => <span class="logo-sub">Fares Hany</span>
+lessons.html:1570 [fares] => <span id="heroInstructorName">مع Mr. Fares Hany</span>
+lessons.html:1570 [hany] => <span id="heroInstructorName">مع Mr. Fares Hany</span>
+lessons.html:1613 [fares] => <div class="cic-item"><span class="cic-ico"><i class="fas fa-user-tie"></i></span> <span id="courseMeta">Mr. Fares Hany<...
+lessons.html:1613 [hany] => <div class="cic-item"><span class="cic-ico"><i class="fas fa-user-tie"></i></span> <span id="courseMeta">Mr. Fares Hany<...
+lessons.html:2817 [fares] => const instructorName = course.instructorName || 'مع Mr. Fares Hany';
+lessons.html:2817 [hany] => const instructorName = course.instructorName || 'مع Mr. Fares Hany';
+lessons.html:2822 [fares] => document.getElementById('courseMeta').textContent = course.instructorName || 'Mr. Fares Hany';
+lessons.html:2822 [hany] => document.getElementById('courseMeta').textContent = course.instructorName || 'Mr. Fares Hany';
+login.html:7 [scorpion] => <title>Login / Sign Up | Scorpion English Academy</title>
+login.html:283 [🦂] => <div class="brand-icon">🦂</div>
+login.html:285 [scorpion] => <span class="b1">SCORPION</span>
+login.html:286 [fares] => <span class="b2" data-i18n="brand_sub">Mr. Fares Hany</span>
+login.html:286 [hany] => <span class="b2" data-i18n="brand_sub">Mr. Fares Hany</span>
+login.html:303 [🦂] => <div class="auth-emoji">🦂</div>
+login.html:408 [scorpion] => &nbsp;·&nbsp; <span data-i18n="footer_tagline">© 2026 Scorpion English Academy — Together To The Top</span>
+login.html:408 [together] => &nbsp;·&nbsp; <span data-i18n="footer_tagline">© 2026 Scorpion English Academy — Together To The Top</span>
+login.html:428 [scorpion] => localStorage.setItem('scorpion_theme', newTheme);
+login.html:430 [scorpion] => const savedTheme = localStorage.getItem('scorpion_theme');
+login.html:451 [scorpion] => applyLanguage(scorpionGetLang());
+login.html:510 [scorpion] => const str = 'scorpion_' + pass;
+login.html:529 [fares] => // { phone: '01096954340', name: 'Mr. Fares Hany', role: 'admin', password: hashPass('CHANGE_THIS_PASSWORD') }
+login.html:529 [hany] => // { phone: '01096954340', name: 'Mr. Fares Hany', role: 'admin', password: hashPass('CHANGE_THIS_PASSWORD') }
+i18n.js:2 [scorpion] => // i18n.js — Scorpion English Academy language switcher (AR <-> EN)
+i18n.js:12 [scorpion] => const SCORPION_DICT = {
+i18n.js:14 [fares] => brand_sub:            { ar: 'أ. فارس هاني',                         en: 'Mr. Fares Hany' },
+i18n.js:14 [فارس] => brand_sub:            { ar: 'أ. فارس هاني',                         en: 'Mr. Fares Hany' },
+i18n.js:14 [hany] => brand_sub:            { ar: 'أ. فارس هاني',                         en: 'Mr. Fares Hany' },
+i18n.js:14 [هاني] => brand_sub:            { ar: 'أ. فارس هاني',                         en: 'Mr. Fares Hany' },
+i18n.js:35 [scorpion] => hero_badge:            { ar: '🦂 أكاديمية سكوربيون للغة الإنجليزية',    en: '🦂 Scorpion English Academy' },
+i18n.js:35 [🦂] => hero_badge:            { ar: '🦂 أكاديمية سكوربيون للغة الإنجليزية',    en: '🦂 Scorpion English Academy' },
+i18n.js:38 [scorpion] => hero_subtitle:         { ar: 'أكاديمية سكوربيون للغة الإنجليزية',       en: 'Scorpion English Academy' },
+i18n.js:47 [scorpion] => footer_tagline:        { ar: '© 2026 أكاديمية سكوربيون — سوا لحد القمة', en: '© 2026 Scorpion English Academy — Together...
+i18n.js:47 [together] => footer_tagline:        { ar: '© 2026 أكاديمية سكوربيون — سوا لحد القمة', en: '© 2026 Scorpion English Academy — Together...
+i18n.js:47 [سوا لحد القمة] => footer_tagline:        { ar: '© 2026 أكاديمية سكوربيون — سوا لحد القمة', en: '© 2026 Scorpion English Academy — Together...
+i18n.js:53 [scorpion] => auth_sub_register:      { ar: 'انضم لأكاديمية سكوربيون دلوقتي',        en: 'Join Scorpion English Academy today' },
+i18n.js:93 [fares] => forgot_password_alert:  { ar: 'من فضلك تواصل مع أ. فارس هاني على تليجرام لإعادة تعيين كلمة المرور.', en: 'Please contact...
+i18n.js:93 [فارس] => forgot_password_alert:  { ar: 'من فضلك تواصل مع أ. فارس هاني على تليجرام لإعادة تعيين كلمة المرور.', en: 'Please contact...
+i18n.js:93 [hany] => forgot_password_alert:  { ar: 'من فضلك تواصل مع أ. فارس هاني على تليجرام لإعادة تعيين كلمة المرور.', en: 'Please contact...
+i18n.js:93 [هاني] => forgot_password_alert:  { ar: 'من فضلك تواصل مع أ. فارس هاني على تليجرام لإعادة تعيين كلمة المرور.', en: 'Please contact...
+i18n.js:96 [scorpion] => function scorpionGetLang(){
+i18n.js:97 [scorpion] => return localStorage.getItem('scorpion_lang') || 'ar';
+i18n.js:106 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:111 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:118 [scorpion] => document.dispatchEvent(new CustomEvent('scorpion:langchange', { detail: { lang } }));
+i18n.js:122 [scorpion] => localStorage.setItem('scorpion_lang', lang);
+i18n.js:127 [scorpion] => setLanguage(scorpionGetLang() === 'ar' ? 'en' : 'ar');
+i18n.js:131 [scorpion] => const entry = SCORPION_DICT[key];
+i18n.js:133 [scorpion] => return entry[scorpionGetLang()] || entry.ar;
+i18n.js:136 [scorpion] => document.addEventListener('DOMContentLoaded', () => applyLanguage(scorpionGetLang()));
+manifest.json:2 [scorpion] => "name": "Scorpion English Academy",
+manifest.json:3 [scorpion] => "short_name": "Scorpion",
+manifest.json:4 [fares] => "description": "Scorpion English Academy — Mr. Fares Hany. Courses, lessons and quizzes for English learners.",
+manifest.json:4 [hany] => "description": "Scorpion English Academy — Mr. Fares Hany. Courses, lessons and quizzes for English learners.",
+manifest.json:4 [scorpion] => "description": "Scorpion English Academy — Mr. Fares Hany. Courses, lessons and quizzes for English learners.",
+offline.html:6 [scorpion] => <title>Offline — Scorpion English Academy</title>
+offline.html:26 [🦂] => <div class="emoji">🦂</div>
+offline.html:28 [scorpion] => <p>Scorpion English Academy needs an internet connection for this page. Please check your connection and try again.</p>
+service-worker.js:2 [scorpion] => // Scorpion English Academy — Service Worker
+service-worker.js:10 [scorpion] => const CACHE_VERSION = 'scorpion-shell-v1';

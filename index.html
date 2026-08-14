@@ -1,0 +1,3033 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#38BDF8">
+  <meta name="description" content="Mostafa Salem English Academy - Master English with confidence. Join Mr. Mostafa Salem's premium English learning platform. Never Give Up.">
+  <meta name="keywords" content="Mostafa Salem English Academy, Mr Mostafa Salem, English teacher, learn English, English courses, online English">
+  <meta name="author" content="Mr Mostafa Salem">
+  <meta property="og:title" content="Mostafa Salem English Academy | Mr Mostafa Salem">
+  <meta property="og:description" content="Master English With Confidence - Never Give Up">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Mostafa Salem English Academy | Mr Mostafa Salem - Never Give Up</title>
+
+  <!-- ===== PWA ===== -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mostafa Salem">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <style>
+    /* ===========================
+       CSS VARIABLES & RESET
+    =========================== */
+    :root {
+      --bg:        #121212;
+      --bg2:       #1F1F24;
+      --card:      #24242B;
+      --primary:   #38BDF8;
+      --gold:      #D4A017;
+      --bronze:    #9A6A2F;
+      --purple:    #8B5CF6;
+      --purple-h:  #7C3AED;
+      --text:      #F8FAFC;
+      --text2:     #94A3B8;
+      --border:    #30363D;
+      --success:   #22C55E;
+      --danger:    #EF4444;
+      --telegram:  #229ED9;
+      --telegram-h:#0088CC;
+      --radius:    16px;
+      --shadow:    0 8px 32px rgba(0,0,0,0.4);
+      --shadow-lg: 0 24px 64px rgba(0,0,0,0.5);
+      --glow-sky:  0 0 40px rgba(56,189,248,0.25);
+      --glow-gold: 0 0 40px rgba(212,160,23,0.25);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Poppins', 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===========================
+       SCROLLBAR
+    =========================== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+    /* ===========================
+       PARTICLES CANVAS
+    =========================== */
+    #particleCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ===========================
+       SPLASH SCREEN
+    =========================== */
+    .splash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #080808;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .splash.hide {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+    .splash-logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #38BDF8, #D4A017, #38BDF8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 4px;
+      animation: splashPulse 2s ease-in-out infinite;
+    }
+    .splash-sub {
+      font-size: 14px;
+      color: rgba(56,189,248,0.6);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .splash-bar {
+      width: 200px;
+      height: 3px;
+      background: rgba(56,189,248,0.15);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .splash-bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #38BDF8, #D4A017);
+      border-radius: 3px;
+      animation: splashFill 2.5s 0.5s ease forwards;
+    }
+    .splash-tagline {
+      font-size: 13px;
+      color: rgba(212,160,23,0.5);
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+    @keyframes splashPulse {
+      0%,100% { filter: drop-shadow(0 0 20px rgba(56,189,248,0.4)); }
+      50%      { filter: drop-shadow(0 0 40px rgba(56,189,248,0.7)); }
+    }
+    @keyframes splashFill { to { width: 100%; } }
+
+    /* ===========================
+       NOTIFICATION BAR
+    =========================== */
+    .notif-bar {
+      background: linear-gradient(90deg, var(--primary), #0EA5E9, var(--gold));
+      background-size: 200% 100%;
+      animation: notifShift 4s linear infinite;
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      z-index: 900;
+    }
+    @keyframes notifShift {
+      0%   { background-position: 0% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .notif-bar button {
+      background: none;
+      border: none;
+      color: rgba(0,0,0,0.6);
+      font-size: 18px;
+      cursor: pointer;
+      margin-right: auto;
+      line-height: 1;
+    }
+
+    /* ===========================
+       NAVBAR
+    =========================== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(18,18,18,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(56,189,248,0.15);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4), 0 1px 0 rgba(56,189,248,0.1);
+      padding: 0 24px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      transition: all 0.3s ease;
+    }
+    .navbar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--primary), var(--gold), var(--primary), transparent);
+      background-size: 200% 100%;
+      animation: navLine 4s linear infinite;
+    }
+    @keyframes navLine {
+      0%   { background-position: -100% 0; }
+      100% { background-position: 100% 0; }
+    }
+
+    .nav-left, .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--glow-sky);
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-logo-icon::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -70%;
+      width: 50%; height: 200%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+      transform: rotate(20deg);
+      animation: sheen 4s ease-in-out infinite;
+    }
+
+    .nav-logo-text .brand {
+      display: block;
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      letter-spacing: 1px;
+    }
+    .nav-logo-text .teacher {
+      display: block;
+      font-size: 10px;
+      color: var(--text2);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* Language toggle (navbar) */
+    .lang-toggle-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.25s;
+      flex-shrink: 0;
+    }
+    .lang-toggle-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      width: 46px;
+      height: 26px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 50px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+    .theme-toggle-knob {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    /* Hamburger — always visible, opens the sidebar */
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+      background: none;
+      border: none;
+      flex-shrink: 0;
+    }
+    .hamburger span {
+      display: block;
+      height: 2.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .hamburger span:nth-child(1) { width: 24px; }
+    .hamburger span:nth-child(2) { width: 18px; }
+    .hamburger span:nth-child(3) { width: 24px; }
+
+    /* Sidebar drawer (replaces the old dropdown nav — used at every screen size) */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .mobile-nav {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: min(300px, 82vw);
+      background: rgba(18,18,18,0.98);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      padding: 20px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 1002;
+      transform: translateX(-105%);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+      overflow-y: auto;
+    }
+    .mobile-nav.open {
+      transform: translateX(0);
+    }
+    .sidebar-close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+    }
+    .mobile-nav a, .mobile-nav button.nav-btn-plain {
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      width: 100%;
+      text-align: start;
+    }
+    .mobile-nav a:hover, .mobile-nav button.nav-btn-plain:hover { background: rgba(56,189,248,0.08); color: var(--primary); }
+    .mobile-nav .mob-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    /* ===========================
+       HERO SECTION
+    =========================== */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      padding: 28px 80px 50px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* Hero Background */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .hero-bg-grad {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 70% 50%, rgba(56,189,248,0.06) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 40% at 30% 80%, rgba(212,160,23,0.05) 0%, transparent 60%);
+    }
+    .hero-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(56,189,248,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    /* Floating Shapes */
+    .hero-shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+      animation: shapeFloat 8s ease-in-out infinite;
+    }
+    .hero-shape-1 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(56,189,248,0.12), transparent 70%);
+      top: -100px; right: 0;
+      animation-delay: 0s;
+    }
+    .hero-shape-2 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(212,160,23,0.10), transparent 70%);
+      bottom: -50px; left: 10%;
+      animation-delay: 3s;
+    }
+    .hero-shape-3 {
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(154,106,47,0.10), transparent 70%);
+      top: 40%; left: 45%;
+      animation-delay: 6s;
+    }
+    @keyframes shapeFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-30px) scale(1.05); }
+    }
+
+    /* Hero Top (badge + title + subtitle) */
+    .hero-top {
+      z-index: 2;
+      max-width: 720px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.3);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .hero-badge span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    .hero-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(36px, 5vw, 68px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+    .hero-title .line1 { color: var(--text); }
+    .hero-title .line2 {
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    .hero-title .line2::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      border-radius: 2px;
+      opacity: 0.6;
+    }
+    .hero-subtitle-brand {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 0;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Hero Buttons — sit directly under the teacher photo */
+    .hero-btns {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 360px;
+      margin: 6px auto 0;
+    }
+    .btn {
+      padding: 16px 32px;
+      border-radius: var(--radius);
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -80%;
+      width: 60%; height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s ease;
+    }
+    .btn:hover::before { left: 130%; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 6px 0 #0369A1, 0 14px 30px rgba(56,189,248,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 0 #0369A1, 0 20px 40px rgba(56,189,248,0.4);
+    }
+    .btn-primary:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #0369A1;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--gold), #B8891A);
+      color: #000;
+      font-weight: 800;
+      box-shadow: 0 6px 0 #8B6314, 0 14px 30px rgba(212,160,23,0.3);
+    }
+    .btn-secondary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 0 #8B6314, 0 20px 40px rgba(212,160,23,0.4);
+    }
+    .btn-secondary:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #8B6314;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-ghost:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .btn-telegram {
+      background: var(--telegram);
+      color: #fff;
+      font-weight: 800;
+    }
+    .btn-telegram:hover {
+      background: var(--telegram-h);
+      transform: translateY(-2px);
+    }
+
+    /* Primary hero CTA — the most prominent action under the teacher photo */
+    .btn-hero-main {
+      width: 100%;
+      justify-content: center;
+      padding: 18px 32px;
+      font-size: 16px;
+    }
+    .hero-btns-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+    }
+    .hero-btns-row .btn {
+      flex: 1;
+      justify-content: center;
+      padding: 14px 18px;
+      font-size: 14px;
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
+    .hero-img-wrap {
+      position: relative;
+      width: 340px;
+      aspect-ratio: 900 / 1273; /* exact ratio of the full uncropped photo */
+      height: auto;
+    }
+
+    /* Glow circles */
+    .hero-glow {
+      position: absolute;
+      inset: -20px;
+      border-radius: 32px;
+      background: radial-gradient(circle, rgba(56,189,248,0.18) 0%, transparent 70%);
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    /* Orbiting rings */
+    .hero-ring {
+      position: absolute;
+      border-radius: 32px;
+      border: 1.5px solid;
+      pointer-events: none;
+    }
+    .hero-ring-1 {
+      width: 112%;
+      height: 108%;
+      top: -4%; left: -6%;
+      border-color: rgba(56,189,248,0.2);
+      animation: spin1 20s linear infinite;
+    }
+    .hero-ring-2 {
+      width: 122%;
+      height: 114%;
+      top: -7%; left: -11%;
+      border-color: rgba(212,160,23,0.15);
+      border-style: dashed;
+      animation: spin1 30s linear infinite reverse;
+    }
+    .hero-ring-3 {
+      width: 132%;
+      height: 120%;
+      top: -10%; left: -16%;
+      border-color: rgba(154,106,47,0.12);
+      animation: spin1 40s linear infinite;
+    }
+
+    /* Teacher image frame — shows the FULL photo, nothing cropped */
+    .hero-img-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      background: var(--card);
+      border: 4px solid rgba(56,189,248,0.3);
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      box-shadow: var(--shadow-lg), 0 0 60px rgba(56,189,248,0.15);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.85) translateY(24px);
+      transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease;
+      will-change: transform;
+    }
+    .hero-img-circle.revealed {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      animation: heroCircleIn 1s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes heroCircleIn {
+      0%   { opacity: 0; transform: scale(0.8) translateY(30px); filter: blur(6px); }
+      60%  { opacity: 1; filter: blur(0); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .hero-img-circle picture {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .hero-img-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* container ratio == photo ratio, so this shows 100% of the photo */
+      object-position: center;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .hero-img-wrap:hover .hero-img-circle img { transform: scale(1.04); }
+    .hero-img-wrap.parallax-active .hero-img-circle {
+      transition: transform 0.15s ease-out, box-shadow 0.4s ease;
+    }
+    .hero-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--bg2), var(--card));
+    }
+    .hero-img-placeholder .teacher-initial {
+      font-size: 100px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .hero-img-placeholder .teacher-name-badge {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text2);
+      letter-spacing: 1px;
+    }
+
+    /* Floating cards — small, balanced left/right, gentle motion */
+    .float-card {
+      position: absolute;
+      background: rgba(36,36,43,0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(56,189,248,0.2);
+      border-radius: 12px;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+      white-space: nowrap;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .float-card:hover {
+      transform: translateY(-3px) scale(1.05) !important;
+      border-color: rgba(139,92,246,0.5);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.35), 0 0 0 1px rgba(139,92,246,0.15);
+    }
+    .float-card-icon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      flex-shrink: 0;
+    }
+    .float-card-icon.gold { background: linear-gradient(135deg, var(--gold), #B8891A); }
+    .float-card .fc-title { font-size: 10.5px; font-weight: 800; color: var(--text); }
+    .float-card .fc-sub  { font-size: 9px; color: var(--text2); margin-top: 1px; }
+
+    /* Balanced: card 1 upper-right, card 2 mid-left, card 3 lower-right */
+    .float-card-1 {
+      top: 6%; right: -8%;
+      animation: floatSway1 5s ease-in-out infinite;
+    }
+    .float-card-2 {
+      top: 46%; left: -12%;
+      animation: floatSway2 6s ease-in-out infinite;
+    }
+    .float-card-3 {
+      bottom: 6%; right: -6%;
+      animation: floatSway3 5.5s ease-in-out infinite;
+    }
+    @keyframes floatSway1 {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(4px, -6px); }
+    }
+    @keyframes floatSway2 {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(-5px, 5px); }
+    }
+    @keyframes floatSway3 {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(4px, 5px); }
+    }
+
+    /* ===========================
+       STATS SECTION
+    =========================== */
+    .stats-section {
+      position: relative;
+      z-index: 1;
+      padding: 60px 80px;
+      background: linear-gradient(135deg, var(--bg2), var(--card));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .stat-item {
+      text-align: center;
+      position: relative;
+    }
+    .stat-item::after {
+      content: '';
+      position: absolute;
+      right: -16px; top: 20%; bottom: 20%;
+      width: 1px;
+      background: var(--border);
+    }
+    .stat-item:last-child::after { display: none; }
+    .stat-num {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(28px, 3vw, 44px);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text2);
+      font-weight: 600;
+    }
+    .stat-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ===========================
+       SECTION COMMONS
+    =========================== */
+    .section {
+      padding: 90px 80px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-head {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .section-tag {
+      display: inline-block;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.25);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 18px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .section-tag.gold {
+      background: rgba(212,160,23,0.1);
+      border-color: rgba(212,160,23,0.25);
+      color: var(--gold);
+    }
+    .section-tag.purple {
+      background: rgba(139,92,246,0.1);
+      border-color: rgba(139,92,246,0.3);
+      color: var(--purple);
+    }
+    .section-title span.purple { color: var(--purple); }
+    .section-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .section-title span { color: var(--primary); }
+    .section-title span.gold { color: var(--gold); }
+    .section-desc {
+      font-size: 16px;
+      color: var(--text2);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ===========================
+       WHY CHOOSE US
+    =========================== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.23,1,0.32,1);
+      cursor: default;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 80px;
+      background: radial-gradient(ellipse, rgba(56,189,248,0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .feature-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(56,189,248,0.3);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), var(--glow-sky);
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover::after  { opacity: 1; }
+    .feature-card:hover .feature-icon { transform: scale(1.1) translateY(-3px); }
+
+    .feature-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      box-shadow: 0 8px 20px rgba(56,189,248,0.25);
+      transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+      z-index: 1;
+    }
+    .feature-icon.gold {
+      background: linear-gradient(135deg, var(--gold), #B8891A);
+      box-shadow: 0 8px 20px rgba(212,160,23,0.25);
+    }
+    .feature-icon.bronze {
+      background: linear-gradient(135deg, var(--bronze), #7A5124);
+      box-shadow: 0 8px 20px rgba(154,106,47,0.25);
+    }
+    .feature-icon.success {
+      background: linear-gradient(135deg, var(--success), #16A34A);
+      box-shadow: 0 8px 20px rgba(34,197,94,0.25);
+    }
+    .feature-icon.purple {
+      background: linear-gradient(135deg, var(--purple), var(--purple-h));
+      box-shadow: 0 8px 20px rgba(139,92,246,0.25);
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.75;
+    }
+    .feature-badge {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 50px;
+      background: rgba(56,189,248,0.1);
+      color: var(--primary);
+      border: 1px solid rgba(56,189,248,0.2);
+    }
+    .feature-badge.gold {
+      background: rgba(212,160,23,0.1);
+      color: var(--gold);
+      border-color: rgba(212,160,23,0.2);
+    }
+    .feature-badge.purple {
+      background: rgba(139,92,246,0.1);
+      color: var(--purple);
+      border-color: rgba(139,92,246,0.2);
+    }
+
+    /* Card style variants — so the six cards don't all look identical
+       (varied backgrounds, borders, shadows & icon placement) */
+    .feature-card.fc-b {
+      border-radius: 22px 8px 22px 8px;
+      background: linear-gradient(160deg, var(--card), rgba(139,92,246,0.07));
+      border: 1px solid rgba(139,92,246,0.25);
+    }
+    .feature-card.fc-b::before { display: none; }
+    .feature-card.fc-b:hover {
+      border-color: rgba(139,92,246,0.45);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 40px rgba(139,92,246,0.18);
+    }
+    .feature-card.fc-b .feature-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .feature-card.fc-b .feature-icon {
+      border-radius: 50%;
+      width: 52px; height: 52px;
+      font-size: 22px;
+      margin-bottom: 0;
+      flex-shrink: 0;
+    }
+    .feature-card.fc-b .feature-title { margin-bottom: 0; }
+
+    .feature-card.fc-c {
+      background: var(--bg2);
+      border: 1px dashed rgba(148,163,184,0.3);
+      border-radius: 14px;
+      box-shadow: none;
+    }
+    .feature-card.fc-c::before { display: none; }
+    .feature-card.fc-c:hover {
+      border: 1px solid rgba(56,189,248,0.3);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .feature-card.fc-c { padding-top: 28px; }
+    .feature-card.fc-c .feature-icon {
+      position: absolute;
+      top: 22px; right: 22px;
+      margin-bottom: 0;
+      border-radius: 4px 14px 14px 14px;
+      width: 48px; height: 48px;
+      font-size: 20px;
+    }
+    .feature-card.fc-c .feature-title { max-width: 78%; }
+
+    /* ===========================
+       COURSES SECTION
+    =========================== */
+    .courses-section { background: var(--bg2); }
+    .filter-wrap {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .filter-btn {
+      padding: 9px 22px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text2);
+      font-family: 'Poppins', sans-serif;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #000;
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .course-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: visible;
+      transition: all 0.35s;
+      position: relative;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .course-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: var(--shadow-lg), var(--glow-sky);
+      border-color: rgba(56,189,248,0.3);
+    }
+    .course-teacher-badge {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      color: #000;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 20px;
+      border-radius: 8px;
+      white-space: nowrap;
+      z-index: 5;
+      box-shadow: 0 4px 16px rgba(56,189,248,0.3);
+    }
+    .course-thumb {
+      width: 100%;
+      height: 220px;
+      border-radius: 18px 18px 0 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+    }
+    .course-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .course-discount {
+      position: absolute;
+      top: 14px; left: -28px;
+      background: var(--danger);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 40px;
+      transform: rotate(-45deg);
+      box-shadow: 0 4px 12px rgba(239,68,68,0.4);
+    }
+    .course-free-badge {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: var(--success);
+      color: #000;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(34,197,94,0.4);
+    }
+    .course-body {
+      background: var(--card);
+      border-radius: 0 0 18px 18px;
+      padding: 22px 20px 26px;
+      width: 100%;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .course-level {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 5px 16px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .course-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .course-divider {
+      width: 50%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      margin: 12px auto;
+    }
+    .course-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .course-price-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .course-price {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+    .course-price-old {
+      font-size: 15px;
+      color: var(--text2);
+      text-decoration: line-through;
+    }
+    .course-enroll-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      color: #000;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 0 #0369A1, 0 8px 20px rgba(56,189,248,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .course-enroll-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #0369A1, 0 16px 30px rgba(56,189,248,0.35);
+    }
+    .course-enroll-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #0369A1;
+    }
+
+    /* ===========================
+       TEACHER SECTION
+    =========================== */
+    .teacher-section {
+      background: linear-gradient(135deg, var(--bg), var(--bg2));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .teacher-inner {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .teacher-img-side {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .teacher-img-frame {
+      width: 320px;
+      aspect-ratio: 900 / 1273;
+      height: auto;
+      border-radius: 24px;
+      background: var(--card);
+      border: 2px solid rgba(56,189,248,0.2);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), var(--glow-sky);
+      position: relative;
+    }
+    .teacher-img-frame picture {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .teacher-img-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* frame ratio == photo ratio → full photo shown, no cropping */
+      object-position: center;
+      transition: transform 0.5s ease;
+    }
+    .teacher-img-frame:hover img { transform: scale(1.04); }
+    .teacher-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg2), var(--card));
+      gap: 10px;
+    }
+    .teacher-img-placeholder .t-initial {
+      font-size: 80px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .teacher-img-badge {
+      position: absolute;
+      bottom: -20px; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--gold), #B8891A);
+      color: #000;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 28px;
+      border-radius: 12px;
+      white-space: nowrap;
+      box-shadow: 0 8px 20px rgba(212,160,23,0.35);
+      z-index: 3;
+    }
+    .teacher-deco {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px solid rgba(56,189,248,0.2);
+      pointer-events: none;
+    }
+    .teacher-deco-1 {
+      width: 120%; height: 120%;
+      top: -10%; left: -10%;
+      animation: spin1 25s linear infinite;
+    }
+    .teacher-deco-2 {
+      width: 140%; height: 140%;
+      top: -20%; left: -20%;
+      border-style: dashed;
+      border-color: rgba(212,160,23,0.12);
+      animation: spin1 35s linear infinite reverse;
+    }
+
+    .teacher-info { padding-bottom: 32px; }
+    .teacher-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+    .teacher-name span {
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .teacher-specialty {
+      font-size: 15px;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .teacher-bio {
+      font-size: 15px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+    .teacher-achievements {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .achievement-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.25s;
+    }
+    .achievement-item:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    .achievement-icon {
+      font-size: 22px;
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: rgba(56,189,248,0.1);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .achievement-icon.gold { background: rgba(212,160,23,0.1); }
+    .achievement-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary);
+      line-height: 1;
+    }
+    .achievement-num.gold { color: var(--gold); }
+    .achievement-lbl {
+      font-size: 11px;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    /* Timeline */
+    .teacher-timeline {
+      position: relative;
+      padding-right: 24px;
+    }
+    .teacher-timeline::before {
+      content: '';
+      position: absolute;
+      right: 6px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--primary), var(--gold), transparent);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 18px;
+      padding-right: 24px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      right: -18px; top: 6px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+    }
+    .timeline-year {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 700;
+      margin-bottom: 3px;
+      letter-spacing: 1px;
+    }
+    .timeline-text {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* ===========================
+       TESTIMONIALS
+    =========================== */
+    .testimonials-section { background: var(--bg); }
+    .testi-slider {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .testi-track {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testi-card {
+      background: rgba(36,36,43,0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .testi-card::before {
+      content: '"';
+      position: absolute;
+      top: -10px; right: 20px;
+      font-size: 120px;
+      color: rgba(56,189,248,0.07);
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .testi-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(56,189,248,0.3);
+      box-shadow: var(--shadow), var(--glow-sky);
+    }
+    .testi-stars {
+      color: var(--gold);
+      font-size: 16px;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+    .testi-text {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .testi-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      color: #000;
+      font-weight: 900;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .testi-name { font-size: 14px; font-weight: 800; color: var(--text); }
+    .testi-grade { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .testi-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--gold));
+      border-radius: 0 0 2px 2px;
+    }
+
+    /* ===========================
+       FAQ SECTION
+    =========================== */
+    .faq-section { background: var(--bg2); }
+    .faq-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .faq-item.open { border-color: rgba(56,189,248,0.3); }
+    .faq-q {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      gap: 16px;
+    }
+    .faq-q-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+    }
+    .faq-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(56,189,248,0.1);
+      border: 1px solid rgba(56,189,248,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary);
+      font-size: 18px;
+      font-weight: 900;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .faq-item.open .faq-icon {
+      background: var(--primary);
+      color: #000;
+      transform: rotate(45deg);
+    }
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0,1,0,1);
+    }
+    .faq-item.open .faq-a { max-height: 300px; transition: max-height 0.6s ease; }
+    .faq-a-inner {
+      padding: 0 24px 20px;
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.8;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    /* ===========================
+       CTA SECTION
+    =========================== */
+    .cta-section {
+      margin: 0 60px 80px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #0C2A3E 0%, #0A1E30 40%, #141418 100%);
+      border: 1px solid rgba(56,189,248,0.2);
+      padding: 72px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg), var(--glow-sky);
+      z-index: 1;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -80px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(56,189,248,0.06);
+      pointer-events: none;
+    }
+    .cta-section::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -60px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: rgba(212,160,23,0.05);
+      pointer-events: none;
+    }
+    .cta-scorpion {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 900;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--primary), var(--gold), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+    }
+    .cta-tagline {
+      font-size: clamp(16px, 2.5vw, 24px);
+      color: rgba(255,255,255,0.7);
+      position: relative;
+      z-index: 1;
+      margin-bottom: 32px;
+      font-weight: 600;
+      letter-spacing: 2px;
+    }
+    .cta-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===========================
+       FOOTER
+    =========================== */
+    footer {
+      background: #0A0A0A;
+      border-top: 1px solid var(--border);
+      padding: 60px 80px 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    .footer-brand .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .footer-logo-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #0EA5E9);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .footer-logo-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .footer-logo-sub { font-size: 11px; color: var(--text2); }
+    .footer-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .footer-socials { display: flex; gap: 10px; }
+    .footer-social {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-decoration: none;
+    }
+    .footer-social:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: translateY(-3px);
+    }
+    .footer-social.tg-social {
+      background: var(--telegram);
+      border-color: var(--telegram);
+    }
+    .footer-social.tg-social:hover { background: var(--telegram-h); }
+
+    .footer-col h5 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 16px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    .footer-col h5::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 30px; height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--primary); }
+
+    .footer-bottom {
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text2);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-bottom .brand { color: var(--primary); font-weight: 700; }
+
+    /* ===========================
+       FIXED BUTTONS
+    =========================== */
+    .tg-fab {
+      position: fixed;
+      bottom: 28px;
+      left: 28px;
+      z-index: 999;
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      background: var(--telegram);
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(34,158,217,0.45);
+      transition: all 0.25s;
+      animation: tgPulse 3s infinite;
+      text-decoration: none;
+    }
+    .tg-fab:hover {
+      background: var(--telegram-h);
+      transform: scale(1.1);
+      animation: none;
+    }
+
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 96px;
+      left: 28px;
+      z-index: 998;
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      font-size: 20px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      box-shadow: var(--shadow);
+    }
+    .scroll-top-btn.show { display: flex; }
+    .scroll-top-btn:hover {
+      background: var(--primary);
+      color: #000;
+      transform: translateY(-2px);
+    }
+
+    /* Ripple Effect */
+    .ripple {
+      position: relative;
+      overflow: hidden;
+    }
+    .ripple-circle {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      animation: rippleAnim 0.6s linear;
+      background: rgba(255,255,255,0.3);
+      pointer-events: none;
+    }
+
+    /* ===========================
+       LIGHT MODE
+    =========================== */
+    [data-theme="light"] {
+      --bg:   #F0F4F8;
+      --bg2:  #E8EEF5;
+      --card: #FFFFFF;
+      --text: #0F172A;
+      --text2:#475569;
+      --border:#CBD5E1;
+      --shadow: 0 8px 32px rgba(0,0,0,0.1);
+      --shadow-lg: 0 24px 64px rgba(0,0,0,0.15);
+    }
+    [data-theme="light"] .tg-fab { color: #fff; }
+    [data-theme="light"] .hero-badge { color: #0369A1; }
+    [data-theme="light"] footer { background: #E2E8F0; }
+    [data-theme="light"] .splash { background: #F0F4F8; }
+
+    /* ===========================
+       RESPONSIVE
+    =========================== */
+    @media (max-width: 1200px) {
+      .hero { padding: 60px 40px; }
+      .section { padding: 80px 40px; }
+      footer { padding: 50px 40px 28px; }
+      .stats-section { padding: 50px 40px; }
+      .cta-section { margin: 0 40px 60px; padding: 60px 40px; }
+    }
+
+    @media (max-width: 900px) {
+      .navbar { padding: 0 20px; }
+
+      .hero {
+        padding: 24px 24px 44px;
+        gap: 22px;
+      }
+      .hero-img-wrap { width: 300px; height: auto; }
+      .float-card-1 { right: -4%; top: 5%; }
+      .float-card-2 { left: -6%; top: 46%; }
+      .float-card-3 { right: -3%; bottom: 6%; }
+
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .stat-item::after { display: none; }
+
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .courses-grid { grid-template-columns: 1fr; max-width: 480px; }
+
+      .teacher-inner { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+      .teacher-img-frame { width: 260px; height: auto; margin: 0 auto; }
+      .teacher-achievements { grid-template-columns: repeat(2, 1fr); }
+      .teacher-timeline { padding-right: 0; padding-left: 24px; }
+      .teacher-timeline::before { right: auto; left: 6px; }
+      .timeline-item { padding-right: 0; padding-left: 24px; }
+      .timeline-item::before { right: auto; left: -18px; }
+
+      .testi-track { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .cta-section { margin: 0 20px 50px; padding: 48px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .navbar { height: 64px; }
+      .hero { padding: 16px 14px 36px; }
+      .section { padding: 60px 18px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      footer { padding: 40px 20px 24px; }
+      .hero-img-wrap { width: 260px; height: auto; }
+      .float-card { padding: 6px 10px; gap: 6px; }
+      .float-card-icon { width: 24px; height: 24px; font-size: 12px; }
+      .float-card .fc-title { font-size: 9.5px; }
+      .float-card .fc-sub { font-size: 8px; }
+      .float-card-1 { right: -2%; top: 4%; }
+      .float-card-2 { left: -3%; top: 46%; }
+      .float-card-3 { right: -1%; bottom: 6%; }
+      .tg-fab { width: 52px; height: 52px; font-size: 22px; bottom: 20px; left: 16px; }
+      .scroll-top-btn { bottom: 80px; left: 16px; }
+      .cta-section { margin: 0 12px 40px; border-radius: 20px; }
+    }
+
+    /* Glitch text for SCORPION */
+    .glitch {
+      position: relative;
+    }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--gold), var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particles Canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ===== SPLASH SCREEN ===== -->
+  <div class="splash" id="splashScreen">
+    <div class="splash-logo glitch" data-text="MUSTAFA SALEM">MUSTAFA SALEM</div>
+    <div class="splash-sub">English Academy</div>
+    <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+    <div class="splash-tagline">Never Give Up</div>
+  </div>
+
+  <!-- ===== NOTIFICATION BAR ===== -->
+  <div class="notif-bar" id="notifBar">
+    <span>🔥 New courses just launched! Join 5000+ students mastering English with Mr. Mostafa Salem</span>
+    <button onclick="document.getElementById('notifBar').style.display='none'" aria-label="Close">×</button>
+  </div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <div class="nav-left">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeToggle">
+        <div class="theme-toggle-knob" id="themeKnob">🌙</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">🦆</div>
+        <div class="nav-logo-text">
+          <span class="brand">MUSTAFA SALEM</span>
+          <span class="teacher" data-i18n="brand_sub">Mr. Mostafa Salem</span>
+        </div>
+      </a>
+      <button onclick="toggleLanguage()" title="Switch language / تغيير اللغة" id="langToggleBtn" class="lang-toggle-btn">
+        <span id="langToggleLabel">EN</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileNav()"></div>
+  <div class="mobile-nav" id="mobileNav">
+    <button class="sidebar-close" onclick="closeMobileNav()" aria-label="Close menu">✕</button>
+    <a href="#hero" onclick="closeMobileNav()" data-i18n="nav_home_icon">🏠 Home</a>
+    <a href="#courses" onclick="closeMobileNav()" data-i18n="nav_courses_icon">📚 Courses</a>
+    <a href="#features" onclick="closeMobileNav()" data-i18n="nav_why_us_icon">⭐ Why Us</a>
+    <a href="#teacher" onclick="closeMobileNav()" data-i18n="nav_teacher_icon">👨‍🏫 Teacher</a>
+    <a href="#testimonials" onclick="closeMobileNav()" data-i18n="nav_reviews_icon">💬 Reviews</a>
+    <a href="#faq" onclick="closeMobileNav()" data-i18n="nav_faq_icon">❓ FAQ</a>
+    <div class="mob-divider"></div>
+    <a href="login.html" id="mobLoginBtn" data-i18n="nav_login">🔑 Login</a>
+    <a href="register.html" id="mobRegisterBtn" data-i18n="nav_signup">✨ Sign Up</a>
+    <a href="lessons.html" id="mobDashBtn" style="display:none;" data-i18n="nav_my_courses">🎓 My Courses</a>
+    <a href="#" id="mobLogoutBtn" style="display:none;" onclick="mostafaSalemLogout();return false;" data-i18n="nav_logout">🚪 Logout</a>
+    <a href="#" id="mobInstallAppBtn" style="display:none;" onclick="installMostafaSalemApp();return false;" data-i18n="nav_install_app">⬇ Install App</a>
+    <div class="mob-divider"></div>
+    <a href="https://t.me/IbrahemTanany" target="_blank" style="color:#229ED9;">
+      Telegram
+    </a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-bg-grad"></div>
+      <div class="hero-bg-grid"></div>
+      <div class="hero-shape hero-shape-1"></div>
+      <div class="hero-shape hero-shape-2"></div>
+      <div class="hero-shape hero-shape-3"></div>
+    </div>
+
+    <!-- Hero Top: badge + title only (long intro paragraph removed) -->
+    <div class="hero-top" data-aos="fade-down" data-aos-duration="900">
+      <div class="hero-badge">
+        <span></span>
+        <span data-i18n="hero_badge">🦆 Mostafa Salem English Academy</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="line1" data-i18n="hero_title_line1">Master English</span><br>
+        <span class="line2" data-i18n="hero_title_line2">With Confidence</span>
+      </h1>
+      <p class="hero-subtitle-brand" data-i18n="hero_subtitle">Mostafa Salem English Academy</p>
+    </div>
+
+    <!-- Hero Visual: teacher photo is now the main focal element -->
+    <div class="hero-visual" data-aos="zoom-in" data-aos-duration="900">
+      <div class="hero-img-wrap">
+        <div class="hero-glow"></div>
+        <div class="hero-ring hero-ring-1"></div>
+        <div class="hero-ring hero-ring-2"></div>
+        <div class="hero-ring hero-ring-3"></div>
+
+        <div class="hero-img-circle" id="heroImgCircle">
+          <img src="صورة المنصه الجديده .jpeg" alt="أ. مصطفى سالم" width="900" height="1273" fetchpriority="high" decoding="async">
+        </div>
+
+        <!-- Floating Badges (smaller, balanced left/right, gentle motion) -->
+        <div class="float-card float-card-1">
+          <div class="float-card-icon gold">🏆</div>
+          <div>
+            <div class="fc-title">Top Rated</div>
+            <div class="fc-sub">5000+ Students</div>
+          </div>
+        </div>
+        <div class="float-card float-card-2">
+          <div class="float-card-icon">🎯</div>
+          <div>
+            <div class="fc-title">98% Success</div>
+            <div class="fc-sub">Proven Results</div>
+          </div>
+        </div>
+        <div class="float-card float-card-3">
+          <div class="float-card-icon gold">⭐</div>
+          <div>
+            <div class="fc-title">4.9 Rating</div>
+            <div class="fc-sub">3000+ Reviews</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero Buttons: directly below the teacher photo, Start Learning is primary -->
+    <div class="hero-btns" data-aos="fade-up" data-aos-duration="900">
+      <a href="#courses" class="btn btn-primary btn-hero-main ripple" data-i18n="hero_start_learning">
+        🚀 Start Learning
+      </a>
+      <div class="hero-btns-row">
+        <a href="#courses" class="btn btn-secondary ripple" data-i18n="hero_browse_courses">
+          📖 Browse Courses
+        </a>
+        <a href="https://t.me/IbrahemTanany" target="_blank" class="btn btn-telegram ripple">
+          Telegram
+        </a>
+      </div>
+      <button class="btn btn-ghost ripple" id="heroInstallBtn" data-pwa-install style="display:none" data-i18n="nav_install_app">
+        ⬇ Install App
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== STATS ===== -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item" data-aos="fade-up" data-aos-delay="0">
+        <span class="stat-icon">👥</span>
+        <div class="stat-num" data-count="5000">0</div>
+        <div class="stat-label" data-i18n="stat_active_students">Active Students</div>
+      </div>
+      <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+        <span class="stat-icon">📚</span>
+        <div class="stat-num" data-count="25">0</div>
+        <div class="stat-label" data-i18n="stat_courses">Courses</div>
+      </div>
+      <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+        <span class="stat-icon">🎬</span>
+        <div class="stat-num" data-count="500">0</div>
+        <div class="stat-label" data-i18n="stat_video_lessons">Video Lessons</div>
+      </div>
+      <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+        <span class="stat-icon">🏆</span>
+        <div class="stat-num" data-count="98">0</div>
+        <div class="stat-label" data-i18n="stat_success_rate">Success Rate %</div>
+      </div>
+      <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
+        <span class="stat-icon">📅</span>
+        <div class="stat-num" data-count="7">0</div>
+        <div class="stat-label" data-i18n="stat_years_experience">Years Experience</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COURSES ===== -->
+  <section class="section courses-section" id="courses">
+    <div class="section-head" data-aos="fade-up">
+      <div class="section-tag gold">Featured Courses</div>
+      <h2 class="section-title">Our <span class="gold">Premium</span> Courses</h2>
+      <p class="section-desc">Carefully crafted courses for every English level — from beginner to advanced</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-wrap" data-aos="fade-up" data-aos-delay="100">
+      <button class="filter-btn active" onclick="filterCourses('all',this)">All Courses</button>
+      <button class="filter-btn" onclick="filterCourses('prep1',this)">1st Prep</button>
+      <button class="filter-btn" onclick="filterCourses('prep2',this)">2nd Prep</button>
+      <button class="filter-btn" onclick="filterCourses('prep3',this)">3rd Prep</button>
+      <button class="filter-btn" onclick="filterCourses('1',this)">1st Secondary</button>
+      <button class="filter-btn" onclick="filterCourses('2',this)">2nd Secondary</button>
+      <button class="filter-btn" onclick="filterCourses('3',this)">3rd Secondary</button>
+      <button class="filter-btn" onclick="filterCourses('free',this)">Free</button>
+    </div>
+
+    <div class="courses-grid" id="coursesGrid">
+      <!-- Courses rendered by JS -->
+    </div>
+  </section>
+
+  <!-- ===== TEACHER SECTION ===== -->
+  <section class="section teacher-section" id="teacher">
+    <div class="teacher-inner">
+
+      <!-- Image Side -->
+      <div class="teacher-img-side" data-aos="fade-right">
+        <div class="teacher-deco teacher-deco-1"></div>
+        <div class="teacher-deco teacher-deco-2"></div>
+        <div class="teacher-img-frame">
+          <img src="صورة المنصه الجديده .jpeg" alt="أ. مصطفى سالم" width="900" height="1273" loading="lazy" decoding="async">
+        </div>
+        <div class="teacher-img-badge">🦆 English Language Teacher</div>
+      </div>
+
+      <!-- Info Side -->
+      <div class="teacher-info" data-aos="fade-left">
+        <div class="section-tag" style="margin-bottom:16px">Meet Your Teacher</div>
+        <h2 class="teacher-name">
+          <span>Mr. Mostafa</span> Salem
+        </h2>
+        <div class="teacher-specialty">🎯 English Language Teacher · Mostafa Salem English Academy</div>
+        <p class="teacher-bio">
+          With over 7 years of dedicated teaching experience, Mr. Mostafa Salem has transformed 
+          thousands of students' English skills. His unique teaching methodology combines 
+          deep grammar understanding with real-world application, making English accessible 
+          and enjoyable for every student. His motto: <strong style="color:var(--gold)">"Never Give Up!"</strong>
+        </p>
+
+        <div class="teacher-achievements">
+          <div class="achievement-item">
+            <div class="achievement-icon">👥</div>
+            <div>
+              <div class="achievement-num" data-count="5000">0</div>
+              <div class="achievement-lbl">Happy Students</div>
+            </div>
+          </div>
+          <div class="achievement-item">
+            <div class="achievement-icon gold">▶️</div>
+            <div>
+              <div class="achievement-num gold" data-count="50000">0</div>
+              <div class="achievement-lbl">YouTube Subscribers</div>
+            </div>
+          </div>
+          <div class="achievement-item">
+            <div class="achievement-icon">📅</div>
+            <div>
+              <div class="achievement-num" data-count="7">0</div>
+              <div class="achievement-lbl">Years Experience</div>
+            </div>
+          </div>
+          <div class="achievement-item">
+            <div class="achievement-icon gold">📱</div>
+            <div>
+              <div class="achievement-num gold" data-count="3000">0</div>
+              <div class="achievement-lbl">Platform Users</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="teacher-timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2018</div>
+            <div class="timeline-text">Founded Mostafa Salem English Academy — started teaching with a vision to make English mastery accessible to all</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2020</div>
+            <div class="timeline-text">Launched online platform reaching students across Egypt and Arab world</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2023</div>
+            <div class="timeline-text">Surpassed 50,000 YouTube subscribers — became one of Egypt's top English educators</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2025</div>
+            <div class="timeline-text">Launched premium interactive platform with live sessions, tracked exams & smart analytics</div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+          <a href="register.html" class="btn btn-primary ripple">🚀 Join Now</a>
+          <a href="https://t.me/IbrahemTanany" target="_blank" class="btn btn-telegram ripple">
+            Contact on Telegram
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="section testimonials-section" id="testimonials">
+    <div class="section-head" data-aos="fade-up">
+      <div class="section-tag">Student Reviews</div>
+      <h2 class="section-title">What Our <span>Students</span> Say</h2>
+      <div style="display:inline-flex;align-items:center;gap:14px;background:var(--card);border:1px solid rgba(212,160,23,0.3);border-radius:14px;padding:12px 22px;margin-top:12px;">
+        <div style="font-family:'Poppins',sans-serif;font-size:38px;font-weight:900;color:var(--gold);line-height:1;">4.9</div>
+        <div>
+          <div style="font-size:20px;color:var(--gold);letter-spacing:3px;">★★★★★</div>
+          <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:2px;">5000+ Reviews</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-slider">
+      <div class="testi-track" id="testiTrack">
+
+        <div class="testi-card" data-aos="fade-up" data-aos-delay="0">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"The best English teacher I've ever had! Mr. Mostafa explains everything so clearly. My grades went from 60% to 95% in just 3 months. Mostafa Salem Academy is truly amazing!"</div>
+          <div class="testi-author">
+            <div class="testi-avatar">A</div>
+            <div>
+              <div class="testi-name">Ahmed Mohamed</div>
+              <div class="testi-grade">Thanaweya Amma Student</div>
+            </div>
+          </div>
+          <div class="testi-bar"></div>
+        </div>
+
+        <div class="testi-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"I was struggling with English for years. After joining Mostafa Salem Academy, everything changed! The weekly exams and live sessions are absolutely game-changing."</div>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:linear-gradient(135deg,var(--gold),#B8891A);">F</div>
+            <div>
+              <div class="testi-name">Fatma Khalid</div>
+              <div class="testi-grade">University Student</div>
+            </div>
+          </div>
+          <div class="testi-bar"></div>
+        </div>
+
+        <div class="testi-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-text">"Never Give Up — that's not just a slogan, it's reality! Mr. Mostafa genuinely cares about every student's success. The platform is smooth and the content is excellent!"</div>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:linear-gradient(135deg,var(--success),#16A34A);">M</div>
+            <div>
+              <div class="testi-name">Mohamed Omar</div>
+              <div class="testi-grade">Secondary School Student</div>
+            </div>
+          </div>
+          <div class="testi-bar"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="section faq-section" id="faq">
+    <div class="section-head" data-aos="fade-up">
+      <div class="section-tag">Got Questions?</div>
+      <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+    </div>
+    <div class="faq-wrap">
+
+      <div class="faq-item" data-aos="fade-up" data-aos-delay="0">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">How do I enroll in a course?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Simply create a free account by clicking "Sign Up", browse our courses, and click "Enroll" on any course you like. For paid courses, you'll be guided through the payment process. It's quick and easy!</div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-aos="fade-up" data-aos-delay="60">
+        <div class="faq-q" onclick="toggleFAQ(this)">
+          <span class="faq-q-text">Are there free courses available?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">Yes! We offer several free courses and trial lessons so you can experience the quality of Mr. Mostafa Salem's teaching before enrolling in a paid course. Free courses are marked with a green badge.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <div class="cta-section" data-aos="zoom-in">
+    <div class="cta-scorpion">MUSTAFA SALEM</div>
+    <div class="cta-tagline">Never Give Up 🦆</div>
+    <p style="color:rgba(255,255,255,0.6);font-size:16px;margin-bottom:36px;position:relative;z-index:1;">
+      Start your English journey today. Join 5000+ students who already trust Mostafa Salem English Academy.
+    </p>
+    <div class="cta-btns">
+      <a href="register.html" class="btn btn-primary ripple" style="font-size:16px;padding:18px 40px;">
+        🚀 Join For Free
+      </a>
+      <a href="login.html" class="btn btn-ghost ripple" style="font-size:16px;padding:18px 40px;color:#fff;border-color:rgba(255,255,255,0.3);">
+        Login to Account
+      </a>
+      <a href="https://t.me/IbrahemTanany" target="_blank" class="btn btn-telegram ripple" style="font-size:16px;padding:18px 40px;">
+        Join Telegram
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <!-- ===== WHY CHOOSE US (moved to bottom, varied card styles) ===== -->
+  <section class="section" id="features">
+    <div class="section-head" data-aos="fade-up">
+      <div class="section-tag purple">Why Choose Us</div>
+      <h2 class="section-title">Why <span class="purple">Mostafa Salem</span> Academy?</h2>
+      <p class="section-desc">Everything you need to master English — all in one premium platform</p>
+    </div>
+    <div class="features-grid">
+
+      <div class="feature-card fc-a" data-aos="fade-up" data-aos-delay="0">
+        <div class="feature-icon">🎓</div>
+        <div class="feature-title">Professional Explanation</div>
+        <div class="feature-desc">Crystal-clear, systematic explanations tailored for Egyptian students. Every grammar rule and vocabulary set explained perfectly.</div>
+        <span class="feature-badge">Expert Level</span>
+      </div>
+
+      <div class="feature-card fc-b" data-aos="fade-up" data-aos-delay="80">
+        <div class="feature-header">
+          <div class="feature-icon gold">📝</div>
+          <div class="feature-title">Weekly Exams</div>
+        </div>
+        <div class="feature-desc">Regular assessments to track your progress. Each exam is designed to challenge and strengthen your English skills continuously.</div>
+        <span class="feature-badge gold">Every Week</span>
+      </div>
+
+      <div class="feature-card fc-c" data-aos="fade-up" data-aos-delay="160">
+        <div class="feature-icon success">💻</div>
+        <div class="feature-title">Interactive Platform</div>
+        <div class="feature-desc">A smooth, fast, and fully responsive learning platform. Study from any device, anytime, anywhere — with instant access to all content.</div>
+        <span class="feature-badge" style="background:rgba(34,197,94,0.1);color:var(--success);border-color:rgba(34,197,94,0.2)">Always On</span>
+      </div>
+
+      <div class="feature-card fc-b" data-aos="fade-up" data-aos-delay="0">
+        <div class="feature-header">
+          <div class="feature-icon bronze">🎬</div>
+          <div class="feature-title">Recorded Lessons</div>
+        </div>
+        <div class="feature-desc">Never miss a lesson! All classes are recorded in HD quality so you can review, rewatch and master every topic at your own pace.</div>
+        <span class="feature-badge" style="background:rgba(154,106,47,0.1);color:var(--bronze);border-color:rgba(154,106,47,0.2)">HD Quality</span>
+      </div>
+
+      <div class="feature-card fc-a" data-aos="fade-up" data-aos-delay="80">
+        <div class="feature-icon purple">📡</div>
+        <div class="feature-title">Live Sessions</div>
+        <div class="feature-desc">Interactive live classes where you can ask questions in real-time. Direct interaction with Mr. Mostafa Salem for instant answers.</div>
+        <span class="feature-badge purple">Real-time</span>
+      </div>
+
+      <div class="feature-card fc-c" data-aos="fade-up" data-aos-delay="160">
+        <div class="feature-icon gold">📊</div>
+        <div class="feature-title">Smart Progress Tracking</div>
+        <div class="feature-desc">Monitor your learning journey with detailed analytics. See your improvements, exam scores and course completion all in one dashboard.</div>
+        <span class="feature-badge gold">Smart Analytics</span>
+      </div>
+
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-icon">🦆</div>
+          <div>
+            <div class="footer-logo-name">MUSTAFA SALEM</div>
+            <div class="footer-logo-sub">English Academy</div>
+          </div>
+        </div>
+        <p class="footer-desc">
+          Master English with confidence under the guidance of Mr. Mostafa Salem. 
+          Premium courses, live sessions, weekly exams and smart progress tracking. 
+          Never Give Up! 🏆
+        </p>
+        <div class="footer-socials">
+          <a href="https://t.me/IbrahemTanany" target="_blank" class="footer-social tg-social" title="Telegram">
+            Telegram
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-col">
+        <h5>Platform</h5>
+        <ul>
+          <li><a href="#courses">Courses</a></li>
+          <li><a href="#features">Why Choose Us</a></li>
+          <li><a href="#teacher">About Teacher</a></li>
+          <li><a href="#testimonials">Student Reviews</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li>
+            <a href="https://t.me/IbrahemTanany" target="_blank" style="color:var(--telegram);">
+              📩 Telegram Channel
+            </a>
+          </li>
+          <li><a href="login.html">Student Login</a></li>
+          <li><a href="register.html">Create Account</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 <span class="brand">Mostafa Salem English Academy</span> · Mr. Mostafa Salem · All Rights Reserved</span>
+      <span>Never Give Up 🦆</span>
+      <span style="opacity:.35;font-size:11px;">
+        <a href="#" id="hiddenAdminLink" onclick="openAdminGate(event)" style="color:inherit;text-decoration:none;">لوحة التحكم</a>
+      </span>
+    </div>
+  </footer>
+
+  <!-- ===== HIDDEN ADMIN PASSWORD GATE ===== -->
+  <div id="adminGateOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(5,7,12,0.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+    <div style="background:var(--card,#1F1F24);border:1px solid var(--border,#30363D);border-radius:16px;padding:28px;max-width:340px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.5);text-align:center;">
+      <div style="font-size:34px;margin-bottom:8px;">🦆</div>
+      <div style="font-weight:800;color:var(--text,#F8FAFC);font-size:16px;margin-bottom:4px;">لوحة التحكم</div>
+      <div style="color:var(--text2,#94A3B8);font-size:13px;margin-bottom:16px;">أدخل كلمة المرور للمتابعة</div>
+      <input type="password" id="adminGatePass" placeholder="Password" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1px solid var(--border,#30363D);background:var(--bg,#121212);color:var(--text,#F8FAFC);font-size:15px;margin-bottom:10px;outline:none;">
+      <div id="adminGateError" style="color:var(--danger,#EF4444);font-size:12.5px;min-height:16px;margin-bottom:10px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeAdminGate()" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border,#30363D);background:transparent;color:var(--text2,#94A3B8);font-weight:600;cursor:pointer;">Cancel</button>
+        <button onclick="submitAdminGate()" style="flex:1;padding:10px;border-radius:10px;border:none;background:var(--gold,#D4A017);color:#121212;font-weight:700;cursor:pointer;">Enter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TELEGRAM FAB ===== -->
+  <a href="https://t.me/IbrahemTanany" target="_blank" class="tg-fab" title="Contact on Telegram">
+    Telegram
+  </a>
+
+  <!-- Scroll Top -->
+  <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <!-- AOS Script -->
+  <!-- ===== Firebase (live database — courses, students, quizzes, payments) ===== -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="i18n.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <script>
+    // ========================================
+    // PARTICLES
+    // ========================================
+    (function() {
+      const cv = document.getElementById('particleCanvas');
+      if (!cv) return;
+      const ctx = cv.getContext('2d');
+      function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize);
+      const pts = Array.from({length: 50}, () => ({
+        x: Math.random() * cv.width,
+        y: Math.random() * cv.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5,
+        c: Math.random() > 0.5 ? '56,189,248' : '212,160,23'
+      }));
+      let running = true;
+      function draw() {
+        if (!running) return;
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        pts.forEach(p => {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > cv.width) p.vx *= -1;
+          if (p.y < 0 || p.y > cv.height) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${p.c},0.6)`;
+          ctx.fill();
+        });
+        pts.forEach((p, i) => {
+          for (let j = i + 1; j < pts.length; j++) {
+            const dx = pts[j].x - p.x, dy = pts[j].y - p.y, d = Math.sqrt(dx*dx + dy*dy);
+            if (d < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(pts[j].x, pts[j].y);
+              ctx.strokeStyle = `rgba(56,189,248,${0.1 * (1 - d/120)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        });
+        requestAnimationFrame(draw);
+      }
+      draw();
+      window._stopParticles = function() { running = false; };
+    })();
+
+    // ========================================
+    // SPLASH SCREEN
+    // ========================================
+    (function() {
+      const splash = document.getElementById('splashScreen');
+      if (!splash) return;
+      setTimeout(() => {
+        splash.classList.add('hide');
+        setTimeout(() => { splash.remove(); }, 900);
+      }, 3000);
+    })();
+
+    // ========================================
+    // AOS INIT
+    // ========================================
+    AOS.init({
+      duration: 700,
+      once: true,
+      easing: 'ease-out-cubic',
+      offset: 60
+    });
+
+    // ========================================
+    // HERO TEACHER IMAGE — reveal + parallax
+    // ========================================
+    (function() {
+      const wrap = document.querySelector('.hero-img-wrap');
+      const circle = document.getElementById('heroImgCircle');
+      if (!wrap || !circle) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            circle.classList.add('revealed');
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.2 });
+      io.observe(circle);
+
+      if (isFinePointer && !reduceMotion) {
+        let rafId = null;
+        let targetX = 0, targetY = 0, curX = 0, curY = 0;
+
+        wrap.addEventListener('mouseenter', () => wrap.classList.add('parallax-active'));
+        wrap.addEventListener('mouseleave', () => {
+          wrap.classList.remove('parallax-active');
+          targetX = 0; targetY = 0;
+        });
+
+        wrap.addEventListener('mousemove', (e) => {
+          const rect = wrap.getBoundingClientRect();
+          const px = (e.clientX - rect.left) / rect.width - 0.5;
+          const py = (e.clientY - rect.top) / rect.height - 0.5;
+          targetX = px * 14;
+          targetY = py * 14;
+          if (!rafId) rafId = requestAnimationFrame(tick);
+        });
+
+        function tick() {
+          curX += (targetX - curX) * 0.12;
+          curY += (targetY - curY) * 0.12;
+          circle.style.transform = `translate(${curX}px, ${curY}px) scale(${circle.classList.contains('revealed') ? 1 : 0.85})`;
+          if (Math.abs(targetX - curX) > 0.05 || Math.abs(targetY - curY) > 0.05) {
+            rafId = requestAnimationFrame(tick);
+          } else {
+            rafId = null;
+          }
+        }
+      }
+    })();
+
+    // ========================================
+    // THEME TOGGLE
+    // ========================================
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') !== 'light';
+      const newTheme = isDark ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      const knob = document.getElementById('themeKnob');
+      if (knob) knob.textContent = newTheme === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('mostafa_salem_theme', newTheme);
+    }
+    window.toggleTheme = toggleTheme;
+
+    const savedTheme = localStorage.getItem('mostafa_salem_theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      const knob = document.getElementById('themeKnob');
+      if (knob) setTimeout(() => { knob.textContent = savedTheme === 'light' ? '☀️' : '🌙'; }, 50);
+    }
+
+    // ========================================
+    // MOBILE NAV
+    // ========================================
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        mobileNav.classList.toggle('open');
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('open', mobileNav.classList.contains('open'));
+        document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : '';
+      });
+    }
+    function closeMobileNav() {
+      if (mobileNav) mobileNav.classList.remove('open');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    window.closeMobileNav = closeMobileNav;
+
+    // ========================================
+    // SCROLL TOP
+    // ========================================
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollTopBtn');
+      if (btn) {
+        btn.classList.toggle('show', window.scrollY > 400);
+      }
+    });
+
+    // ========================================
+    // ANIMATED COUNTERS
+    // ========================================
+    function animateCounter(el, target, suffix) {
+      let start = 0;
+      const duration = 2000;
+      const startTime = performance.now();
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(start + (target - start) * eased);
+        el.textContent = current.toLocaleString() + (suffix || '');
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    const counterObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const count = parseInt(el.getAttribute('data-count'));
+          const suffix = el.getAttribute('data-suffix') || '';
+          animateCounter(el, count, suffix);
+          counterObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    document.querySelectorAll('[data-count]').forEach(el => counterObs.observe(el));
+
+    // ========================================
+    // FAQ TOGGLE
+    // ========================================
+    function toggleFAQ(el) {
+      const item = el.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+    window.toggleFAQ = toggleFAQ;
+
+    // ========================================
+    // FILTER COURSES
+    // ========================================
+    function filterCourses(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCourseFilter = cat;
+      renderCourses(cat);
+    }
+    window.filterCourses = filterCourses;
+
+    // ========================================
+    // COURSES DATA — live from Firebase (same source as dashboard.html)
+    // ========================================
+    // Shown only if Firebase + local cache are both empty (e.g. first-ever load, offline).
+    const fallbackCourses = [
+      {
+        id: 'demo-1', title: 'Complete Beginner English', grade: 'all', type: 'free',
+        desc: 'Start from scratch! Master the fundamentals of English grammar, vocabulary and pronunciation.',
+        price: 0, oldPrice: null, emoji: '📗',
+        bg: 'linear-gradient(135deg,#0C4A6E,#0369A1,#0EA5E9)'
+      },
+      {
+        id: 'demo-2', title: 'Grammar Mastery Course', grade: '1', type: 'paid',
+        desc: 'Deep dive into English grammar. From tenses to conditionals — master every rule with practice.',
+        price: 150, oldPrice: 250, emoji: '📘',
+        bg: 'linear-gradient(135deg,#1E3A5F,#1D4ED8,#3B82F6)'
+      },
+      {
+        id: 'demo-3', title: 'Thanaweya Amma Prep', grade: '3', type: 'paid',
+        desc: 'Complete exam preparation for Thanaweya Amma. All units covered with exam strategies.',
+        price: 200, oldPrice: 350, emoji: '🏆',
+        bg: 'linear-gradient(135deg,#451A03,#92400E,#D97706)'
+      }
+    ];
+
+    let liveCourses = null;         // filled once we hear from Firebase or local cache
+    let currentCourseFilter = 'all';
+
+    function normalizeCourse(c) {
+      const price = Number(c.price) || 0;
+      const oldPrice = c.oldPrice != null && c.oldPrice !== '' ? Number(c.oldPrice) : null;
+      const discount = (oldPrice && oldPrice > price) ? Math.round((1 - price / oldPrice) * 100) : null;
+      return {
+        id: c.id,
+        title: c.title || 'Untitled Course',
+        desc: c.desc || '',
+        grade: c.grade || 'all',
+        isFree: c.type === 'free' || price === 0,
+        price, oldPrice, discount,
+        thumbnail: c.thumbnail || '',
+        thumbnailX: Number.isFinite(c.thumbnailX) ? c.thumbnailX : 50,
+        thumbnailY: Number.isFinite(c.thumbnailY) ? c.thumbnailY : 50,
+        bg: c.headerColor || c.bg || c.color || 'linear-gradient(135deg,#1a1a2e,#8B6914)',
+        emoji: c.emoji || '📖',
+        studentsCount: c.studentsCount || 0,
+        rating: c.rating || 0
+      };
+    }
+
+    const GRADE_LABELS = { 'prep1': '1st Prep', 'prep2': '2nd Prep', 'prep3': '3rd Prep', '1': '1st Secondary', '2': '2nd Secondary', '3': '3rd Secondary', 'all': 'All Grades' };
+
+    function applyCourses(rawList) {
+      liveCourses = (Array.isArray(rawList) ? rawList : []).map(normalizeCourse);
+      renderCourses(currentCourseFilter);
+    }
+
+    // 1) Instant paint from local cache (same key dashboard.html writes to)
+    (function loadCachedCourses() {
+      try {
+        const cached = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+        if (Array.isArray(cached) && cached.length) applyCourses(cached);
+      } catch (e) { /* ignore corrupt cache */ }
+    })();
+
+    // 2) Live subscription to Firebase — any change made in dashboard.html
+    //    (add / edit / delete / reorder a course) appears here automatically.
+    (function subscribeToCoursesLive() {
+      function attach() {
+        if (!window.db) return false;
+        window.db.collection('platform_data').doc('courses_list')
+          .onSnapshot(
+            (doc) => {
+              const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+              applyCourses(items);
+              localStorage.setItem('alamin_courses', JSON.stringify(items));
+            },
+            (err) => console.warn('[courses] Firebase live sync error:', err.code, err.message)
+          );
+        return true;
+      }
+      if (!attach()) {
+        // firebase-config.js may still be loading — retry briefly
+        let tries = 0;
+        const t = setInterval(() => {
+          tries++;
+          if (attach() || tries > 40) clearInterval(t); // ~6s max
+        }, 150);
+      }
+    })();
+
+    function renderCourses(filter) {
+      filter = filter || 'all';
+      const grid = document.getElementById('coursesGrid');
+      if (!grid) return;
+
+      const source = liveCourses && liveCourses.length ? liveCourses : fallbackCourses.map(normalizeCourse);
+
+      const list = filter === 'all' ? source :
+                   filter === 'free' ? source.filter(c => c.isFree) :
+                   source.filter(c => c.grade === filter || c.grade === 'all');
+
+      if (!list.length) {
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;">
+          <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+          <p style="color:var(--text2);font-size:15px;font-weight:600;">No courses found in this category.</p>
+        </div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(c => `
+        <div class="course-card">
+          <div class="course-teacher-badge">🦆 Mr. Mostafa Salem</div>
+          <div class="course-thumb" style="background:${c.bg}">
+            ${c.thumbnail
+              ? `<img src="${c.thumbnail}" alt="${c.title}" loading="lazy" style="object-position:${c.thumbnailX}% ${c.thumbnailY}%;">`
+              : `<span style="font-size:72px;z-index:2;position:relative;">${c.emoji}</span>`}
+            ${c.discount ? `<div class="course-discount">${c.discount}% OFF</div>` : ''}
+            ${c.isFree ? `<div class="course-free-badge">FREE</div>` : ''}
+          </div>
+          <div class="course-body">
+            <div class="course-level">${GRADE_LABELS[c.grade] || 'All Grades'}</div>
+            <div class="course-title">${c.title}</div>
+            <div class="course-divider"></div>
+            <div class="course-desc">${c.desc}</div>
+            <div class="course-price-row">
+              ${c.isFree
+                ? `<div class="course-price" style="color:var(--success);">FREE</div>`
+                : `<div class="course-price">${c.price} EGP</div>
+                   ${c.oldPrice ? `<div class="course-price-old">${c.oldPrice} EGP</div>` : ''}`
+              }
+            </div>
+            <button class="course-enroll-btn ripple" onclick="enrollCourse('${c.id}')">
+              ${c.isFree ? '🎁 Enroll Free' : '🚀 Enroll Now'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function enrollCourse(id) {
+      const user = JSON.parse(localStorage.getItem('alamin_current') || 'null');
+      if (!user) {
+        window.location.href = 'login.html?next=' + encodeURIComponent('lessons.html?course=' + id);
+        return;
+      }
+      window.location.href = 'lessons.html?course=' + id;
+    }
+    window.enrollCourse = enrollCourse;
+
+    // ========================================
+    // AUTH STATE (login.html / register.html integration)
+    // ========================================
+    function mostafaSalemLogout() {
+      localStorage.removeItem('alamin_current');
+      localStorage.removeItem('alamin_remember');
+      window.location.reload();
+    }
+    window.mostafaSalemLogout = mostafaSalemLogout;
+
+    function refreshAuthUI() {
+      const user = JSON.parse(localStorage.getItem('alamin_current') || 'null');
+      const loggedIn = !!user;
+
+      const loginBtn    = document.getElementById('navLoginBtn');
+      const registerBtn = document.getElementById('navRegisterBtn');
+      const dashBtn     = document.getElementById('navDashBtn');
+      const logoutBtn   = document.getElementById('navLogoutBtn');
+      const mobLogin    = document.getElementById('mobLoginBtn');
+      const mobRegister = document.getElementById('mobRegisterBtn');
+      const mobDash     = document.getElementById('mobDashBtn');
+      const mobLogout   = document.getElementById('mobLogoutBtn');
+
+      if (loginBtn)    loginBtn.style.display    = loggedIn ? 'none' : '';
+      if (registerBtn) registerBtn.style.display = loggedIn ? 'none' : '';
+      if (dashBtn)      dashBtn.style.display     = loggedIn ? '' : 'none';
+      if (logoutBtn)    logoutBtn.style.display   = loggedIn ? '' : 'none';
+      if (mobLogin)    mobLogin.style.display    = loggedIn ? 'none' : '';
+      if (mobRegister) mobRegister.style.display = loggedIn ? 'none' : '';
+      if (mobDash)      mobDash.style.display     = loggedIn ? '' : 'none';
+      if (mobLogout)    mobLogout.style.display   = loggedIn ? '' : 'none';
+
+      if (loggedIn && dashBtn) dashBtn.textContent = '🎓 Hi, ' + (user.name ? user.name.split(' ')[0] : 'Student');
+      if (loggedIn && mobDash) mobDash.textContent = '🎓 Hi, ' + (user.name ? user.name.split(' ')[0] : 'Student');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCourses('all');
+      refreshAuthUI();
+    });
+
+    // ========================================
+    // HIDDEN ADMIN DASHBOARD GATE
+    // ========================================
+    const ADMIN_GATE_PASSWORD = '2025';
+    const ADMIN_SESSION_KEY = 'mostafa_salem_admin_ok';
+
+    function openAdminGate(e) {
+      if (e) e.preventDefault();
+      const overlay = document.getElementById('adminGateOverlay');
+      const input = document.getElementById('adminGatePass');
+      const err = document.getElementById('adminGateError');
+      if (!overlay) return;
+      err.textContent = '';
+      input.value = '';
+      overlay.style.display = 'flex';
+      setTimeout(() => input.focus(), 50);
+    }
+    window.openAdminGate = openAdminGate;
+
+    function closeAdminGate() {
+      const overlay = document.getElementById('adminGateOverlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+    window.closeAdminGate = closeAdminGate;
+
+    function submitAdminGate() {
+      const input = document.getElementById('adminGatePass');
+      const err = document.getElementById('adminGateError');
+      if (input.value === ADMIN_GATE_PASSWORD) {
+        try { sessionStorage.setItem(ADMIN_SESSION_KEY, 'true'); } catch (e) {}
+        window.location.href = 'dashboard.html';
+      } else {
+        err.textContent = 'كلمة المرور غير صحيحة';
+        input.value = '';
+        input.focus();
+      }
+    }
+    window.submitAdminGate = submitAdminGate;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const passInput = document.getElementById('adminGatePass');
+      if (passInput) {
+        passInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') submitAdminGate();
+          if (e.key === 'Escape') closeAdminGate();
+        });
+      }
+      const overlay = document.getElementById('adminGateOverlay');
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeAdminGate();
+        });
+      }
+    });
+
+    // ========================================
+    // PWA — service worker + install prompt
+    // ========================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch((err) => {
+          console.warn('[PWA] Service worker registration failed:', err);
+        });
+      });
+    }
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const btn = document.getElementById('installAppBtn');
+      const mobBtn = document.getElementById('mobInstallAppBtn');
+      if (btn) btn.style.display = 'inline-flex';
+      if (mobBtn) mobBtn.style.display = '';
+    });
+
+    function installMostafaSalemApp() {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.finally(() => {
+        deferredInstallPrompt = null;
+        const btn = document.getElementById('installAppBtn');
+        const mobBtn = document.getElementById('mobInstallAppBtn');
+        if (btn) btn.style.display = 'none';
+        if (mobBtn) mobBtn.style.display = 'none';
+      });
+    }
+    window.installMostafaSalemApp = installMostafaSalemApp;
+
+    window.addEventListener('appinstalled', () => {
+      const btn = document.getElementById('installAppBtn');
+      const mobBtn = document.getElementById('mobInstallAppBtn');
+      if (btn) btn.style.display = 'none';
+      if (mobBtn) mobBtn.style.display = 'none';
+      deferredInstallPrompt = null;
+    });
+  </script>
+</body>
+</html>
