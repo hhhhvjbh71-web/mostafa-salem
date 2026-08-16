@@ -1,7 +1,7 @@
 {
-  "name": "Mostafa Salem English Academy",
-  "short_name": "Mostafa Salem",
-  "description": "Mostafa Salem English Academy — Mr. Mostafa Salem. Courses, lessons and quizzes for English learners.",
+  "name": "Never Give Up — Mr. Mostafa Salem",
+  "short_name": "Never Give Up",
+  "description": "Never Give Up English Platform — Mr. Mostafa Salem. Courses, lessons and quizzes for English learners.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

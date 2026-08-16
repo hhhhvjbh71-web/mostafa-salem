@@ -1,13 +1,9 @@
 // ============================================================
-// Mostafa Salem English Academy — Service Worker
-// Provides an installable PWA shell + basic offline support.
-// Live data (courses, students, quizzes...) always comes from
-// Firebase over the network — this worker never caches that,
-// it only caches the static app shell so the site can install
-// and open instantly, with a friendly offline fallback.
+// Never Give Up English Platform — Service Worker
+// Mr. Mostafa Salem
 // ============================================================
 
-const CACHE_VERSION = 'mostafa-salem-shell-v1';
+const CACHE_VERSION = 'never-give-up-shell-v2';
 const OFFLINE_URL = 'offline.html';
 
 const SHELL_ASSETS = [

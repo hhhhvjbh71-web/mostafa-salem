@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>لوحة التحكم - أكاديمية مصطفى سالم</title>
+<title>لوحة التحكم - Never Give Up (أ. مصطفى سالم)</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
@@ -816,7 +816,7 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
 <!-- ===== ADMIN PASSWORD GATE (protects direct URL access too) ===== -->
 <div id="dashGateOverlay" style="display:none;position:fixed;inset:0;z-index:999999;background:#0b1220;align-items:center;justify-content:center;">
   <div style="background:#111827;border:1px solid #1e293b;border-radius:16px;padding:30px;max-width:340px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,0.5);text-align:center;">
-    <div style="font-size:36px;margin-bottom:10px;">🦆</div>
+    <div style="font-size:36px;margin-bottom:10px;">⚡</div>
     <div style="font-weight:800;color:#e2e8f0;font-size:17px;margin-bottom:4px;">لوحة التحكم</div>
     <div style="color:#94a3b8;font-size:13px;margin-bottom:18px;">أدخل كلمة المرور للدخول</div>
     <input type="password" id="dashGatePass" placeholder="Password" autocomplete="off" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1px solid #1e293b;background:#0b1220;color:#e2e8f0;font-size:15px;margin-bottom:10px;outline:none;">
@@ -871,12 +871,12 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">
-    <div class="sidebar-logo-icon">
-      <img src="ايقونة الهدر.png" alt="الدكتور">
+    <div class="sidebar-logo-icon" style="font-size:22px;">
+      ⚡
     </div>
     <div>
-      <div class="sidebar-logo-text">MUSTAFA SALEM</div>
-      <div class="sidebar-logo-sub">لوحة التحكم</div>
+      <div class="sidebar-logo-text">NEVER GIVE UP</div>
+      <div class="sidebar-logo-sub">أ. مصطفى سالم - لوحة التحكم</div>
     </div>
   </div>
 
@@ -2795,7 +2795,7 @@ function showPage(id) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pageEl = document.getElementById('page-'+id);
   if(pageEl) pageEl.classList.add('active');
-  document.getElementById('pageTitle').textContent = pageTitles[id] || 'Mustafa Salem';
+  document.getElementById('pageTitle').textContent = pageTitles[id] || 'Never Give Up';
   document.querySelectorAll('.nav-item').forEach(n=>{
     if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active');
   });

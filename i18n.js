@@ -11,6 +11,7 @@
 
 const MOSTAFA_SALEM_DICT = {
   // ---- shared / nav / footer ----
+  brand_name:           { ar: 'NEVER GIVE UP',                        en: 'NEVER GIVE UP' },
   brand_sub:            { ar: 'أ. مصطفى سالم',                         en: 'Mr. Mostafa Salem' },
   nav_home:              { ar: 'الرئيسية',                             en: 'Home' },
   nav_courses:           { ar: 'الكورسات',                             en: 'Courses' },
@@ -32,10 +33,10 @@ const MOSTAFA_SALEM_DICT = {
   nav_faq_icon:          { ar: '❓ الأسئلة الشائعة',                     en: '❓ FAQ' },
 
   // ---- hero / stats ----
-  hero_badge:            { ar: '🦆 أكاديمية مصطفى سالم للغة الإنجليزية',    en: '🦆 Mostafa Salem English Academy' },
+  hero_badge:            { ar: '✨ منصة Never Give Up للغة الإنجليزية',   en: '✨ Never Give Up English Academy' },
   hero_title_line1:      { ar: 'أتقن اللغة الإنجليزية',                  en: 'Master English' },
   hero_title_line2:      { ar: 'بكل ثقة',                                en: 'With Confidence' },
-  hero_subtitle:         { ar: 'أكاديمية مصطفى سالم للغة الإنجليزية',       en: 'Mostafa Salem English Academy' },
+  hero_subtitle:         { ar: 'Never Give Up — أ. مصطفى سالم',         en: 'Never Give Up — Mr. Mostafa Salem' },
   hero_start_learning:   { ar: '🚀 ابدأ التعلم',                         en: '🚀 Start Learning' },
   hero_browse_courses:   { ar: '📖 تصفح الكورسات',                       en: '📖 Browse Courses' },
   stat_active_students:  { ar: 'طالب نشط',                              en: 'Active Students' },
@@ -44,13 +45,13 @@ const MOSTAFA_SALEM_DICT = {
   stat_success_rate:     { ar: 'نسبة النجاح %',                          en: 'Success Rate %' },
   stat_years_experience: { ar: 'سنوات خبرة',                            en: 'Years Experience' },
   back_home:             { ar: '← العودة للرئيسية',                    en: '← Back to Home' },
-  footer_tagline:        { ar: '© 2026 أكاديمية مصطفى سالم — أبداً لا تستسلم', en: '© 2026 Mostafa Salem English Academy — Never Give Up' },
+  footer_tagline:        { ar: '© 2026 Never Give Up — أ. مصطفى سالم · جميع الحقوق محفوظة', en: '© 2026 Never Give Up — Mr. Mostafa Salem · All Rights Reserved' },
 
   // ---- login/register page ----
   auth_title_login:      { ar: 'أهلاً بعودتك',                         en: 'Welcome Back' },
   auth_sub_login:         { ar: 'سجّل دخولك عشان تكمل رحلتك',           en: 'Sign in to continue your journey' },
   auth_title_register:    { ar: 'أنشئ حسابك',                          en: 'Create Your Account' },
-  auth_sub_register:      { ar: 'انضم لأكاديمية مصطفى سالم دلوقتي',        en: 'Join Mostafa Salem English Academy today' },
+  auth_sub_register:      { ar: 'انضم لمنصة Never Give Up دلوقتي',       en: 'Join Never Give Up Academy today' },
   tab_login:              { ar: '🔑 تسجيل الدخول',                     en: '🔑 Login' },
   tab_register:           { ar: '✨ إنشاء حساب',                        en: '✨ Sign Up' },
   label_phone:            { ar: 'رقم الهاتف',                          en: 'Phone Number' },
