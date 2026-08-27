@@ -52,41 +52,43 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Cairo:wght@300;400;500;600;700;800;900" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Cairo:wght@300;400;500;600;700;800;900&family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/player.js/0.1.0/player.min.js"></script>
 <style>
 /* ─── CSS Variables (متوافقة مع نظام الدكتور) ─────────────── */
 :root {
-  --primary:       #0284c7;
-  --primary-dark:  #0369a1;
-  --primary-light: rgba(2,132,199,.10);
-  --accent:        #eab308;
-  --success:       #16a34a;
-  --danger:        #dc2626;
-  --bg:            #f8fafc;
-  --card:          #ffffff;
-  --text:          #0f172a;
-  --text2:         #475569;
-  --border:        #e2e8f0;
-  --shadow-sm:     0 2px 8px rgba(15,23,42,.04);
-  --shadow-md:     0 8px 24px rgba(2,132,199,.08);
-  --shadow-lg:     0 16px 40px rgba(15,23,42,.08);
-  --radius:        16px;
+  /* ── Never Give Up Design Tokens ── */
+  --primary:       #00C9A7;
+  --primary-dark:  #00a387;
+  --primary-light: rgba(0,201,167,.10);
+  --accent:        #F5A623;
+  --success:       #22C55E;
+  --danger:        #EF4444;
+  --bg:            #08080D;
+  --card:          #111118;
+  --text:          #F6F3ED;
+  --text2:         rgba(246,243,237,.52);
+  --border:        rgba(246,243,237,.08);
+  --shadow-sm:     0 2px 12px rgba(0,0,0,.25);
+  --shadow-md:     0 8px 28px rgba(0,201,167,.1);
+  --shadow-lg:     0 20px 60px rgba(0,0,0,.45);
+  --radius:        10px;
 }
-[data-theme="dark"] {
-  --primary:       #38bdf8;
-  --primary-dark:  #7dd3fc;
-  --primary-light: rgba(56,189,248,.12);
-  --accent:        #facc15;
-  --bg:            #030712;
-  --card:          #0f172a;
-  --text:          #f8fafc;
-  --text2:         #94a3b8;
-  --border:        #1e293b;
-  --shadow-sm:     0 2px 8px rgba(0,0,0,.2);
-  --shadow-md:     0 8px 24px rgba(0,0,0,.3);
-  --shadow-lg:     0 16px 40px rgba(0,0,0,.4);
+/* Dark is always active — light mode overrides for users who prefer it */
+[data-theme="light"] {
+  --primary:       #00C9A7;
+  --primary-dark:  #008f76;
+  --primary-light: rgba(0,201,167,.12);
+  --accent:        #F5A623;
+  --bg:            #F0F4F8;
+  --card:          #FFFFFF;
+  --text:          #0F172A;
+  --text2:         #475569;
+  --border:        #E2E8F0;
+  --shadow-sm:     0 2px 8px rgba(15,23,42,.06);
+  --shadow-md:     0 8px 24px rgba(0,201,167,.1);
+  --shadow-lg:     0 16px 40px rgba(15,23,42,.1);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 body{ font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text); line-height:1.6; direction:rtl; }
@@ -96,9 +98,9 @@ body{ font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text);
 
 /* ─── TOP BAR ─────────────────────────────────────────────── */
 .topbar {
-  background: rgba(255,255,255,.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgba(8,8,13,.9);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   padding: 0 32px;
   height: 72px;
   display: flex;
@@ -107,8 +109,8 @@ body{ font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text);
   position: sticky; top: 0; z-index: 200;
   box-shadow: 0 2px 12px rgba(2,132,199,.07);
 }
-[data-theme="dark"] .topbar {
-  background: rgba(3,7,18,.88);
+[data-theme="light"] .topbar {
+  background: rgba(240,244,248,.92);
 }
 .topbar::after {
   content: '';
@@ -1516,6 +1518,212 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
   }
   .grade-card h3 { font-size: 1rem !important; }
 }
+</style>
+
+<style>
+/* ═══════════════════════════════════════════
+   NEVER GIVE UP — Visual Identity Layer
+   Applied on top of existing lessons.html CSS
+   All original logic preserved 100%
+═══════════════════════════════════════════ */
+
+/* Scrollbar */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--primary); border-radius:3px; }
+
+/* Body default dark */
+body {
+  background: var(--bg) !important;
+  color: var(--text) !important;
+}
+
+/* ── TOPBAR enhanced ── */
+.topbar {
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  height: 68px !important;
+}
+.topbar::after {
+  background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--primary), transparent) !important;
+  background-size: 300% 100% !important;
+  animation: shine-bar 4s linear infinite !important;
+  box-shadow: none !important;
+  height: 1px !important;
+  opacity: .5;
+}
+
+/* Logo update */
+.logo-img-wrap {
+  border-radius: 8px !important;
+  border: 1px solid rgba(0,201,167,.35) !important;
+  box-shadow: 0 0 16px rgba(0,201,167,.2) !important;
+}
+.logo-main {
+  font-family: 'Bebas Neue', sans-serif !important;
+  font-size: 1.05rem !important;
+  letter-spacing: .08em !important;
+  color: var(--primary) !important;
+}
+.logo-sub { color: rgba(246,243,237,.5) !important; }
+
+/* Topbar buttons */
+.tb-btn {
+  background: rgba(246,243,237,.04) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text2) !important;
+  border-radius: 6px !important;
+}
+.tb-btn:hover { border-color: var(--primary) !important; color: var(--primary) !important; background: rgba(0,201,167,.06) !important; }
+.theme-btn { background: rgba(0,201,167,.08) !important; border-color: rgba(0,201,167,.3) !important; color: var(--primary) !important; }
+
+/* ── COURSE HERO BANNER ── */
+.course-hero {
+  border-radius: 10px !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(0,201,167,.15) inset !important;
+}
+.course-hero::before {
+  background:
+    radial-gradient(circle at 85% 10%, rgba(0,201,167,.28), transparent 55%),
+    radial-gradient(circle at 10% 90%, rgba(245,166,35,.2), transparent 50%) !important;
+}
+
+/* ── CARDS ── */
+.quick-actions-card,
+.course-info-card,
+.progress-section,
+.gate-box,
+.lesson-card,
+.notes-card,
+.quiz-card,
+[class*="-card"],
+[class*="card-"] {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* Quick action items */
+.qa-ico.qa-quiz   { background: rgba(124,58,237,.15) !important; }
+.qa-ico.qa-files  { background: rgba(245,166,35,.15) !important; }
+.qa-ico.qa-notes  { background: rgba(0,201,167,.12) !important; color: var(--primary) !important; }
+.qa-ico.qa-content{ background: rgba(34,197,94,.12) !important; }
+
+/* Progress */
+.progress-fill {
+  background: linear-gradient(90deg, var(--primary) 0%, #00e4bb 60%, var(--accent) 100%) !important;
+  box-shadow: 0 0 14px rgba(0,201,167,.4) !important;
+}
+.progress-pct {
+  background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb a { color: var(--primary) !important; }
+
+/* ── INPUTS ── */
+input, select, textarea {
+  background: rgba(246,243,237,.04) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(0,201,167,.12) !important;
+}
+input::placeholder, textarea::placeholder { color: rgba(246,243,237,.2) !important; }
+
+/* ── BUTTONS ── */
+.btn-gate-action,
+.btn-gate-action:not(.free-btn) {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 20px rgba(0,201,167,.3) !important;
+  font-family: 'Cairo', sans-serif !important;
+}
+.btn-gate-action:hover { box-shadow: 0 10px 28px rgba(0,201,167,.45) !important; }
+.btn-gate-action.free-btn { background: linear-gradient(135deg, #22C55E, #16a34a) !important; }
+.btn-copy { background: var(--primary) !important; }
+.btn-copy:hover { background: var(--primary-dark) !important; }
+
+/* ── ACT TABS ── */
+.act-tabs {
+  background: rgba(246,243,237,.04) !important;
+  border-color: var(--border) !important;
+  border-radius: 8px !important;
+}
+.act-tab.active {
+  background: rgba(0,201,167,.12) !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+}
+
+/* ── PAY BOX ── */
+.pay-info-box {
+  background: rgba(245,166,35,.06) !important;
+  border-color: rgba(245,166,35,.2) !important;
+}
+.pay-info-title { color: var(--accent) !important; }
+.pay-number { color: var(--primary) !important; }
+
+/* ── LESSON ITEMS ── */
+[class*="lesson-item"], [class*="lesson-row"] {
+  border-color: var(--border) !important;
+}
+[class*="lesson-item"]:hover, [class*="lesson-row"]:hover {
+  background: rgba(0,201,167,.05) !important;
+}
+
+/* ── QUIZ ── */
+.quiz-preview-q { background: rgba(246,243,237,.03) !important; border-color: var(--border) !important; }
+.quiz-preview-q-num { color: var(--primary) !important; }
+.opt-letter { color: var(--primary) !important; background: rgba(0,201,167,.08) !important; }
+
+/* ── ALERTS / TOASTS ── */
+[class*="alert-"], [class*="-alert"],
+[class*="toast"], [class*="snack"] {
+  border-radius: 8px !important;
+}
+
+/* ── MODALS ── */
+[class*="modal-"], [class*="-modal"],
+[class*="overlay-"], [class*="-overlay"] {
+  backdrop-filter: blur(12px) !important;
+}
+[class*="modal-content"], [class*="modal-box"], [class*="popup-box"] {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+}
+
+/* ── TABLE ── */
+th { background: rgba(246,243,237,.03) !important; color: var(--text2) !important; border-color: var(--border) !important; }
+td { border-color: var(--border) !important; }
+tr:hover td { background: rgba(0,201,167,.04) !important; }
+
+/* ── BADGE ── */
+.cic-badge.free { background: rgba(34,197,94,.12) !important; color: #4ade80 !important; }
+.cic-badge.paid { background: rgba(245,166,35,.12) !important; color: var(--accent) !important; }
+
+/* ── HERO RING ── */
+.hero-ring-fill { stroke: var(--primary) !important; filter: drop-shadow(0 0 6px rgba(0,201,167,.55)) !important; }
+.hero-ring-track { stroke: rgba(0,201,167,.15) !important; }
+
+/* ── BACK TO TOP / FAB ── */
+.tg-fab-wrap, [class*="fab"], [class*="tg-btn"], [class*="back-top"] {
+  filter: none !important;
+}
+
+/* ── FOOTER (if any in lessons) ── */
+footer, .footer { background: #05050A !important; border-top: 1px solid var(--border) !important; }
+
+/* ── SHIMMER animations keep working ── */
+.progress-fill::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent) !important; }
 </style>
 </head>
 <body>
