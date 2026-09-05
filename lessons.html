@@ -9,8 +9,26 @@
 <script>
 (function(){
   try {
-    var u = JSON.parse(localStorage.getItem('alamin_current') || 'null');
-    if (!u) {
+    // Check full session first (with expiry)
+    var session = null;
+    var rawSession = localStorage.getItem('alamin_session_remember');
+    if (rawSession) {
+      var s = JSON.parse(rawSession);
+      if (s && s.user) {
+        if (s.expiresAt && Date.now() > s.expiresAt) {
+          localStorage.removeItem('alamin_session_remember');
+          localStorage.removeItem('alamin_current');
+        } else {
+          session = s.user;
+          // Keep alamin_current in sync for backward compat
+          localStorage.setItem('alamin_current', JSON.stringify(session));
+        }
+      }
+    }
+    if (!session) {
+      session = JSON.parse(localStorage.getItem('alamin_current') || 'null');
+    }
+    if (!session) {
       var next = encodeURIComponent(location.pathname.split('/').pop() + location.search);
       window.location.replace('login.html?next=' + next);
     }
@@ -1957,12 +1975,30 @@ if(savedTheme === 'dark') document.documentElement.setAttribute('data-theme','da
 // AUTH
 // ═══════════════════════════════════════════════════════════
 function getCurrentUser(){
-  try { return JSON.parse(localStorage.getItem('alamin_current') || 'null'); }
+  try {
+    // Prefer full session (respects expiry)
+    const raw = localStorage.getItem('alamin_session_remember');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && s.user) {
+        if (s.expiresAt && Date.now() > s.expiresAt) {
+          localStorage.removeItem('alamin_session_remember');
+          localStorage.removeItem('alamin_current');
+          return null;
+        }
+        return s.user;
+      }
+    }
+    return JSON.parse(localStorage.getItem('alamin_current') || 'null');
+  }
   catch(e){ return null; }
 }
 function doLogout(){
   localStorage.removeItem('alamin_current');
-  window.location.href = 'index.html';
+  localStorage.removeItem('alamin_session_remember');
+  localStorage.removeItem('alamin_remember');
+  sessionStorage.removeItem('alamin_current');
+  window.location.href = 'login.html';
 }
 // زر "رجوع" في التوب بار: يرجع للصفحة السابقة بدل ما يعمل تسجيل خروج
 function goBackPage(){
@@ -2011,7 +2047,7 @@ function animateCards(){
 // ═══════════════════════════════════════════════════════════
 function getOpenedLessonsKey(courseId){
   const user = getCurrentUser();
-  const uid = user ? (user.phone || user.id || 'guest') : 'guest';
+  const uid = user ? (user.id || user.phone || 'guest') : 'guest';  // user.id is primary key
   return `alamin_opened_${uid}_${courseId}`;
 }
 function loadOpenedLessons(courseId){
@@ -2102,6 +2138,16 @@ function hasCourseAccess(courseId){
   const user = getCurrentUser();
   if(!user) return false;
   if(user.role === 'admin') return true;
+
+  // الكورسات المجانية متاحة تلقائياً لجميع الطلاب المسجلين
+  try {
+    const allCourses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+    const course = allCourses.find(c => String(c.id) === String(courseId));
+    if(course && (course.type === 'free' || parseFloat(course.price || 0) === 0)) {
+      return true;
+    }
+  } catch(e) {}
+
   return Array.isArray(user.enrolledCourses) &&
          user.enrolledCourses.some(id => String(id) === String(courseId));
 }
@@ -2473,7 +2519,7 @@ async function submitCoursePaymentRequest(courseId){
 // ═══════════════════════════════════════════════════════════
 function getQuizAttemptKey(quizId){
   const user = getCurrentUser();
-  const uid  = user ? (user.phone || user.id || user.name || 'guest') : 'guest';
+  const uid  = user ? (user.id || user.phone || 'guest') : 'guest';  // user.id is primary key
   return `${uid}_${quizId}`;
 }
 function hasQuizAttempt(quizId){

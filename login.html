@@ -15,9 +15,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-  /* ═══════════════════════════════
-     TOKENS
-  ═══════════════════════════════ */
   :root {
     --ink:        #08080D;
     --ink-2:      #111118;
@@ -58,7 +55,6 @@
     position:relative; overflow-x:hidden;
   }
 
-  /* Background */
   body::before {
     content:'';
     position:fixed; inset:0;
@@ -68,7 +64,6 @@
     pointer-events:none; z-index:0;
   }
 
-  /* Watermark */
   .page-wm {
     position:fixed; inset:0;
     display:flex; align-items:center; justify-content:center;
@@ -83,7 +78,6 @@
     user-select:none;
   }
 
-  /* ── TOP BAR ── */
   .topbar {
     display:flex; align-items:center; justify-content:space-between;
     padding:20px 32px;
@@ -122,14 +116,12 @@
   }
   [data-theme="light"] .theme-toggle-knob { transform:translateX(22px); }
 
-  /* ── AUTH LAYOUT — split panel on desktop ── */
   .auth-layout {
     flex:1; display:grid;
     grid-template-columns:1fr 1fr;
     position:relative; z-index:2;
   }
 
-  /* LEFT PANEL */
   .auth-left {
     background:var(--ink-2);
     border-right:1px solid var(--b-light);
@@ -187,13 +179,11 @@
     padding-left:14px; position:relative; z-index:1;
   }
 
-  /* RIGHT PANEL — form */
   .auth-right {
     display:flex; align-items:center; justify-content:center;
     padding:48px 32px;
   }
 
-  /* ── AUTH CARD ── */
   .auth-card {
     width:100%; max-width:440px;
     background:rgba(246,243,237,.03);
@@ -219,7 +209,6 @@
   }
   .auth-sub { font-size:.82rem; color:var(--muted); }
 
-  /* Tabs (original logic preserved, new skin) */
   .tabs {
     display:flex; gap:4px;
     background:rgba(246,243,237,.04);
@@ -243,7 +232,6 @@
   form { display:none; flex-direction:column; gap:14px; }
   form.active { display:flex; }
 
-  /* Fields */
   .field { display:flex; flex-direction:column; gap:5px; }
   .field label {
     font-size:.7rem; font-weight:700; color:var(--muted-2);
@@ -301,7 +289,6 @@
   .row-inline a { color:var(--teal); text-decoration:none; font-weight:700; }
   .row-inline a:hover { text-decoration:underline; }
 
-  /* Submit button */
   .submit-btn {
     margin-top:4px;
     border:none; border-radius:var(--radius);
@@ -326,7 +313,6 @@
   .submit-btn:active { transform:translateY(0); }
   .submit-btn:disabled { opacity:.6; cursor:not-allowed; transform:none; }
 
-  /* Divider */
   .divider {
     display:flex; align-items:center; gap:10px;
     margin:18px 0 2px; color:var(--muted); font-size:.72rem;
@@ -338,7 +324,6 @@
   .switch-line a { color:var(--teal); font-weight:700; text-decoration:none; cursor:pointer; }
   .switch-line a:hover { text-decoration:underline; }
 
-  /* Alerts */
   .alert {
     display:none; font-size:.8rem; font-weight:600;
     padding:10px 14px; border-radius:var(--radius);
@@ -349,7 +334,6 @@
   .alert.error { background:rgba(239,68,68,.1); color:#F87171; border:1px solid rgba(239,68,68,.25); }
   .alert.success { background:rgba(34,197,94,.1); color:#4ADE80; border:1px solid rgba(34,197,94,.25); }
 
-  /* Back home */
   .back-home {
     display:inline-flex; align-items:center; gap:6px;
     color:var(--muted); text-decoration:none;
@@ -364,7 +348,6 @@
     border-top:1px solid var(--b-light);
   }
 
-  /* ── RESPONSIVE ── */
   @media(max-width:820px){
     .auth-layout { grid-template-columns:1fr; }
     .auth-left { display:none; }
@@ -375,11 +358,21 @@
     .auth-card { padding:28px 20px 24px; }
     .topbar { padding:16px 18px; }
   }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display:inline-block;
+    width:16px; height:16px;
+    border:2px solid rgba(8,8,13,.3);
+    border-top-color:var(--ink);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+  }
 </style>
 </head>
 <body>
 
-<!-- Watermark -->
 <div class="page-wm"><span class="page-wm-text">NEVER<br>GIVE<br>UP</span></div>
 
 <!-- TOP BAR -->
@@ -401,14 +394,13 @@
   </div>
 </div>
 
-<!-- AUTH LAYOUT — two-panel on desktop -->
+<!-- AUTH LAYOUT -->
 <div class="auth-layout">
 
   <!-- LEFT PANEL -->
   <div class="auth-left">
     <div class="auth-left-bg"></div>
     <div class="auth-left-glow"></div>
-
     <div>
       <div class="left-eyebrow">
         <span class="left-eyebrow-line"></span>
@@ -430,7 +422,6 @@
         <div class="left-feature"><span class="left-feature-dot"></span>Download your certificates</div>
       </div>
     </div>
-
     <div class="left-quote">
       "The secret of getting ahead is getting started."<br>
       <strong style="color:var(--surface);font-style:normal;font-size:.75rem">— Mark Twain</strong>
@@ -443,115 +434,217 @@
 
       <div class="auth-head">
         <div class="auth-emoji">⚡</div>
-        <div class="auth-title" id="cardTitle" data-i18n="auth_title_login">Welcome Back</div>
-        <div class="auth-sub" id="cardSub" data-i18n="auth_sub_login">Sign in and Never Give Up</div>
+        <div class="auth-title" id="cardTitle">مرحباً بك</div>
+        <div class="auth-sub" id="cardSub">سجّل دخولك ولا تستسلم</div>
       </div>
 
       <div class="tabs">
-        <button class="tab-btn active" id="tabLoginBtn" data-i18n="tab_login" onclick="switchTab('login')">🔑 Login</button>
-        <button class="tab-btn" id="tabRegisterBtn" data-i18n="tab_register" onclick="switchTab('register')">✨ Sign Up</button>
+        <button class="tab-btn active" id="tabLoginBtn" onclick="switchTab('login')">🔑 تسجيل الدخول</button>
+        <button class="tab-btn" id="tabRegisterBtn" onclick="switchTab('register')">✨ إنشاء حساب</button>
       </div>
 
       <div class="alert error" id="alertError"></div>
       <div class="alert success" id="alertSuccess"></div>
 
-      <!-- LOGIN FORM (original fields preserved exactly) -->
+      <!-- ════════════════════════════════
+           LOGIN FORM
+           تسجيل الدخول برقم الهاتف وكلمة المرور
+      ════════════════════════════════ -->
       <form id="loginForm" class="active">
+
         <div class="field">
-          <label data-i18n="label_phone">Phone Number</label>
+          <label>رقم هاتف الطالب</label>
           <div class="input-wrap">
             <span class="ic">📱</span>
-            <input type="tel" id="loginPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" required>
+            <input type="tel" id="loginPhone" placeholder="01xxxxxxxxx"
+                   maxlength="11" inputmode="numeric"
+                   oninput="this.value=this.value.replace(/\D/g,'')"
+                   required>
           </div>
         </div>
+
         <div class="field">
-          <label data-i18n="label_password">Password</label>
+          <label>كلمة المرور</label>
           <div class="input-wrap">
             <span class="ic">🔒</span>
-            <input type="password" id="loginPassword" data-i18n-placeholder="placeholder_password" placeholder="Enter your password" required>
-            <button type="button" class="toggle-pass" onclick="togglePass('loginPassword', this)">👁️</button>
+            <input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" required>
+            <button type="button" class="toggle-pass" onclick="togglePass('loginPassword',this)">👁️</button>
           </div>
         </div>
+
         <div class="row-inline">
-          <label><input type="checkbox" id="rememberMe"> <span data-i18n="remember_me">Remember me</span></label>
-          <a onclick="alert(t('forgot_password_alert'))" data-i18n="forgot_password">Forgot password?</a>
+          <label><input type="checkbox" id="rememberMe" checked> <span>تذكرني</span></label>
+          <a onclick="alert('للاسترداد تواصل مع الإدارة')">نسيت كلمة المرور؟</a>
         </div>
-        <button type="submit" class="submit-btn" id="loginBtn" data-i18n="btn_login">🚀 Login</button>
+
+        <button type="submit" class="submit-btn" id="loginBtn">🚀 دخول</button>
       </form>
 
-      <!-- REGISTER FORM (original fields preserved exactly) -->
+      <!-- ════════════════════════════════
+           REGISTER FORM
+           إنشاء حساب جديد
+      ════════════════════════════════ -->
       <form id="registerForm">
+
+        <!-- الاسم الثلاثي -->
         <div class="field">
-          <label data-i18n="label_fullname">Full Name</label>
+          <label>الاسم الثلاثي</label>
           <div class="input-wrap">
             <span class="ic">👤</span>
-            <input type="text" id="regName" data-i18n-placeholder="placeholder_fullname" placeholder="Your full name" required>
+            <input type="text" id="regName"
+                   placeholder="الاسم الأول والثاني والثالث"
+                   autocomplete="name" required>
           </div>
         </div>
+
+        <!-- رقم هاتف الطالب — 11 رقم بالضبط -->
         <div class="field">
-          <label data-i18n="label_phone">Phone Number</label>
+          <label>رقم هاتف الطالب</label>
           <div class="input-wrap">
             <span class="ic">📱</span>
-            <input type="tel" id="regPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" required>
+            <input type="tel" id="regPhone"
+                   placeholder="01xxxxxxxxx"
+                   maxlength="11"
+                   inputmode="numeric"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)"
+                   autocomplete="tel" required>
           </div>
         </div>
+
+        <!-- رقم هاتف ولي الأمر — 11 رقم بالضبط -->
         <div class="field">
-          <label data-i18n="label_parent_phone">Parent's Phone Number</label>
+          <label>رقم هاتف ولي الأمر</label>
           <div class="input-wrap">
             <span class="ic">👨‍👩‍👧</span>
-            <input type="tel" id="regParentPhone" data-i18n-placeholder="placeholder_phone" placeholder="01xxxxxxxxx" pattern="^01[0-9]{9}$" required>
+            <input type="tel" id="regParentPhone"
+                   placeholder="01xxxxxxxxx"
+                   maxlength="11"
+                   inputmode="numeric"
+                   oninput="this.value=this.value.replace(/\D/g,'').slice(0,11)"
+                   required>
           </div>
         </div>
+
+        <!-- المرحلة الدراسية -->
         <div class="field">
-          <label data-i18n="label_grade">Grade / Level</label>
+          <label>المرحلة الدراسية</label>
           <div class="input-wrap">
             <span class="ic">🎓</span>
-            <select id="regGrade" required>
-              <option value="" disabled selected data-i18n="select_grade_default">Select your grade</option>
-              <option value="prep1">1st Prep — الأول الإعدادي</option>
-              <option value="prep2">2nd Prep — الثاني الإعدادي</option>
-              <option value="prep3">3rd Prep — الثالث الإعدادي</option>
-              <option value="1">1st Secondary — الأول الثانوي</option>
-              <option value="2">2nd Secondary — الثاني الثانوي</option>
-              <option value="3">3rd Secondary — الثالث الثانوي</option>
+            <select id="regGrade" required onchange="onGradeChange(this.value)">
+              <option value="" disabled selected>اختر المرحلة الدراسية</option>
+              <option value="prep1">أولى إعدادي</option>
+              <option value="prep2">ثانية إعدادي</option>
+              <option value="prep3">ثالثة إعدادي</option>
+              <option value="1">أولى ثانوي</option>
+              <option value="2">ثانية ثانوي</option>
+              <option value="3">ثالثة ثانوي</option>
             </select>
           </div>
         </div>
-        <div class="field">
-          <label data-i18n="label_password">Password</label>
-          <div class="input-wrap">
-            <span class="ic">🔒</span>
-            <input type="password" id="regPassword" data-i18n-placeholder="placeholder_password_min" placeholder="At least 6 characters" minlength="6" required>
-            <button type="button" class="toggle-pass" onclick="togglePass('regPassword', this)">👁️</button>
+
+        <!-- الشعبة — تظهر فقط عند ثانية ثانوي -->
+        <div class="field" id="trackField" style="display:none;">
+          <label>الشُعبة</label>
+          <div style="display:flex;gap:8px;">
+            <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 0;border:1.5px solid var(--b-light);border-radius:var(--radius);cursor:pointer;font-size:.88rem;font-weight:600;color:var(--muted);transition:.2s;background:rgba(246,243,237,.04);" id="trackLabelGeneral">
+              <input type="radio" name="regTrack" id="trackGeneral" value="general" style="display:none;" onchange="selectTrack('general')">
+              📚 عام
+            </label>
+            <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 0;border:1.5px solid var(--b-light);border-radius:var(--radius);cursor:pointer;font-size:.88rem;font-weight:600;color:var(--muted);transition:.2s;background:rgba(246,243,237,.04);" id="trackLabelBacc">
+              <input type="radio" name="regTrack" id="trackBacc" value="baccalaureate" style="display:none;" onchange="selectTrack('baccalaureate')">
+              🌐 بكالوريا
+            </label>
           </div>
         </div>
+
+        <!-- المحافظة -->
         <div class="field">
-          <label data-i18n="label_confirm_password">Confirm Password</label>
+          <label>المحافظة</label>
           <div class="input-wrap">
-            <span class="ic">🔒</span>
-            <input type="password" id="regPassword2" data-i18n-placeholder="placeholder_password_again" placeholder="Re-enter password" minlength="6" required>
+            <span class="ic">📍</span>
+            <select id="regGov" required>
+              <option value="" disabled selected>اختر المحافظة</option>
+              <option value="القاهرة">القاهرة</option>
+              <option value="الجيزة">الجيزة</option>
+              <option value="الإسكندرية">الإسكندرية</option>
+              <option value="الدقهلية">الدقهلية</option>
+              <option value="البحيرة">البحيرة</option>
+              <option value="الغربية">الغربية</option>
+              <option value="المنوفية">المنوفية</option>
+              <option value="الشرقية">الشرقية</option>
+              <option value="القليوبية">القليوبية</option>
+              <option value="كفر الشيخ">كفر الشيخ</option>
+              <option value="دمياط">دمياط</option>
+              <option value="بورسعيد">بورسعيد</option>
+              <option value="الإسماعيلية">الإسماعيلية</option>
+              <option value="السويس">السويس</option>
+              <option value="شمال سيناء">شمال سيناء</option>
+              <option value="جنوب سيناء">جنوب سيناء</option>
+              <option value="الفيوم">الفيوم</option>
+              <option value="بني سويف">بني سويف</option>
+              <option value="المنيا">المنيا</option>
+              <option value="أسيوط">أسيوط</option>
+              <option value="سوهاج">سوهاج</option>
+              <option value="قنا">قنا</option>
+              <option value="الأقصر">الأقصر</option>
+              <option value="أسوان">أسوان</option>
+              <option value="البحر الأحمر">البحر الأحمر</option>
+              <option value="الوادي الجديد">الوادي الجديد</option>
+              <option value="مطروح">مطروح</option>
+            </select>
           </div>
         </div>
+
+        <!-- كلمة المرور — 6 خانات على الأقل (أرقام أو حروف إنجليزية أو خليط) -->
+        <div class="field">
+          <label>كلمة المرور <small style="font-weight:400;opacity:.6;text-transform:none;">(6 خانات على الأقل)</small></label>
+          <div class="input-wrap">
+            <span class="ic">🔒</span>
+            <input type="password" id="regPassword"
+                   placeholder="أرقام أو حروف إنجليزية — 6 خانات فأكثر"
+                   minlength="6"
+                   autocomplete="new-password" required>
+            <button type="button" class="toggle-pass" onclick="togglePass('regPassword',this)">👁️</button>
+          </div>
+        </div>
+
+        <!-- تأكيد كلمة المرور -->
+        <div class="field">
+          <label>تأكيد كلمة المرور</label>
+          <div class="input-wrap">
+            <span class="ic">🔒</span>
+            <input type="password" id="regPassword2"
+                   placeholder="أعد كتابة كلمة المرور"
+                   minlength="6"
+                   autocomplete="new-password" required>
+          </div>
+        </div>
+
+        <!-- الموافقة -->
         <div class="row-inline">
-          <label><input type="checkbox" id="agreeTerms" required> <span data-i18n="agree_terms">I agree to the Terms & Conditions</span></label>
+          <label>
+            <input type="checkbox" id="agreeTerms" required>
+            <span>أوافق على الشروط والأحكام</span>
+          </label>
         </div>
-        <button type="submit" class="submit-btn" id="registerBtn" data-i18n="btn_register">🎉 Create Account</button>
+
+        <button type="submit" class="submit-btn" id="registerBtn">🎉 إنشاء الحساب</button>
       </form>
 
-      <div class="divider" data-i18n="divider_or">or</div>
+      <div class="divider">أو</div>
       <div class="switch-line" id="switchLine">
-        <span data-i18n="switch_to_register">Don't have an account? </span><a onclick="switchTab('register')" data-i18n="switch_to_register_link">Sign up now</a>
+        <span>ليس لديك حساب؟ </span><a onclick="switchTab('register')">سجّل الآن</a>
       </div>
     </div>
   </div>
 </div>
 
 <footer class="mini">
-  <a href="index.html" class="back-home" data-i18n="back_home">← Back to Home</a>
-  &nbsp;·&nbsp; <span data-i18n="footer_tagline">© 2026 Never Give Up — أ. مصطفى سالم · جميع الحقوق محفوظة</span>
+  <a href="index.html" class="back-home">← الرجوع للرئيسية</a>
+  &nbsp;·&nbsp; <span>© 2026 Never Give Up — أ. مصطفى سالم · جميع الحقوق محفوظة</span>
 </footer>
 
-<!-- ===== Firebase (original — 100% unchanged) ===== -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -560,225 +653,481 @@
 <script src="i18n.js"></script>
 
 <script>
-  /* =====================================================
-     ALL ORIGINAL JAVASCRIPT PRESERVED EXACTLY AS-IS
-     (100% same logic from original login.html)
-  ===================================================== */
+/* ══════════════════════════════════════════════════════════════
+   SESSION KEYS  (ثابتة — لا تتغير)
+══════════════════════════════════════════════════════════════ */
+const SESSION_KEY    = 'alamin_current';        // backward-compat
+const REMEMBER_KEY   = 'alamin_session_remember';
+const SESSION_EXPIRY = 30 * 24 * 60 * 60 * 1000; // 30 يوم
 
-  // ── THEME (original)
-  function toggleTheme(){
-    const html = document.documentElement;
-    const isDark = html.getAttribute('data-theme') !== 'light';
-    const newTheme = isDark ? 'light' : 'dark';
-    html.setAttribute('data-theme', newTheme);
-    document.getElementById('themeKnob').textContent = newTheme === 'light' ? '☀️' : '🌙';
-    localStorage.setItem('mostafa_salem_theme', newTheme);
-  }
-  const savedTheme = localStorage.getItem('mostafa_salem_theme');
-  if (savedTheme) {
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeKnob').textContent = savedTheme === 'light' ? '☀️' : '🌙';
-  }
-
-  // ── TAB SWITCHING (original)
-  function switchTab(tab){
-    hideAlerts();
-    const isLogin = tab === 'login';
-    document.getElementById('tabLoginBtn').classList.toggle('active', isLogin);
-    document.getElementById('tabRegisterBtn').classList.toggle('active', !isLogin);
-    document.getElementById('loginForm').classList.toggle('active', isLogin);
-    document.getElementById('registerForm').classList.toggle('active', !isLogin);
-    document.getElementById('cardTitle').setAttribute('data-i18n', isLogin ? 'auth_title_login' : 'auth_title_register');
-    document.getElementById('cardSub').setAttribute('data-i18n', isLogin ? 'auth_sub_login' : 'auth_sub_register');
-    document.getElementById('switchLine').innerHTML = isLogin
-      ? `<span data-i18n="switch_to_register">${t('switch_to_register')}</span><a onclick="switchTab('register')" data-i18n="switch_to_register_link">${t('switch_to_register_link')}</a>`
-      : `<span data-i18n="switch_to_login">${t('switch_to_login')}</span><a onclick="switchTab('login')" data-i18n="switch_to_login_link">${t('switch_to_login_link')}</a>`;
-    applyLanguage(mostafaSalemGetLang());
-    {
-      const params = new URLSearchParams(location.search);
-      const qs = params.toString();
-      const base = isLogin ? 'login.html' : 'register.html';
-      history.replaceState(null, '', qs ? base + '?' + qs : base);
+/* ── حفظ الجلسة ────────────────────────────────────────────── */
+function saveSession(user, remember) {
+  remember = (remember !== false); // default: true
+  const sessionData = {
+    user:      user,
+    remember:  remember,
+    savedAt:   Date.now(),
+    expiresAt: remember ? (Date.now() + SESSION_EXPIRY) : null,
+  };
+  try {
+    localStorage.setItem(SESSION_KEY,  JSON.stringify(user));
+    localStorage.setItem(REMEMBER_KEY, JSON.stringify(sessionData));
+    if (!remember) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
     }
-  }
+  } catch(e) { console.warn('[session] save error:', e); }
+}
 
-  (function initTab(){
-    const params = new URLSearchParams(location.search);
-    const path = location.pathname.toLowerCase();
-    if (path.endsWith('register.html') || params.get('tab') === 'register') {
-      switchTab('register');
+/* ── تحميل الجلسة ───────────────────────────────────────────── */
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && s.user) {
+        if (s.expiresAt && Date.now() > s.expiresAt) { clearSession(); return null; }
+        return s.user;
+      }
     }
-  })();
+    // Legacy fallback
+    const legacy = localStorage.getItem(SESSION_KEY);
+    return legacy ? JSON.parse(legacy) : null;
+  } catch(e) { return null; }
+}
 
-  function getNextUrl(fallback){
-    const params = new URLSearchParams(location.search);
-    const next = params.get('next');
-    return next ? decodeURIComponent(next) : fallback;
+/* ── مسح الجلسة ─────────────────────────────────────────────── */
+function clearSession() {
+  try {
+    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(REMEMBER_KEY);
+    localStorage.removeItem('alamin_remember');
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch(e) {}
+}
+
+/* ── بيانات المستخدمين (localStorage) ──────────────────────── */
+function getUsers()  { return JSON.parse(localStorage.getItem('alamin_users') || '[]'); }
+function saveUsers(u){ localStorage.setItem('alamin_users', JSON.stringify(u)); }
+function normalizePhone(p){ return String(p || '').trim().replace(/\s/g,''); }
+
+/* ── تشفير كلمة المرور ──────────────────────────────────────── */
+function hashPass(pass){
+  let h = 0;
+  const str = 'mostafa_salem_' + pass;
+  for (let i = 0; i < str.length; i++){
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
   }
+  return 'h' + Math.abs(h).toString(36);
+}
 
-  function togglePass(id, btn){
+/* ── حسابات الأدمن ──────────────────────────────────────────── */
+const ADMIN_ACCOUNTS = [
+  // { phone: '01096954340', name: 'Mr. Mostafa Salem', role: 'admin', password: hashPass('CHANGE_THIS') }
+];
+function findAdminAccount(phone, pass){
+  return ADMIN_ACCOUNTS.find(a => normalizePhone(a.phone) === phone && a.password === hashPass(pass));
+}
+
+/* ── Firebase helpers ───────────────────────────────────────── */
+async function waitForDb(maxMs) {
+  maxMs = maxMs || 8000;
+  if (window.db) return window.db;
+  return new Promise(resolve => {
+    const start = Date.now();
+    const t = setInterval(() => {
+      if (window.db) { clearInterval(t); resolve(window.db); }
+      else if (Date.now() - start > maxMs) { clearInterval(t); resolve(null); }
+    }, 120);
+  });
+}
+
+async function syncStudentToFirebase(user) {
+  const db = await waitForDb(4000);
+  if (!db) { console.warn('[auth] Firebase not ready'); return false; }
+  try {
+    const writePromise = db.collection('students').doc(String(user.phone)).set({
+      id:              user.id,
+      name:            user.name,
+      phone:           user.phone,
+      parentPhone:     user.parentPhone  || '',
+      grade:           user.grade        || '',
+      track:           user.track        || '',
+      gov:             user.gov          || '',
+      password:        user.password     || '',
+      role:            'student',
+      status:          'active',
+      studentType:     'outside',
+      enrolledCourses: user.enrolledCourses || [],
+      progress:        user.progress        || {},
+      createdAt:       user.createdAt       || new Date().toISOString(),
+      registeredAt:    user.createdAt       || new Date().toISOString(),
+      joinDate:        (user.createdAt      || new Date().toISOString()).slice(0,10),
+      qrCode:          user.id,
+    }, { merge: true });
+    
+    // 4 seconds max wait for Firestore write so UI never blocks
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase sync timeout')), 4000));
+    await Promise.race([writePromise, timeoutPromise]);
+    console.log('[auth] ✅ Student saved to Firestore:', user.phone);
+    return true;
+  } catch(e) {
+    console.warn('[auth] Firebase sync note:', e.message);
+    return false;
+  }
+}
+
+async function fetchStudentFromFirebase(phone) {
+  const db = await waitForDb(6000);
+  if (!db) return null;
+  try {
+    const snap = await db.collection('students').doc(String(phone)).get();
+    return snap.exists ? snap.data() : null;
+  } catch(e) {
+    console.warn('[auth] Firebase fetch failed:', e.message);
+    return null;
+  }
+}
+
+function scheduleFirebaseRetry(user) {
+  setTimeout(async () => {
+    const ok = await syncStudentToFirebase(user);
+    console.log(ok ? '[auth] ✅ Delayed sync OK' : '[auth] ⚠️ Delayed sync failed', user.phone);
+  }, 5000);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   UI HELPERS
+══════════════════════════════════════════════════════════════ */
+function showError(msg){
+  hideAlerts();
+  const el = document.getElementById('alertError');
+  el.textContent = '⚠️ ' + msg;
+  el.classList.add('show');
+}
+function showSuccess(msg){
+  hideAlerts();
+  const el = document.getElementById('alertSuccess');
+  el.textContent = '✅ ' + msg;
+  el.classList.add('show');
+}
+function hideAlerts(){
+  document.getElementById('alertError').classList.remove('show');
+  document.getElementById('alertSuccess').classList.remove('show');
+}
+
+function togglePass(id, btn){
+  const el = document.getElementById(id);
+  const show = el.type === 'password';
+  el.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁️';
+}
+
+function getNextUrl(fallback){
+  const params = new URLSearchParams(location.search);
+  const next = params.get('next');
+  return next ? decodeURIComponent(next) : fallback;
+}
+
+/* ── THEME ──────────────────────────────────────────────────── */
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') !== 'light';
+  const newTheme = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  document.getElementById('themeKnob').textContent = newTheme === 'light' ? '☀️' : '🌙';
+  localStorage.setItem('mostafa_salem_theme', newTheme);
+}
+(function(){
+  const t = localStorage.getItem('mostafa_salem_theme');
+  if (t) {
+    document.documentElement.setAttribute('data-theme', t);
+    document.getElementById('themeKnob').textContent = t === 'light' ? '☀️' : '🌙';
+  }
+})();
+
+/* ── TABS ───────────────────────────────────────────────────── */
+function switchTab(tab){
+  hideAlerts();
+  const isLogin = tab === 'login';
+  document.getElementById('tabLoginBtn').classList.toggle('active', isLogin);
+  document.getElementById('tabRegisterBtn').classList.toggle('active', !isLogin);
+  document.getElementById('loginForm').classList.toggle('active', isLogin);
+  document.getElementById('registerForm').classList.toggle('active', !isLogin);
+  document.getElementById('cardTitle').textContent = isLogin ? 'مرحباً بك' : 'إنشاء حساب جديد';
+  document.getElementById('cardSub').textContent   = isLogin ? 'سجّل دخولك ولا تستسلم' : 'انضم إلى منصة Never Give Up';
+  document.getElementById('switchLine').innerHTML  = isLogin
+    ? '<span>ليس لديك حساب؟ </span><a onclick="switchTab(\'register\')">سجّل الآن</a>'
+    : '<span>لديك حساب بالفعل؟ </span><a onclick="switchTab(\'login\')">سجّل الدخول</a>';
+  const params = new URLSearchParams(location.search);
+  const qs = params.toString();
+  const base = isLogin ? 'login.html' : 'register.html';
+  history.replaceState(null, '', qs ? base + '?' + qs : base);
+}
+
+/* ── init tab from URL ──────────────────────────────────────── */
+(function initTab(){
+  const params = new URLSearchParams(location.search);
+  const path = location.pathname.toLowerCase();
+  if (path.endsWith('register.html') || params.get('tab') === 'register') {
+    switchTab('register');
+  }
+})();
+
+/* ── Grade → Track ──────────────────────────────────────────── */
+function onGradeChange(grade) {
+  const trackField = document.getElementById('trackField');
+  if (grade === '2') {
+    trackField.style.display = 'block';
+    document.querySelectorAll('[name="regTrack"]').forEach(r => r.checked = false);
+    resetTrackLabels();
+  } else {
+    trackField.style.display = 'none';
+    document.querySelectorAll('[name="regTrack"]').forEach(r => r.checked = false);
+  }
+}
+function selectTrack(val) {
+  resetTrackLabels();
+  const lbl = val === 'general'
+    ? document.getElementById('trackLabelGeneral')
+    : document.getElementById('trackLabelBacc');
+  if (lbl) {
+    lbl.style.borderColor = 'var(--teal)';
+    lbl.style.color       = 'var(--teal)';
+    lbl.style.background  = 'rgba(0,201,167,.08)';
+  }
+}
+function resetTrackLabels() {
+  ['trackLabelGeneral','trackLabelBacc'].forEach(id => {
     const el = document.getElementById(id);
-    const show = el.type === 'password';
-    el.type = show ? 'text' : 'password';
-    btn.textContent = show ? '🙈' : '👁️';
-  }
-
-  function showError(msg){
-    hideAlerts();
-    const el = document.getElementById('alertError');
-    el.textContent = '⚠️ ' + msg;
-    el.classList.add('show');
-  }
-  function showSuccess(msg){
-    hideAlerts();
-    const el = document.getElementById('alertSuccess');
-    el.textContent = '✅ ' + msg;
-    el.classList.add('show');
-  }
-  function hideAlerts(){
-    document.getElementById('alertError').classList.remove('show');
-    document.getElementById('alertSuccess').classList.remove('show');
-  }
-
-  // ── LOCAL USER STORE (original)
-  function getUsers(){ return JSON.parse(localStorage.getItem('alamin_users') || '[]'); }
-  function saveUsers(u){ localStorage.setItem('alamin_users', JSON.stringify(u)); }
-  function normalizePhone(p){ return String(p || '').trim(); }
-
-  function hashPass(pass){
-    let h = 0;
-    const str = 'mostafa_salem_' + pass;
-    for (let i = 0; i < str.length; i++){
-      h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+    if (el) {
+      el.style.borderColor = 'var(--b-light)';
+      el.style.color       = 'var(--muted)';
+      el.style.background  = 'rgba(246,243,237,.04)';
     }
-    return 'h' + Math.abs(h).toString(36);
+  });
+}
+
+/* ── i18n stub (if i18n.js not loaded) ─────────────────────── */
+function t(k){ return (window.mostafaSalemTranslations && window.mostafaSalemTranslations[k]) || k; }
+function toggleLanguage(){ if(window.mostafaSalemToggleLang) window.mostafaSalemToggleLang(); }
+function mostafaSalemGetLang(){ return (window._ms_lang) || 'ar'; }
+function applyLanguage(l){ if(window.mostafaSalemApplyLang) window.mostafaSalemApplyLang(l); }
+
+/* ══════════════════════════════════════════════════════════════
+   REGISTER — إنشاء حساب
+══════════════════════════════════════════════════════════════ */
+document.getElementById('registerForm').addEventListener('submit', async function(e){
+  e.preventDefault(); hideAlerts();
+
+  const name        = document.getElementById('regName').value.trim();
+  const phone       = normalizePhone(document.getElementById('regPhone').value);
+  const parentPhone = normalizePhone(document.getElementById('regParentPhone').value);
+  const grade       = document.getElementById('regGrade').value;
+  const gov         = document.getElementById('regGov').value;
+  const pass1       = document.getElementById('regPassword').value;
+  const pass2       = document.getElementById('regPassword2').value;
+
+  // الشعبة (ثانية ثانوي فقط)
+  let track = '';
+  if (grade === '2') {
+    const trackRadio = document.querySelector('[name="regTrack"]:checked');
+    if (!trackRadio) return showError('من فضلك اختر الشُعبة (عام أو بكالوريا)');
+    track = trackRadio.value;
   }
 
-  // ── ADMIN ACCOUNTS (original)
-  const ADMIN_ACCOUNTS = [
-    // { phone: '01096954340', name: 'Mr. Mostafa Salem', role: 'admin', password: hashPass('CHANGE_THIS_PASSWORD') }
-  ];
+  /* ── Validation ─────────────────────────────────────────── */
+  if (!name)
+    return showError('من فضلك أدخل اسمك الثلاثي كاملاً');
+  if (name.trim().split(/\s+/).length < 2)
+    return showError('يجب إدخال الاسم الثلاثي (اسمان على الأقل)');
 
-  function findAdminAccount(phone, pass){
-    return ADMIN_ACCOUNTS.find(a => normalizePhone(a.phone) === phone && a.password === hashPass(pass));
-  }
+  // رقم الهاتف: 11 رقم بالضبط يبدأ بـ 01
+  if (!/^01[0-9]{9}$/.test(phone))
+    return showError('رقم هاتف الطالب يجب أن يكون 11 رقماً ويبدأ بـ 01');
+  if (phone.length !== 11)
+    return showError('رقم هاتف الطالب يجب أن يكون 11 رقماً بالضبط');
 
-  async function syncStudentToFirebase(user){
-    if (!window.db) return;
-    try {
-      await window.db.collection('students').doc(String(user.phone)).set({
-        id: user.id, name: user.name, phone: user.phone,
-        parentPhone: user.parentPhone || '', grade: user.grade || '',
-        role: 'student', enrolledCourses: user.enrolledCourses || [],
-        createdAt: user.createdAt || new Date().toISOString()
-      }, { merge: true });
-    } catch(e){ console.warn('[auth] Firebase sync failed:', e.message); }
-  }
+  if (!/^01[0-9]{9}$/.test(parentPhone))
+    return showError('رقم هاتف ولي الأمر يجب أن يكون 11 رقماً ويبدأ بـ 01');
+  if (parentPhone.length !== 11)
+    return showError('رقم هاتف ولي الأمر يجب أن يكون 11 رقماً بالضبط');
 
-  async function fetchStudentFromFirebase(phone){
-    if (!window.db) return null;
-    try {
-      const snap = await window.db.collection('students').doc(String(phone)).get();
-      return snap.exists ? snap.data() : null;
-    } catch(e){ console.warn('[auth] Firebase fetch failed:', e.message); return null; }
-  }
+  if (!grade)
+    return showError('من فضلك اختر المرحلة الدراسية');
+  if (!gov)
+    return showError('من فضلك اختر المحافظة');
 
-  // ── REGISTER (original)
-  document.getElementById('registerForm').addEventListener('submit', async function(e){
-    e.preventDefault(); hideAlerts();
-    const name = document.getElementById('regName').value.trim();
-    const phone = normalizePhone(document.getElementById('regPhone').value);
-    const parentPhone = normalizePhone(document.getElementById('regParentPhone').value);
-    const grade = document.getElementById('regGrade').value;
-    const pass1 = document.getElementById('regPassword').value;
-    const pass2 = document.getElementById('regPassword2').value;
+  // كلمة المرور: 6 خانات على الأقل (أرقام أو حروف إنجليزية)
+  if (pass1.length < 6)
+    return showError('كلمة المرور يجب أن تكون 6 خانات على الأقل');
+  if (!/^[a-zA-Z0-9]+$/.test(pass1))
+    return showError('كلمة المرور تحتوي على أحرف غير مسموح بها — استخدم أرقاماً أو حروفاً إنجليزية فقط');
+  if (pass1 !== pass2)
+    return showError('كلمة المرور وتأكيدها غير متطابقتين');
+  if (!document.getElementById('agreeTerms').checked)
+    return showError('يجب الموافقة على الشروط والأحكام');
 
-    if (!/^01[0-9]{9}$/.test(phone)) return showError(t('err_invalid_phone'));
-    if (!/^01[0-9]{9}$/.test(parentPhone)) return showError(t('err_invalid_parent_phone'));
-    if (pass1.length < 6) return showError(t('err_password_length'));
-    if (pass1 !== pass2) return showError(t('err_password_mismatch'));
+  // التحقق من تكرار الرقم محلياً
+  const users = getUsers();
+  if (users.some(u => normalizePhone(u.phone) === phone))
+    return showError('هذا الرقم مسجّل بالفعل — سجّل الدخول أو استخدم رقماً آخر');
 
-    const users = getUsers();
-    if (users.some(u => normalizePhone(u.phone) === phone)) return showError(t('err_account_exists'));
+  const btn = document.getElementById('registerBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري إنشاء الحساب...';
 
-    const btn = document.getElementById('registerBtn');
-    btn.disabled = true; btn.textContent = t('btn_register_loading');
+  try {
+    // التحقق من Firestore
+    const remoteCheck = await fetchStudentFromFirebase(phone);
+    if (remoteCheck && remoteCheck.id) {
+      btn.disabled = false; btn.textContent = '🎉 إنشاء الحساب';
+      return showError('هذا الرقم مسجّل بالفعل — سجّل الدخول');
+    }
+  } catch(_) {}
 
-    const newUser = {
-      id: 'stu_' + Date.now(), name, phone, parentPhone, grade,
-      password: hashPass(pass1), role: 'student',
-      enrolledCourses: [], createdAt: new Date().toISOString()
+  /* ── إنشاء User ID فريد وثابت ──────────────────────────── */
+  const now = new Date().toISOString();
+  const newUser = {
+    id:              'stu_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    name,
+    phone,
+    parentPhone,
+    grade,
+    track,
+    gov,
+    password:        hashPass(pass1),
+    role:            'student',
+    status:          'active',
+    studentType:     'outside',
+    enrolledCourses: [],
+    progress:        {},
+    createdAt:       now,
+    registeredAt:    now,
+    joinDate:        now.slice(0, 10),
+  };
+  newUser.qrCode = newUser.id;
+
+  // حفظ محلي فوري
+  users.push(newUser);
+  saveUsers(users);
+
+  // حفظ الجلسة مباشرةً (تذكرني دائماً عند التسجيل)
+  saveSession(newUser, true);
+
+  // مزامنة Firebase
+  const synced = await syncStudentToFirebase(newUser);
+  if (!synced) scheduleFirebaseRetry(newUser);
+
+  btn.disabled = false; btn.textContent = '🎉 إنشاء الحساب';
+  showSuccess(synced
+    ? 'تم إنشاء الحساب بنجاح! جاري التحويل...'
+    : 'تم إنشاء الحساب! سيتم المزامنة قريباً...'
+  );
+
+  // التحويل إلى الصفحة الرئيسية (index) بعد التسجيل
+  setTimeout(() => { window.location.href = getNextUrl('index.html'); }, 1400);
+});
+
+/* ══════════════════════════════════════════════════════════════
+   LOGIN — تسجيل الدخول
+══════════════════════════════════════════════════════════════ */
+document.getElementById('loginForm').addEventListener('submit', async function(e){
+  e.preventDefault(); hideAlerts();
+
+  const phone = normalizePhone(document.getElementById('loginPhone').value);
+  const pass  = document.getElementById('loginPassword').value;
+
+  if (!phone || !pass) return showError('من فضلك أدخل رقم الهاتف وكلمة المرور');
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+
+  // تحقق من حسابات الأدمن أولاً
+  const adminMatch = findAdminAccount(phone, pass);
+  if (adminMatch) {
+    const adminUser = {
+      id:        'staff_' + adminMatch.phone,
+      name:      adminMatch.name,
+      phone:     adminMatch.phone,
+      role:      adminMatch.role || 'admin',
+      createdAt: new Date().toISOString(),
     };
+    saveSession(adminUser, true);
+    btn.disabled = false; btn.textContent = '🚀 دخول';
+    showSuccess('أهلاً ' + adminUser.name + '! جاري الدخول للوحة التحكم...');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+    return;
+  }
 
-    users.push(newUser); saveUsers(users);
-    await syncStudentToFirebase(newUser);
-    localStorage.setItem('alamin_current', JSON.stringify(newUser));
+  // بحث في localStorage
+  let users = getUsers();
+  let user  = users.find(u => normalizePhone(u.phone) === phone);
 
-    btn.disabled = false; btn.textContent = t('btn_register');
-    showSuccess(t('msg_account_created'));
-    setTimeout(() => { window.location.href = getNextUrl('lessons.html'); }, 1200);
-  });
-
-  // ── LOGIN (original)
-  document.getElementById('loginForm').addEventListener('submit', async function(e){
-    e.preventDefault(); hideAlerts();
-    const phone = normalizePhone(document.getElementById('loginPhone').value);
-    const pass = document.getElementById('loginPassword').value;
-    if (!phone || !pass) return showError(t('err_missing_credentials'));
-
-    const btn = document.getElementById('loginBtn');
-    btn.disabled = true; btn.textContent = t('btn_login_loading');
-
-    const adminMatch = findAdminAccount(phone, pass);
-    if (adminMatch) {
-      const adminUser = { id:'staff_'+adminMatch.phone, name:adminMatch.name, phone:adminMatch.phone, role:adminMatch.role||'admin', createdAt:new Date().toISOString() };
-      localStorage.setItem('alamin_current', JSON.stringify(adminUser));
-      if (document.getElementById('rememberMe').checked) localStorage.setItem('alamin_remember', phone);
-      btn.disabled = false; btn.textContent = t('btn_login');
-      showSuccess(t('msg_welcome_back').replace('__NAME__', adminUser.name));
-      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
-      return;
+  // إن لم يوجد محلياً — جرّب Firestore
+  if (!user) {
+    const remote = await fetchStudentFromFirebase(phone);
+    if (remote && remote.password) {
+      user = remote;
+      const idx = users.findIndex(u => normalizePhone(u.phone) === normalizePhone(remote.phone || ''));
+      if (idx > -1) users[idx] = { ...users[idx], ...remote };
+      else users.push(remote);
+      saveUsers(users);
     }
+  }
 
-    let users = getUsers();
-    let user = users.find(u => normalizePhone(u.phone) === phone);
+  btn.disabled = false; btn.textContent = '🚀 دخول';
 
-    if (!user) {
-      const remote = await fetchStudentFromFirebase(phone);
-      if (remote && remote.password) { user = remote; users.push(user); saveUsers(users); }
+  if (!user)                         return showError('لا يوجد حساب بهذا الرقم — أنشئ حساباً جديداً');
+  if (user.password !== hashPass(pass)) return showError('كلمة المرور غير صحيحة');
+
+  const remember = document.getElementById('rememberMe').checked;
+  saveSession(user, remember);
+
+  showSuccess('أهلاً ' + (user.name ? user.name.split(' ')[0] : 'بك') + '! جاري التحويل...');
+  setTimeout(() => {
+    // الأدمن → الداشبورد | الطالب → الصفحة الرئيسية
+    if (user.role === 'admin') {
+      window.location.href = 'dashboard.html';
+    } else {
+      window.location.href = getNextUrl('index.html');
     }
+  }, 1000);
+});
 
-    if (!user) { btn.disabled = false; btn.textContent = t('btn_login'); return showError(t('err_no_account')); }
-    if (user.password !== hashPass(pass)) { btn.disabled = false; btn.textContent = t('btn_login'); return showError(t('err_wrong_password')); }
-
-    localStorage.setItem('alamin_current', JSON.stringify(user));
-    if (document.getElementById('rememberMe').checked) localStorage.setItem('alamin_remember', phone);
-
-    btn.disabled = false; btn.textContent = t('btn_login');
-    showSuccess(t('msg_welcome_back').replace('__NAME__', user.name || 'Student'));
-    setTimeout(() => { window.location.href = (user.role === 'admin') ? 'dashboard.html' : getNextUrl('lessons.html'); }, 1000);
-  });
-
-  // ── Pre-fill remembered phone (original)
-  (function(){
-    const remembered = localStorage.getItem('alamin_remember');
-    if (remembered) {
-      document.getElementById('loginPhone').value = remembered;
+/* ── تعبئة الهاتف إن كان محفوظاً ───────────────────────────── */
+(function prefill(){
+  try {
+    const raw = localStorage.getItem(REMEMBER_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s && s.user && s.user.phone && s.remember) {
+      document.getElementById('loginPhone').value = s.user.phone;
       document.getElementById('rememberMe').checked = true;
     }
-  })();
+  } catch(_) {}
+})();
 
-  // ── Already logged in (original)
-  (function(){
-    const current = JSON.parse(localStorage.getItem('alamin_current') || 'null');
-    if (current) showSuccess(t('msg_already_signed_in').replace('__NAME__', current.name || 'a student'));
-  })();
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js').catch(() => {});
-    });
+/* ── Auto-redirect إن كانت الجلسة قائمة ────────────────────── */
+(function autoRedirect(){
+  const current = loadSession();
+  if (!current) return;
+  // أدمن → dashboard
+  if (current.role === 'admin') {
+    window.location.replace('dashboard.html');
+    return;
   }
+  // طالب → الصفحة المطلوبة أو الرئيسية
+  const params = new URLSearchParams(location.search);
+  const next   = params.get('next');
+  window.location.replace(next ? decodeURIComponent(next) : 'index.html');
+})();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

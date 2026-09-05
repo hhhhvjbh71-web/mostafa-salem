@@ -3,7 +3,7 @@
 // Mr. Mostafa Salem
 // ============================================================
 
-const CACHE_VERSION = 'never-give-up-shell-v3';
+const CACHE_VERSION = 'never-give-up-shell-v4';
 const OFFLINE_URL = 'offline.html';
 
 const SHELL_ASSETS = [
@@ -11,6 +11,7 @@ const SHELL_ASSETS = [
   'index.html',
   'login.html',
   'register.html',
+  'profile.html',
   'lessons.html',
   'manifest.json',
   'offline.html',

@@ -1,46 +1,61 @@
 // ============================================================
-// session-guard.js — Mostafa Salem English Academy
-// Lightweight session validation helper for protected pages
-// (lessons.html, dashboard.html, etc.)
-// Loaded AFTER firebase-config.js so window.db is available.
+// session-guard.js — Mostafa Salem Platform
+// يحمي الصفحات المحمية ويتحقق من الجلسة
 // ============================================================
 
 (function() {
   'use strict';
 
-  // ── helpers ──────────────────────────────────────────────
+  const SESSION_KEY  = 'alamin_current';
+  const REMEMBER_KEY = 'alamin_session_remember';
+
+  /* ── تحميل الجلسة (يدعم النظام الجديد والقديم) ── */
+  function loadSession() {
+    try {
+      const raw = localStorage.getItem(REMEMBER_KEY);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s && s.user) {
+          if (s.expiresAt && Date.now() > s.expiresAt) {
+            clearSession(); return null;
+          }
+          return s.user;
+        }
+      }
+      const legacy = localStorage.getItem(SESSION_KEY);
+      return legacy ? JSON.parse(legacy) : null;
+    } catch(e) { return null; }
+  }
+
+  function clearSession() {
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(REMEMBER_KEY);
+      localStorage.removeItem('alamin_remember');
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch(e) {}
+  }
 
   function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem('alamin_current') || 'null');
-    } catch (e) {
-      return null;
-    }
+    return loadSession();
   }
 
   function redirectToLogin(reason) {
     try {
       console.warn('[SessionGuard] Redirecting to login:', reason);
-      // Clear stale session data
-      localStorage.removeItem('alamin_current');
+      clearSession();
       const next = encodeURIComponent(
         location.pathname.split('/').pop() + location.search
       );
       window.location.replace('login.html?next=' + next);
-    } catch (e) {}
+    } catch(e) {}
   }
 
-  // ── core guard ───────────────────────────────────────────
-
+  // ── Core Guard ──────────────────────────────────────────
   const SessionGuard = {
 
-    /**
-     * Checks that a valid session exists in localStorage.
-     * Call this on DOMContentLoaded for protected pages.
-     * @returns {object|null} user object, or null (and redirects)
-     */
     requireLogin: function() {
-      const user = getCurrentUser();
+      const user = loadSession();
       if (!user || !user.id) {
         redirectToLogin('no session');
         return null;
@@ -48,85 +63,110 @@
       return user;
     },
 
-    /**
-     * Optional: verify session is still active against Firestore.
-     * Returns true if valid, false if the session has been revoked.
-     * Non-blocking — page still works while this resolves.
-     * @returns {Promise<boolean>}
-     */
+    requireAdmin: function() {
+      const user = loadSession();
+      if (!user || !user.id) {
+        redirectToLogin('no session for admin page');
+        return null;
+      }
+      // الداشبورد تتحقق من sessionStorage أيضاً (admin gate)
+      if (user.role !== 'admin') {
+        const adminOk = sessionStorage.getItem('mostafa_salem_admin_ok');
+        if (!adminOk) {
+          // طالب عادي يحاول الوصول للداشبورد → رجّعه للرئيسية
+          window.location.replace('index.html');
+          return null;
+        }
+      }
+      return user;
+    },
+
     verifySessionActive: async function() {
-      const user = getCurrentUser();
-      if (!user || !user.phone) return true; // no phone = local-only session, allow
+      const user = loadSession();
+      if (!user || !user.phone) return true;
 
       try {
-        if (!window.db) return true; // Firebase not ready yet — allow
-
-        const docId = String(user.phone);
+        if (!window.db) return true;
         const snap = await window.db
           .collection('students')
-          .doc(docId)
+          .doc(String(user.phone))
           .get({ source: 'server' });
 
-        if (!snap.exists) return true; // new student not yet synced — allow
-
+        if (!snap.exists) return true;
         const data = snap.data();
 
-        // If admin revoked this session, data.sessionRevoked will be true
         if (data.sessionRevoked === true) {
           console.warn('[SessionGuard] Session revoked by admin');
           redirectToLogin('session revoked');
           return false;
         }
 
-        // Optionally refresh local user data with latest from Firestore
+        // تحديث البيانات المحلية من Firestore
         if (data.name || data.grade) {
           const refreshed = Object.assign({}, user, {
-            name:         data.name         || user.name,
-            grade:        data.grade        || user.grade,
-            parentPhone:  data.parentPhone  || user.parentPhone,
+            name:            data.name         || user.name,
+            grade:           data.grade        || user.grade,
+            parentPhone:     data.parentPhone  || user.parentPhone,
             enrolledCourses: data.enrolledCourses || user.enrolledCourses || [],
           });
-          localStorage.setItem('alamin_current', JSON.stringify(refreshed));
+          localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
+          // تحديث الـ remember session أيضاً
+          try {
+            const raw = localStorage.getItem(REMEMBER_KEY);
+            if (raw) {
+              const s = JSON.parse(raw);
+              s.user = refreshed;
+              localStorage.setItem(REMEMBER_KEY, JSON.stringify(s));
+            }
+          } catch(_) {}
         }
 
         return true;
-
-      } catch (err) {
-        // Network / Firestore error — don't block the user
+      } catch(err) {
         console.warn('[SessionGuard] verifySessionActive error (non-fatal):', err.message);
         return true;
       }
     },
 
-    /**
-     * Returns current user from localStorage (no network call).
-     * @returns {object|null}
-     */
     getUser: getCurrentUser,
 
-    /**
-     * Logout helper — clears localStorage and redirects.
-     */
     logout: function() {
-      localStorage.removeItem('alamin_current');
-      localStorage.removeItem('alamin_remember');
+      clearSession();
       window.location.href = 'login.html';
     },
   };
 
-  // Expose globally
   window.SessionGuard = SessionGuard;
 
-  // ── auto-guard: redirect immediately if no session ───────
-  // (Backup for pages that don't run the inline guest-gate script)
+  // ── auto-guard: حماية الصفحات المحمية فقط ──────────────
   (function autoGuard() {
-    const user = getCurrentUser();
-    if (!user) {
-      // Only redirect if we're on a clearly protected page
-      const protectedPages = ['lessons.html'];
-      const currentPage = location.pathname.split('/').pop().toLowerCase();
-      if (protectedPages.some(p => currentPage.includes(p.replace('.html', '')))) {
+    const user = loadSession();
+    const currentPage = location.pathname.split('/').pop().toLowerCase();
+
+    // صفحات تحتاج تسجيل دخول (طالب أو أدمن)
+    const studentPages = ['lessons.html'];
+    // صفحات تحتاج صلاحية أدمن
+    const adminPages   = ['dashboard.html'];
+
+    if (adminPages.some(p => currentPage.includes(p.replace('.html','')))) {
+      if (!user) {
+        redirectToLogin('auto-guard: no session on admin page');
+        return;
+      }
+      // الأدمن يمر، الطالب العادي يُعاد توجيهه للرئيسية
+      if (user.role !== 'admin') {
+        const adminOk = sessionStorage.getItem('mostafa_salem_admin_ok');
+        if (!adminOk) {
+          window.location.replace('index.html');
+          return;
+        }
+      }
+    }
+
+    if (studentPages.some(p => currentPage.includes(p.replace('.html','')))) {
+      if (!user) {
         redirectToLogin('auto-guard: no session on protected page');
+        return;
       }
     }
   })();

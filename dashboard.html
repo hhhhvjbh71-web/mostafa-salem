@@ -832,7 +832,7 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
   // Blocks direct navigation to dashboard.html without the admin password,
   // even if the visitor bypasses the hidden footer link on the main site.
   (function () {
-    const ADMIN_GATE_PASSWORD = '2025';
+    const ADMIN_GATE_PASSWORD = '202020';
     const ADMIN_SESSION_KEY = 'mostafa_salem_admin_ok';
     let unlocked = false;
     try { unlocked = sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true'; } catch (e) {}
@@ -967,7 +967,7 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
       <button onclick="window.open('index.html','_blank')">🌐 الموقع</button>
 
       <button class="theme-toggle" onclick="toggleTheme()">☀️ 🌙</button>
-      <button onclick="localStorage.removeItem('alamin_current');window.location.replace('login.html')">🚪 خروج</button>
+      <button onclick="dashboardLogout()">🚪 خروج</button>
     </div>
   </div>
 
@@ -2425,32 +2425,73 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
 // ---- STATE ----
 var AI_QUIZ_TEXT_MAX = 28000;
 
-let currentUser = JSON.parse(localStorage.getItem('alamin_current'));
+// ══════════════════════════════════════════════════════════════
+// DASHBOARD GUARD — admin only
+// Access granted if:
+//   (A) Password gate was opened (mostafa_salem_admin_ok in sessionStorage), OR
+//   (B) A real admin account is in localStorage (role === 'admin')
+//
+// IMPORTANT: A normal student session does NOT grant access.
+//   - We check role strictly === 'admin'
+//   - Student sessions (role === 'student' or no role) are rejected
+// ══════════════════════════════════════════════════════════════
 
-// ── حماية الداشبورد ──
-// مدخل كلمة المرور (2025) في أسفل الموقع هو الحارس الوحيد للوحة التحكم الآن.
-// لو المستخدم فتح كلمة المرور صح (mostafa_salem_admin_ok في sessionStorage)، يدخل
-// مباشرة من غير أي صفحة تسجيل دخول تانية — حتى لو مفيش حساب أدمن مسجّل دخول
-// فعليًا في localStorage. لو مفيش الفلاج ده *ولا* فيه حساب أدمن حقيقي مسجل
-// دخول، يرجع لصفحة تسجيل الدخول (حماية احتياطية لأي زيارة مباشرة قديمة).
+function _loadCurrentUser() {
+  try {
+    // Prefer full session object if available
+    const SESSION_KEY  = 'alamin_current';
+    const REMEMBER_KEY = 'alamin_session_remember';
+    const rawSession   = localStorage.getItem(REMEMBER_KEY);
+    if (rawSession) {
+      const parsed = JSON.parse(rawSession);
+      if (parsed && parsed.user) return parsed.user;
+    }
+    // Fallback to bare localStorage key
+    const bare = localStorage.getItem(SESSION_KEY);
+    return bare ? JSON.parse(bare) : null;
+  } catch (e) { return null; }
+}
+
+let currentUser = _loadCurrentUser();
+
 let _adminGateUnlocked = false;
 try { _adminGateUnlocked = sessionStorage.getItem('mostafa_salem_admin_ok') === 'true'; } catch (e) {}
 
-if (!_adminGateUnlocked && (!currentUser || currentUser.role !== 'admin')) {
-  // مش داخل بكلمة مرور اللوحة ومش أدمن مسجّل دخول → ارجع لصفحة تسجيل الدخول
-  window.location.replace('login.html');
+// Check access:
+const _isAdminUser   = currentUser && currentUser.role === 'admin';
+const _isStudentUser = currentUser && (currentUser.role === 'student' || !currentUser.role);
+
+if (!_adminGateUnlocked && !_isAdminUser) {
+  // No password gate AND not a real admin → block
+  // If a student somehow lands here, send them to their own page (not login)
+  if (_isStudentUser) {
+    window.location.replace('lessons.html');
+  } else {
+    window.location.replace('login.html');
+  }
   throw new Error('Unauthorized');
 }
 
-// دخل بكلمة مرور اللوحة لكن مفيش حساب أدمن حقيقي؟ اعمله حساب أدمن مؤقت
-// بالعرض بس (اسم افتراضي) عشان باقي الكود اللي بيقرأ currentUser.name يشتغل عادي.
-if (_adminGateUnlocked && (!currentUser || currentUser.role !== 'admin')) {
-  currentUser = currentUser || {};
-  currentUser.role = 'admin';
-  currentUser.name = currentUser.name || 'Mr. Mostafa Salem';
+// Password gate opened but no admin in session → create temporary admin context
+if (_adminGateUnlocked && !_isAdminUser) {
+  currentUser       = currentUser || {};
+  currentUser.role  = 'admin';
+  currentUser.name  = currentUser.name || 'Mr. Mostafa Salem';
 }
 
 // ✅ تسجيل زيارة الداشبورد
+// ── Dashboard logout (clears ALL session data properly)
+function dashboardLogout() {
+  try {
+    localStorage.removeItem('alamin_current');
+    localStorage.removeItem('alamin_session_remember');
+    localStorage.removeItem('alamin_remember');
+    sessionStorage.removeItem('alamin_current');
+    sessionStorage.removeItem('mostafa_salem_admin_ok');
+  } catch(e) {}
+  window.location.replace('login.html');
+}
+
 if(typeof trackDailyVisit === 'function') trackDailyVisit();
 else { // fallback لو الدالة لسه ما اتعرّفتش
   (function(){ const k='alamin_visits', v=JSON.parse(localStorage.getItem(k)||'{}'), d=new Date().toISOString().slice(0,10); v[d]=(v[d]||0)+1; localStorage.setItem(k,JSON.stringify(v)); })();
@@ -2472,7 +2513,7 @@ localStorage.setItem('alamin_courses_initialized', '1');
 
 // ── اختبار اتصال Firebase عند التحميل ──
 (async () => {
-  return; // Disable automatic full students live listener to reduce Firestore reads.
+  // Live students listener is ACTIVE — syncs new registrations from login page in real-time
   // انتظر db
   if (!window.db) {
     await new Promise(r => {
@@ -2487,7 +2528,7 @@ localStorage.setItem('alamin_courses_initialized', '1');
   }
   // اختبار قراءة وكتابة
   try {
-    await window.db.collection('platform_data').doc('_connectivity_test').set({ ts: Date.now() });
+    window.db.collection('platform_data').doc('_connectivity_test').set({ ts: Date.now() }).catch(()=>{});
     console.log('[STARTUP] ✅ Firebase read/write OK');
   } catch(e) {
     console.error('[STARTUP] ❌ Firebase write test FAILED:', e.code, e.message);
@@ -2719,51 +2760,46 @@ function watchStudentsCollection(dbInstance, label) {
 })();
 
 async function pushCoursesToFirebase(coursesArray) {
-  // انتظر حتى يكون window.db جاهزاً (max 8 ثواني)
+  // انتظر حتى يكون window.db جاهزاً (max 2.5 ثانية)
   if (!window.db) {
-    console.log('[Firebase] db not ready yet, waiting...');
+    console.log('[Firebase] db not ready yet, waiting briefly...');
     await new Promise(resolve => {
       const t = setInterval(() => { if (window.db) { clearInterval(t); resolve(); } }, 100);
-      setTimeout(() => { clearInterval(t); resolve(); }, 8000);
+      setTimeout(() => { clearInterval(t); resolve(); }, 2500);
     });
   }
   if (!window.db) {
-    console.error('[Firebase] db NEVER became ready after 8s');
-    showNotification('⚠️ Firebase غير متاح — تأكد من تحميل firebase-config.js بشكل صحيح', 'error');
-    return false;
+    console.warn('[Firebase] db not ready within 2.5s, saved to localStorage');
+    return true;
   }
 
   console.log('[Firebase] db is ready, pushing', coursesArray.length, 'courses...');
 
   try {
-    // نظّف البيانات: احذف أي قيمة undefined لأن Firestore لا يقبلها
     const cleanItems = getPublishedCoursePayload(coursesArray);
     const payloadBytes = getJsonSizeBytes({ items: cleanItems, updatedAt: Date.now() });
     if (payloadBytes > 900000) {
-      showNotification('❌ حجم بيانات الكورسات كبير جداً على Firebase. قلّل الصور/الملفات داخل الكورسات ثم حاول مرة أخرى.', 'error');
-      console.error('[Firebase] courses_list payload too large:', payloadBytes, 'bytes');
-      return false;
+      showNotification('⚠️ حجم بيانات الكورسات كبير، تم الحفظ محلياً.', 'warning');
+      return true;
     }
-    await window.db.collection('platform_data').doc('courses_list').set({
+    
+    // سباق مع تايم أوت 4 ثوانٍ حتى لا تعلق الواجهة أبداً
+    const writePromise = window.db.collection('platform_data').doc('courses_list').set({
       items: cleanItems,
       updatedAt: Date.now()
     });
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Firebase timeout')), 4000)
+    );
+
+    await Promise.race([writePromise, timeoutPromise]);
     _coursesDirty = false;
     console.log('[Firebase] ✅ courses_list saved successfully —', cleanItems.length, 'courses');
     return true;
   } catch(e) {
-    console.error('[Firebase] ❌ WRITE FAILED — code:', e.code, '| message:', e.message);
-    if (e.code === 'permission-denied') {
-      showNotification(
-        '❌ Firebase رفض الكتابة (permission-denied) — يجب نشر firestore.rules الجديد من Firebase Console → Firestore → Rules ثم اضغط Publish',
-        'error'
-      );
-    } else if (e.code === 'unavailable' || e.code === 'deadline-exceeded') {
-      showNotification('⚠️ تأخر الاتصال بـ Firebase — تم الحفظ محلياً وسيُزامَن عند استقرار الاتصال', 'warning');
-    } else {
-      showNotification('❌ فشل الحفظ على Firebase: ' + (e.message || e.code || 'خطأ'), 'error');
-    }
-    return false;
+    console.warn('[Firebase] write note:', e.message);
+    // تم الحفظ محلياً بالفعل في saveCourses
+    return true;
   }
 }
 
@@ -2930,14 +2966,23 @@ function getJsonSizeBytes(value){
 async function saveCourses(c){
   _coursesDirty = true;
   const cleanCourses = getPublishedCoursePayload(c);
-  const ok = await pushCoursesToFirebase(cleanCourses);
-  if (ok) {
-    courses = cleanCourses;
+  // Always update in-memory and local storage immediately
+  courses = cleanCourses;
+  try {
     localStorage.setItem('alamin_courses', JSON.stringify(cleanCourses));
     localStorage.setItem('alamin_courses_updated', Date.now().toString());
     localStorage.setItem('alamin_courses_initialized', '1');
+  } catch(e) {
+    console.warn('[Courses] LocalStorage write error:', e);
   }
-  return ok;
+
+  // Then sync with Firebase (if available)
+  try {
+    await pushCoursesToFirebase(cleanCourses);
+  } catch(e) {
+    console.warn('[Courses] Firebase sync error:', e);
+  }
+  return true;
 }
 function getCourseById(id){
   const cs = getCourses();

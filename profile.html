@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الملف الشخصي | Mr. Mostafa Salem — Never Give Up</title>
+<link rel="icon" type="image/jpeg" href="duck.jpeg">
+<meta name="description" content="الملف الشخصي للطالب على منصة Never Give Up لمستر مصطفى سالم">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Tajawal:wght@400;500;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --teal: #00C9A7;
+  --teal-rgb: 0, 201, 167;
+  --gold: #FFB703;
+  --gold-rgb: 255, 183, 3;
+  --ink: #08080D;
+  --surface: #F6F3ED;
+  --muted: #8E8D8A;
+  --card-bg: #101018;
+  --card-border: rgba(246, 243, 237, 0.08);
+  --bg-gradient: radial-gradient(circle at top, #141424 0%, #08080D 100%);
+  --radius: 12px;
+  --radius-lg: 18px;
+}
+
+[data-theme="light"] {
+  --ink: #F6F3ED;
+  --surface: #0E0E14;
+  --muted: #5A5A66;
+  --card-bg: #FFFFFF;
+  --card-border: rgba(14, 14, 20, 0.08);
+  --bg-gradient: radial-gradient(circle at top, #E8ECEF 0%, #F6F3ED 100%);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--ink);
+  background-image: var(--bg-gradient);
+  color: var(--surface);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* NAVBAR */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: rgba(8, 8, 13, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--card-border);
+}
+
+[data-theme="light"] .navbar {
+  background: rgba(246, 243, 237, 0.88);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-brand img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--teal);
+  object-fit: cover;
+}
+
+.nav-brand-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: .08em;
+  color: var(--teal);
+  line-height: 1;
+}
+
+.nav-brand-sub {
+  font-size: .72rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-nav {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all .2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-teal {
+  background: var(--teal);
+  color: #08080D;
+}
+.btn-teal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 201, 167, 0.35);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--surface);
+}
+.btn-outline:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: rgba(246,243,237,.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--surface);
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  width: 100%;
+  flex: 1;
+}
+
+/* HERO PROFILE CARD */
+.profile-hero {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  margin-bottom: 28px;
+}
+
+.profile-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(0, 201, 167, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.profile-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 1;
+}
+
+.profile-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), #007F68);
+  color: #08080D;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(0, 201, 167, 0.4);
+  border: 3px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
+
+.profile-info h1 {
+  font-size: 1.65rem;
+  font-weight: 900;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.role-badge {
+  background: rgba(0, 201, 167, 0.15);
+  color: var(--teal);
+  border: 1px solid rgba(0, 201, 167, 0.3);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.profile-meta-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: .84rem;
+  color: var(--muted);
+}
+
+.meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(246, 243, 237, 0.05);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+}
+
+.profile-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1;
+  flex-wrap: wrap;
+}
+
+/* STATS ROW */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 201, 167, 0.3);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(0, 201, 167, 0.1);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.stat-content h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--surface);
+  line-height: 1.1;
+}
+
+.stat-content p {
+  font-size: .78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* MAIN CONTENT GRID */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 28px;
+}
+
+@media (max-width: 860px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* CARDS */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--surface);
+}
+
+/* DETAILS LIST */
+.details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--card-border);
+  font-size: .88rem;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-label {
+  color: var(--muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-val {
+  font-weight: 700;
+  color: var(--surface);
+  direction: ltr;
+  text-align: right;
+}
+
+/* COURSES LIST */
+.courses-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.course-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(246, 243, 237, 0.03);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  gap: 14px;
+  transition: all .2s ease;
+}
+
+.course-item:hover {
+  background: rgba(0, 201, 167, 0.05);
+  border-color: rgba(0, 201, 167, 0.3);
+}
+
+.course-item-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.course-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--teal);
+  color: #08080D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.course-title {
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--surface);
+  margin-bottom: 2px;
+}
+
+.course-grade {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.empty-courses {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.empty-courses-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  opacity: .7;
+}
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 16, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  direction: rtl;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--teal);
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: rgba(246, 243, 237, 0.04);
+  color: var(--surface);
+  font-family: inherit;
+  font-size: .9rem;
+  outline: none;
+  transition: border-color .2s;
+}
+
+.form-control:focus {
+  border-color: var(--teal);
+}
+
+.alert-box {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: .82rem;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.alert-success {
+  background: rgba(0, 201, 167, 0.12);
+  color: var(--teal);
+  border: 1px solid var(--teal);
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #EF4444;
+  border: 1px solid #EF4444;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 24px;
+  font-size: .78rem;
+  color: var(--muted);
+  border-top: 1px solid var(--card-border);
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a href="index.html" class="nav-brand">
+      <img src="duck.jpeg" alt="Logo">
+      <div>
+        <div class="nav-brand-title">NEVER GIVE UP</div>
+        <div class="nav-brand-sub">Mr. Mostafa Salem</div>
+      </div>
+    </a>
+  </div>
+  <div class="nav-actions">
+    <a href="index.html" class="btn-nav btn-outline">🏠 الرئيسية</a>
+    <a href="lessons.html" class="btn-nav btn-teal">🎓 كورساتي</a>
+    <button class="theme-toggle" onclick="toggleTheme()" title="تغيير المظهر" id="themeToggleBtn">🌙</button>
+    <button class="btn-nav btn-outline" onclick="logout()" style="color:#EF4444;border-color:rgba(239,68,68,0.2);">🚪 خروج</button>
+  </div>
+</nav>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="profile-avatar-wrap">
+      <div class="profile-avatar" id="heroAvatar">ط</div>
+      <div class="profile-info">
+        <h1>
+          <span id="heroName">الطالب</span>
+          <span class="role-badge" id="heroRole">طالب</span>
+        </h1>
+        <div class="profile-meta-tags">
+          <span class="meta-tag">📚 <span id="heroGrade">—</span></span>
+          <span class="meta-tag">📍 <span id="heroGov">—</span></span>
+          <span class="meta-tag">🆔 <span id="heroId">—</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="profile-hero-actions">
+      <button class="btn-nav btn-outline" onclick="openEditModal()">✏️ تعديل البيانات</button>
+      <a href="index.html#courses" class="btn-nav btn-teal">✨ استكشاف الكورسات</a>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">🎓</div>
+      <div class="stat-content">
+        <h3 id="statCoursesCount">0</h3>
+        <p>الكورسات المشترك بها</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-content">
+        <h3 id="statQuizzesCount">0</h3>
+        <p>الاختبارات المكتملة</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⭐</div>
+      <div class="stat-content">
+        <h3 id="statStatus">نشط</h3>
+        <p>حالة الحساب</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT GRID -->
+  <div class="content-grid">
+
+    <!-- DETAILS CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👤 البيانات الشخصية</div>
+        <button class="btn-nav btn-outline" style="padding:4px 10px;font-size:.75rem;" onclick="openEditModal()">تعديل</button>
+      </div>
+      <div class="details-list">
+        <div class="detail-item">
+          <span class="detail-label">👤 الاسم الكامل</span>
+          <span class="detail-val" id="detName" style="direction:rtl;">—</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">📱 رقم الطالب</span>
+          <span class="detail-val" id="detPhone">—</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">👨‍👦 هاتف ولي الأمر</span>
+          <span class="detail-val" id="detParentPhone">—</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">🏫 المرحلة الدراسية</span>
+          <span class="detail-val" id="detGrade" style="direction:rtl;">—</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">📍 المحافظة</span>
+          <span class="detail-val" id="detGov" style="direction:rtl;">—</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">📅 تاريخ التسجيل</span>
+          <span class="detail-val" id="detJoinDate">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENROLLED COURSES CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📚 كورساتي النشطة</div>
+        <a href="lessons.html" class="btn-nav btn-outline" style="padding:4px 10px;font-size:.75rem;">إلى المشاهدة 🎬</a>
+      </div>
+      <div class="courses-container" id="coursesListWrap">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">✏️ تعديل البيانات الشخصية</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+
+    <div class="alert-box alert-error" id="editError"></div>
+    <div class="alert-box alert-success" id="editSuccess"></div>
+
+    <form id="editProfileForm" onsubmit="handleSaveProfile(event)">
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" class="form-control" id="editName" required>
+      </div>
+      <div class="form-group">
+        <label>رقم هاتف ولي الأمر</label>
+        <input type="tel" class="form-control" id="editParentPhone" maxlength="11" placeholder="01xxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>المحافظة</label>
+        <input type="text" class="form-control" id="editGov" placeholder="مثال: القاهرة، الجيزة...">
+      </div>
+      <div class="form-group">
+        <label>كلمة المرور الجديدة (اتركها فارغة إذا لم ترد التغيير)</label>
+        <input type="password" class="form-control" id="editPassword" placeholder="6 أحرف أو أرقام على الأقل">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button type="submit" class="btn-nav btn-teal" style="flex:1;justify-content:center;padding:12px;" id="saveProfileBtn">حفظ التعديلات ✅</button>
+        <button type="button" class="btn-nav btn-outline" style="padding:12px;" onclick="closeEditModal()">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>
+  © 2026 Never Give Up · Mr. Mostafa Salem · جميع الحقوق محفوظة
+</footer>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+
+<script>
+/* ── Helpers ── */
+function getSession() {
+  try {
+    const raw = localStorage.getItem('alamin_current') || sessionStorage.getItem('alamin_current');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function saveSession(u) {
+  try {
+    localStorage.setItem('alamin_current', JSON.stringify(u));
+    sessionStorage.setItem('alamin_current', JSON.stringify(u));
+  } catch(e) {}
+}
+
+function hashPass(pass) {
+  let h = 0;
+  const str = 'mostafa_salem_' + pass;
+  for (let i = 0; i < str.length; i++) {
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  }
+  return 'h' + Math.abs(h).toString(36);
+}
+
+function getGradeLabel(grade, track) {
+  const map = {
+    prep1: 'أولى إعدادي', prep2: 'ثانية إعدادي', prep3: 'ثالثة إعدادي',
+    '1': 'أولى ثانوي', '2': 'ثانية ثانوي', '3': 'ثالثة ثانوي'
+  };
+  let lbl = map[grade] || grade || 'غير محدد';
+  if (track === 'general') lbl += ' (عام)';
+  if (track === 'baccalaureate') lbl += ' (بكالوريا)';
+  return lbl;
+}
+
+/* ── Theme ── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') !== 'light';
+  const newTheme = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', newTheme);
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = newTheme === 'light' ? '☀️' : '🌙';
+  localStorage.setItem('mostafa_salem_theme', newTheme);
+}
+
+(function initTheme() {
+  const t = localStorage.getItem('mostafa_salem_theme');
+  if (t) {
+    document.documentElement.setAttribute('data-theme', t);
+    const btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+  }
+})();
+
+/* ── Check Authentication ── */
+let currentUser = getSession();
+
+if (!currentUser) {
+  window.location.replace('login.html?next=profile.html');
+}
+
+/* ── Render User Details ── */
+function renderProfile() {
+  currentUser = getSession();
+  if (!currentUser) {
+    window.location.replace('login.html');
+    return;
+  }
+
+  const firstLetter = (currentUser.name || 'ط').trim().charAt(0) || 'ط';
+  document.getElementById('heroAvatar').textContent = firstLetter;
+  document.getElementById('heroName').textContent = currentUser.name || 'الطالب';
+  document.getElementById('heroRole').textContent = currentUser.role === 'admin' ? 'مدير المنصة ⚡' : 'طالب 🎓';
+  
+  const gradeLabel = getGradeLabel(currentUser.grade, currentUser.track);
+  document.getElementById('heroGrade').textContent = gradeLabel;
+  document.getElementById('heroGov').textContent = currentUser.gov || 'غير محدد';
+  document.getElementById('heroId').textContent = currentUser.id ? currentUser.id.slice(-6).toUpperCase() : 'STU';
+
+  document.getElementById('detName').textContent = currentUser.name || '—';
+  document.getElementById('detPhone').textContent = currentUser.phone || '—';
+  document.getElementById('detParentPhone').textContent = currentUser.parentPhone || '—';
+  document.getElementById('detGrade').textContent = gradeLabel;
+  document.getElementById('detGov').textContent = currentUser.gov || '—';
+  document.getElementById('detJoinDate').textContent = currentUser.joinDate || (currentUser.createdAt ? currentUser.createdAt.slice(0, 10) : '—');
+
+  // Stats
+  const enrolled = currentUser.enrolledCourses || [];
+  document.getElementById('statCoursesCount').textContent = enrolled.length;
+
+  const quizAttempts = JSON.parse(localStorage.getItem('alamin_quiz_attempts') || '[]');
+  const myAttempts = quizAttempts.filter(a => a.studentPhone === currentUser.phone || a.userId === currentUser.id);
+  document.getElementById('statQuizzesCount').textContent = myAttempts.length;
+
+  renderCourses();
+}
+
+/* ── Render Enrolled Courses ── */
+function renderCourses() {
+  const wrap = document.getElementById('coursesListWrap');
+  if (!wrap) return;
+
+  const enrolled = currentUser.enrolledCourses || [];
+  const allCourses = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+
+  if (!enrolled.length) {
+    wrap.innerHTML = `
+      <div class="empty-courses">
+        <div class="empty-courses-icon">📚</div>
+        <p style="font-weight:700;margin-bottom:8px;">لست مشتركاً في أي كورس حالياً</p>
+        <p style="font-size:.82rem;margin-bottom:16px;">استكشف باقات وكورسات مستر مصطفى سالم وابدأ التعلّم الآن!</p>
+        <a href="index.html#courses" class="btn-nav btn-teal" style="display:inline-flex;">تصفح الكورسات المتاحة 🚀</a>
+      </div>
+    `;
+    return;
+  }
+
+  wrap.innerHTML = enrolled.map(cId => {
+    const course = allCourses.find(c => String(c.id) === String(cId)) || {
+      id: cId,
+      title: 'كورس رقم #' + cId,
+      grade: currentUser.grade,
+      emoji: '📖'
+    };
+
+    return `
+      <div class="course-item">
+        <div class="course-item-info">
+          <div class="course-badge">${course.emoji || '📖'}</div>
+          <div>
+            <div class="course-title">${course.title || 'كورس إنجليزي'}</div>
+            <div class="course-grade">${getGradeLabel(course.grade, course.track)}</div>
+          </div>
+        </div>
+        <a href="lessons.html?course=${course.id}" class="btn-nav btn-teal" style="padding:6px 14px;font-size:.78rem;">مشاهدة الدروس 🎬</a>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ── Edit Modal ── */
+function openEditModal() {
+  document.getElementById('editName').value = currentUser.name || '';
+  document.getElementById('editParentPhone').value = currentUser.parentPhone || '';
+  document.getElementById('editGov').value = currentUser.gov || '';
+  document.getElementById('editPassword').value = '';
+  document.getElementById('editError').style.display = 'none';
+  document.getElementById('editSuccess').style.display = 'none';
+  document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('active');
+}
+
+async function handleSaveProfile(e) {
+  e.preventDefault();
+  const name = document.getElementById('editName').value.trim();
+  const parentPhone = document.getElementById('editParentPhone').value.trim();
+  const gov = document.getElementById('editGov').value.trim();
+  const newPass = document.getElementById('editPassword').value.trim();
+
+  const errBox = document.getElementById('editError');
+  const sucBox = document.getElementById('editSuccess');
+  errBox.style.display = 'none';
+  sucBox.style.display = 'none';
+
+  if (!name || name.split(/\s+/).length < 2) {
+    errBox.textContent = 'من فضلك أدخل اسمك الثلاثي كاملاً';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  if (parentPhone && !/^01[0-9]{9}$/.test(parentPhone)) {
+    errBox.textContent = 'رقم ولي الأمر يجب أن يكون 11 رقماً ويبدأ بـ 01';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  if (newPass && newPass.length < 6) {
+    errBox.textContent = 'كلمة المرور يجب أن تكون 6 خانات على الأقل';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('saveProfileBtn');
+  btn.disabled = true;
+  btn.textContent = 'جاري الحفظ...';
+
+  // Update object
+  currentUser.name = name;
+  currentUser.parentPhone = parentPhone;
+  currentUser.gov = gov;
+  if (newPass) {
+    currentUser.password = hashPass(newPass);
+  }
+
+  // Update LocalStorage users array
+  try {
+    const users = JSON.parse(localStorage.getItem('alamin_users') || '[]');
+    const idx = users.findIndex(u => String(u.phone) === String(currentUser.phone));
+    if (idx > -1) {
+      users[idx] = { ...users[idx], ...currentUser };
+    } else {
+      users.push(currentUser);
+    }
+    localStorage.setItem('alamin_users', JSON.stringify(users));
+  } catch(err) {}
+
+  // Update session
+  saveSession(currentUser);
+
+  // Sync to Firestore
+  if (window.db) {
+    try {
+      const updateData = {
+        name: currentUser.name,
+        parentPhone: currentUser.parentPhone,
+        gov: currentUser.gov
+      };
+      if (newPass) updateData.password = currentUser.password;
+
+      const p = window.db.collection('students').doc(String(currentUser.phone)).set(updateData, { merge: true });
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3500));
+      await Promise.race([p, timeout]);
+    } catch(err) {
+      console.warn('[Profile] Firestore update note:', err.message);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'حفظ التعديلات ✅';
+  sucBox.textContent = '✅ تم تحديث بياناتك بنجاح!';
+  sucBox.style.display = 'block';
+
+  renderProfile();
+  setTimeout(() => {
+    closeEditModal();
+  }, 1200);
+}
+
+/* ── Logout ── */
+function logout() {
+  localStorage.removeItem('alamin_current');
+  localStorage.removeItem('alamin_session_remember');
+  localStorage.removeItem('alamin_remember');
+  sessionStorage.removeItem('alamin_current');
+  sessionStorage.removeItem('mostafa_salem_admin_ok');
+  window.location.replace('login.html');
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  renderProfile();
+});
+</script>
+
+</body>
+</html>
