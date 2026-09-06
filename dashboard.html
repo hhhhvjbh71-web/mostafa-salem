@@ -2568,25 +2568,27 @@ let _coursesSyncVersion = 0;
     // وبيمنع ظهور نسخة قديمة/مخزنة (Cache) بدل آخر بيانات فعلية.
     window.db.collection('platform_data').doc('courses_list')
       .onSnapshot({ includeMetadataChanges: false }, async (doc) => {
-        // تجاهل أي قراءة جاية من الكاش المحلي فقط (لسه ما اتأكدتش من السيرفر)
-        // عشان منعرضش بيانات قديمة على الشاشة قبل ما تتأكد من Firebase.
-        if (doc.metadata && doc.metadata.fromCache && !navigator.onLine === false) {
-          // لو من الكاش وفي اتصال إنترنت فعلي، سيبها تكمل — Firestore هيبعت تحديث حقيقي فور وصوله.
-        }
         let fbCourses = [];
         if (doc.exists) {
           const data = doc.data() || {};
           const rawFbCourses = Array.isArray(data.items) ? data.items : [];
           fbCourses = getPublishedCoursePayload(rawFbCourses);
         }
-        if (fbCourses.length > 0) {
-          courses = fbCourses;
-          localStorage.setItem('alamin_courses', JSON.stringify(courses));
-          localStorage.setItem('alamin_courses_initialized', '1');
-          localStorage.setItem('alamin_courses_fb_migrated', '1');
-          console.log('[courses-live] تحديث فوري:', courses.length, 'كورس (from server:', !doc.metadata.fromCache, ')');
-          if (typeof renderCourses === 'function') { try { renderCourses(); } catch (e) {} }
-          if (typeof refreshCoursesUI === 'function') { try { refreshCoursesUI(); } catch (e) {} }
+
+        // Fix 1: حدّث دايماً حتى لو الـ array فاضية (مش بس لو length > 0)
+        courses = fbCourses;
+        localStorage.setItem('alamin_courses', JSON.stringify(courses));
+        localStorage.setItem('alamin_courses_initialized', '1');
+        localStorage.setItem('alamin_courses_fb_migrated', '1');
+        console.log('[courses-live] تحديث فوري:', courses.length, 'كورس (from server:', !doc.metadata.fromCache, ')');
+
+        // Fix 2 + 3: استدعاء الدوال الصح بدل renderCourses/refreshCoursesUI اللي مش موجودين
+        const activePage = document.querySelector('.page.active');
+        if (activePage) {
+          const pageId = activePage.id.replace('page-', '');
+          if (pageId === 'courses') { try { renderCoursesAdmin(); } catch(e) {} }
+          if (pageId === 'student-courses') { try { renderStudentCourses(); } catch(e) {} }
+          if (pageId === 'overview') { try { renderOverview(); } catch(e) {} }
         }
       }, (err) => {
         console.error('[courses-live] onSnapshot error:', err);
