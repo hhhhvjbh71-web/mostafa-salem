@@ -2684,23 +2684,18 @@ function watchStudentsCollection(dbInstance, label) {
   try {
     dbInstance.collection('students')
       .onSnapshot({ includeMetadataChanges: false }, (snapshot) => {
-        const users = getUsers();
-        let changed = false;
+        // FIX: نستخدم snapshot.docs (كل الطلاب) مش snapshot.docChanges() (التغييرات بس)
+        // المشكلة كانت: لما داشبورد بيفتح في متصفح جديد، localStorage فاضي،
+        // وdocChanges() بيجيب بس اللي اتغير من بعد ما الlistener اشترك مش كل الطلاب الموجودين.
+        const allUsers = [];
+        snapshot.docs.forEach(doc => {
+          const data = doc.data() || {};
+          if (data.role === 'admin') return;
 
-        snapshot.docChanges().forEach(change => {
-          const data = change.doc.data() || {};
-          if (data.role === 'admin') return; // تجاهل الأدمن فقط، بدون تغيير أي منطق تاني
-
-          const id = String(data.id || data.phone || data.qrCode || change.doc.id);
+          const id = String(data.id || data.phone || data.qrCode || doc.id);
           if (!id) return;
 
-          if (change.type === 'removed') {
-            const idx = users.findIndex(u => String(u.id) === id);
-            if (idx > -1) { users.splice(idx, 1); changed = true; }
-            return;
-          }
-
-          const incoming = {
+          allUsers.push({
             ...data,
             id,
             qrCode: data.qrCode || id,
@@ -2714,35 +2709,20 @@ function watchStudentsCollection(dbInstance, label) {
             status: data.status || 'active',
             enrolledCourses: data.enrolledCourses || [],
             joinDate: data.joinDate || (data.registeredAt ? data.registeredAt.slice(0,10) : '-')
-          };
-
-          const existingIndex = users.findIndex(u =>
-            String(u.id) === id ||
-            (incoming.phone && String(u.phone||'') === incoming.phone)
-          );
-          if (existingIndex > -1) {
-            users[existingIndex] = { ...users[existingIndex], ...incoming };
-          } else {
-            users.push(incoming);
-          }
-          changed = true;
+          });
         });
 
-        if (!changed) return;
+        saveUsers(allUsers);
+        console.log(`[students-live:${label}] تحديث فوري لعدد الطلاب:`, allUsers.length, '(from server:', !snapshot.metadata.fromCache, ')');
 
-        saveUsers(users);
-        console.log(`[students-live:${label}] تحديث فوري لعدد الطلاب:`, users.length, '(from server:', !snapshot.metadata.fromCache, ')');
-
-        // نحدّث بس الصفحة المفتوحة حالياً، زي بالظبط منطق الكورسات فوق
         const activePage = document.querySelector('.page.active');
         if (activePage) {
-          const id = activePage.id.replace('page-', '');
-          if (id === 'overview' && typeof renderOverview === 'function') renderOverview();
-          if (id === 'students' && typeof renderStudentsTable === 'function') renderStudentsTable();
+          const pageId = activePage.id.replace('page-', '');
+          if (pageId === 'overview' && typeof renderOverview === 'function') renderOverview();
+          if (pageId === 'students' && typeof renderStudentsTable === 'function') renderStudentsTable();
         }
-        // بادج عدد الطلاب في الشريط الجانبي (لو موجود) بيتحدّث دايماً بغض النظر عن الصفحة المفتوحة
         const badge = document.getElementById('studentsBadge');
-        if (badge) badge.textContent = users.length;
+        if (badge) badge.textContent = allUsers.length;
       }, (err) => {
         console.error(`[students-live:${label}] onSnapshot error:`, err);
       });
