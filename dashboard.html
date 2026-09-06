@@ -2662,10 +2662,28 @@ let _coursesSyncVersion = 0;
 function studentDb(user) {
   return window.db;
 }
+function getStudentDocId(userOrId) {
+  if (userOrId && typeof userOrId === 'object') {
+    return String(userOrId.firestoreDocId || userOrId.phone || userOrId.id || userOrId.qrCode || '');
+  }
+  const normalized = normalizeStudentId(userOrId);
+  const users = getUsers();
+  const u = users.find(x =>
+    normalizeStudentId(x.id) === normalized ||
+    normalizeStudentId(x.phone) === normalized ||
+    normalizeStudentId(x.firestoreDocId) === normalized
+  );
+  return u ? getStudentDocId(u) : String(userOrId || '');
+}
 // نسخة بتاخد الـ id فقط (لما مفيش user object قدامنا) وبتدور في users المحليين
 function studentDbById(id) {
   const users = getUsers();
-  const u = users.find(x => normalizeStudentId(x.id) === normalizeStudentId(id));
+  const normalized = normalizeStudentId(id);
+  const u = users.find(x =>
+    normalizeStudentId(x.id) === normalized ||
+    normalizeStudentId(x.phone) === normalized ||
+    normalizeStudentId(x.firestoreDocId) === normalized
+  );
   return studentDb(u);
 }
 
@@ -2698,6 +2716,7 @@ function watchStudentsCollection(dbInstance, label) {
           allUsers.push({
             ...data,
             id,
+            firestoreDocId: doc.id,
             qrCode: data.qrCode || id,
             name: data.name || data.fullName || 'طالب',
             grade: data.grade || 'all',
@@ -2752,7 +2771,7 @@ async function pushCoursesToFirebase(coursesArray) {
   }
   if (!window.db) {
     console.warn('[Firebase] db not ready within 2.5s, saved to localStorage');
-    return true;
+    return false;
   }
 
   console.log('[Firebase] db is ready, pushing', coursesArray.length, 'courses...');
@@ -2762,7 +2781,7 @@ async function pushCoursesToFirebase(coursesArray) {
     const payloadBytes = getJsonSizeBytes({ items: cleanItems, updatedAt: Date.now() });
     if (payloadBytes > 900000) {
       showNotification('⚠️ حجم بيانات الكورسات كبير، تم الحفظ محلياً.', 'warning');
-      return true;
+      return false;
     }
     
     // سباق مع تايم أوت 4 ثوانٍ حتى لا تعلق الواجهة أبداً
@@ -2781,7 +2800,7 @@ async function pushCoursesToFirebase(coursesArray) {
   } catch(e) {
     console.warn('[Firebase] write note:', e.message);
     // تم الحفظ محلياً بالفعل في saveCourses
-    return true;
+    return false;
   }
 }
 
@@ -2960,11 +2979,11 @@ async function saveCourses(c){
 
   // Then sync with Firebase (if available)
   try {
-    await pushCoursesToFirebase(cleanCourses);
+    return await pushCoursesToFirebase(cleanCourses);
   } catch(e) {
     console.warn('[Courses] Firebase sync error:', e);
+    return false;
   }
-  return true;
 }
 function getCourseById(id){
   const cs = getCourses();
@@ -3675,7 +3694,7 @@ async function grantCourseToStudent(userId){
 
     const _db1 = studentDb(users[idx]);
     if(_db1){
-      await _db1.collection('students').doc(String(users[idx].id)).update({
+      await _db1.collection('students').doc(getStudentDocId(users[idx])).update({
         enrolledCourses: users[idx].enrolledCourses
       });
     } else {
@@ -3709,7 +3728,7 @@ async function revokeCourseFromStudent(userId, courseId){
   const _db2 = studentDb(users[idx]);
   if(_db2){
     try {
-      await _db2.collection('students').doc(String(users[idx].id)).update({
+      await _db2.collection('students').doc(getStudentDocId(users[idx])).update({
         enrolledCourses: users[idx].enrolledCourses
       });
     } catch(e){ console.warn('sync revoke failed:', e); }
@@ -3724,11 +3743,12 @@ async function deleteStudent(id){
   if(!confirm('هل أنت متأكد من حذف هذا الطالب؟ سيتم حذفه نهائياً.')) return;
   const normalizedId = normalizeStudentId(id);
   const _dbDel = studentDbById(normalizedId); // ← لازم نحددها قبل ما نمسح الطالب من users المحليين
+  const docIdToDelete = getStudentDocId(normalizedId);
   let users = getUsers().filter(u => normalizeStudentId(u.id) !== normalizedId);
   saveUsers(users);
   if(_dbDel){
     try {
-      await _dbDel.collection('students').doc(normalizedId).delete();
+      await _dbDel.collection('students').doc(docIdToDelete).delete();
     } catch(e){
       console.warn('Could not delete from Firebase:', e);
       showNotification('⚠️ تم الحذف محلياً لكن فشل الحذف من Firebase', 'error');
@@ -5359,7 +5379,7 @@ function verifyPayment(txId) {
         saveUsers(users);
         const _db3 = studentDb(users[uIdx]);
         if(_db3){
-          _db3.collection('students').doc(String(users[uIdx].id)).update({
+          _db3.collection('students').doc(getStudentDocId(users[uIdx])).update({
             enrolledCourses: users[uIdx].enrolledCourses
           }).catch(e => console.warn('sync verifyPayment failed:', e));
         }
@@ -6685,6 +6705,7 @@ async function syncPlatformStudents(showNotif = true) {
       const incoming = {
         ...data,
         id,
+        firestoreDocId: doc.id,
         qrCode: data.qrCode || id,
         name: data.name || data.fullName || 'طالب',
         grade: data.grade || 'all',
