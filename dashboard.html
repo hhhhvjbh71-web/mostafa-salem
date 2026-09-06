@@ -2568,11 +2568,15 @@ let _coursesSyncVersion = 0;
     // وبيمنع ظهور نسخة قديمة/مخزنة (Cache) بدل آخر بيانات فعلية.
     window.db.collection('platform_data').doc('courses_list')
       .onSnapshot({ includeMetadataChanges: false }, async (doc) => {
-        let fbCourses = [];
-        if (doc.exists) {
-          const data = doc.data() || {};
-          const rawFbCourses = Array.isArray(data.items) ? data.items : [];
-          fbCourses = getPublishedCoursePayload(rawFbCourses);
+        let fbCourses = await loadCoursesFromFirebase();
+        if (!fbCourses || !fbCourses.length) {
+          if (doc.exists) {
+            const data = doc.data() || {};
+            const rawFbCourses = Array.isArray(data.items) ? data.items : [];
+            fbCourses = getPublishedCoursePayload(rawFbCourses);
+          } else {
+            fbCourses = [];
+          }
         }
 
         // Fix 1: حدّث دايماً حتى لو الـ array فاضية (مش بس لو length > 0)
@@ -2597,11 +2601,12 @@ let _coursesSyncVersion = 0;
 
   try {
     const doc = await window.db.collection('platform_data').doc('courses_list').get({ source: 'server' });
-    let fbCourses = [];
+    const fromCollection = await loadCoursesFromFirebase();
+    let fbCourses = fromCollection && fromCollection.length ? fromCollection : [];
     if (doc.exists) {
       const data = doc.data() || {};
       const rawFbCourses = Array.isArray(data.items) ? data.items : [];
-      fbCourses = getPublishedCoursePayload(rawFbCourses);
+      fbCourses = fromCollection && fromCollection.length ? fromCollection : getPublishedCoursePayload(rawFbCourses);
       if (fbCourses.length !== rawFbCourses.length) {
         await pushCoursesToFirebase(fbCourses);
         console.log('[courses-init] Removed legacy seeded courses from Firebase');
@@ -2778,24 +2783,35 @@ async function pushCoursesToFirebase(coursesArray) {
 
   try {
     const cleanItems = getPublishedCoursePayload(coursesArray);
-    const payloadBytes = getJsonSizeBytes({ items: cleanItems, updatedAt: Date.now() });
-    if (payloadBytes > 900000) {
-      showNotification('⚠️ حجم بيانات الكورسات كبير، تم الحفظ محلياً.', 'warning');
+    const indexItems = getCourseIndexPayload(cleanItems);
+    const indexPayloadBytes = getJsonSizeBytes({ items: indexItems, updatedAt: Date.now() });
+    if (indexPayloadBytes > 900000) {
+      showNotification('⚠️ حجم فهرس الكورسات كبير جداً. قلل حجم صور الكروت أو البانرات ثم حاول مرة أخرى.', 'warning');
       return false;
     }
-    
-    // سباق مع تايم أوت 4 ثوانٍ حتى لا تعلق الواجهة أبداً
-    const writePromise = window.db.collection('platform_data').doc('courses_list').set({
-      items: cleanItems,
+
+    const existingSnap = await window.db.collection('platform_courses').get();
+    const nextIds = new Set(cleanItems.map(c => String(c.id)));
+    const batch = window.db.batch();
+    cleanItems.forEach(course => {
+      batch.set(window.db.collection('platform_courses').doc(String(course.id)), {
+        ...course,
+        updatedAt: Date.now()
+      }, { merge: true });
+    });
+    existingSnap.forEach(doc => {
+      if (!nextIds.has(String(doc.id))) batch.delete(doc.ref);
+    });
+
+    const indexRef = window.db.collection('platform_data').doc('courses_list');
+    batch.set(indexRef, {
+      items: indexItems,
       updatedAt: Date.now()
     });
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Firebase timeout')), 4000)
-    );
 
-    await Promise.race([writePromise, timeoutPromise]);
+    await batch.commit();
     _coursesDirty = false;
-    console.log('[Firebase] ✅ courses_list saved successfully —', cleanItems.length, 'courses');
+    console.log('[Firebase] ✅ courses saved successfully —', cleanItems.length, 'full courses + index');
     return true;
   } catch(e) {
     console.warn('[Firebase] write note:', e.message);
@@ -2957,6 +2973,52 @@ function getPublishedCoursePayload(list){
       course.bannerBgWarning = 'تم حذف خلفية بانر كبيرة جداً قبل النشر';
     }
     return course;
+  });
+}
+
+function getCourseIndexPayload(list){
+  return getPublishedCoursePayload(list).map(course => {
+    const lessonCount = Array.isArray(course.lessons) ? course.lessons.length : Number(course.lessonCount || 0) || 0;
+    return {
+      id: course.id,
+      title: course.title || '',
+      desc: course.desc || '',
+      aiSmartDesc: course.aiSmartDesc || '',
+      grade: course.grade || 'all',
+      order: course.order ?? null,
+      type: course.type || 'free',
+      price: course.price || 0,
+      oldPrice: course.oldPrice ?? null,
+      track: course.track || 'both',
+      courseType: course.courseType || 'normal',
+      childCourseIds: Array.isArray(course.childCourseIds) ? course.childCourseIds : [],
+      thumbnail: course.thumbnail || '',
+      thumbnailX: course.thumbnailX ?? 50,
+      thumbnailY: course.thumbnailY ?? 50,
+      headerTitle: course.headerTitle || '',
+      headerColor: course.headerColor || course.color || course.bg || '',
+      bannerImage: course.bannerImage || '',
+      bannerColor: course.bannerColor || '',
+      bannerBg: course.bannerBg || '',
+      imageLayout: course.imageLayout || 'top',
+      cardShowBadge: course.cardShowBadge !== false,
+      cardNamePosition: course.cardNamePosition || 'top',
+      cardNameBg: course.cardNameBg || '#0284c7',
+      cardNameColor: course.cardNameColor || '#ffffff',
+      cardShowStatus: course.cardShowStatus !== false,
+      cardBadgeType: course.cardBadgeType || 'auto',
+      cardShowHover: course.cardShowHover !== false,
+      studentsCount: course.studentsCount || 0,
+      rating: course.rating || 0,
+      cardRadius: course.cardRadius ?? 24,
+      color: course.color || course.headerColor || '',
+      bg: course.bg || course.headerColor || '',
+      emoji: course.emoji || '📖',
+      created: course.created || '',
+      updated: course.updated || '',
+      lessonCount,
+      lessons: Array.from({ length: lessonCount }, () => ({}))
+    };
   });
 }
 
