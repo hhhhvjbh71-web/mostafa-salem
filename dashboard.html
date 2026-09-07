@@ -1049,7 +1049,7 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
               <option value="أدبي">أدبي</option>
             </select>
             <button id="palestinianFilterBtn" onclick="togglePalestinianFilter()" style="background:var(--bg);color:var(--text);border:2px solid var(--border);padding:8px 14px;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">🇵🇸 الطلاب الفلسطينيون</button>
-            <button onclick="syncPlatformStudents()" style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;padding:9px 16px;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">🔄 تحديث</button>
+            <button id="syncStudentsBtn" onclick="syncPlatformStudents(true)" style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;padding:9px 16px;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">🔄 تحديث من قاعدة البيانات</button>
           </div>
         </div>
         <div id="studentsGradeSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:0 24px 18px"></div>
@@ -1082,12 +1082,19 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
 
     <!-- COURSES PAGE -->
     <div class="page" id="page-courses">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
         <h2 style="font-size:22px;font-weight:900">إدارة الكورسات 📚</h2>
-        <button class="btn-add" onclick="openAddCourseModal()">➕ إضافة كورس</button>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button onclick="reloadCoursesFromFirebase()" style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;padding:9px 16px;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px">🔄 تحديث من قاعدة البيانات</button>
+          <button class="btn-add" onclick="openAddCourseModal()">➕ إضافة كورس</button>
+        </div>
       </div>
+      <div id="coursesLoadingMsg" style="display:none;text-align:center;padding:40px;color:var(--primary);font-size:16px;font-weight:700;">⏳ جاري تحميل الكورسات من قاعدة البيانات...</div>
       <div class="courses-admin-grid" id="coursesAdminGrid">
-        <!-- Auto-rendered -->
+        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#aaa;">
+          <div style="font-size:48px;margin-bottom:16px">⏳</div>
+          <p style="font-size:16px;">جاري تحميل الكورسات من قاعدة البيانات...</p>
+        </div>
       </div>
     </div>
 
@@ -2498,22 +2505,68 @@ else { // fallback لو الدالة لسه ما اتعرّفتش
 }
 
 let courses = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
-// Firebase is the source of truth. Do not seed demo courses in localStorage:
-// that made old/default courses appear in some browsers and disappear in others.
+// Firebase is the source of truth. Do not seed demo courses in localStorage.
+// قائمة شاملة بعناوين الكورسات الافتراضية/التجريبية التي أُضيفت تلقائياً من النظام — يجب حذفها
 const _legacySeedCourseTitles = new Set([
+  // الكورسات الافتراضية القديمة
   'المراجعة النهائية الصف الأول الثانوي',
   'المراجعة النهائية الصف الثاني الثانوي',
-  'مراجعة التربية الدينية الصف الثالث'
+  'مراجعة التربية الدينية الصف الثالث',
+  // كورسات تجريبية شائعة
+  'كورس تجريبي',
+  'كورس نموذجي',
+  'اختبار كورس',
+  'Demo Course',
+  'Test Course',
+  'Sample Course',
 ]);
+
+// حذف الكورسات الافتراضية من localStorage فوراً
 if (Array.isArray(courses) && courses.some(c => _legacySeedCourseTitles.has(c && c.title))) {
   courses = courses.filter(c => !_legacySeedCourseTitles.has(c && c.title));
   localStorage.setItem('alamin_courses', JSON.stringify(courses));
+  console.log('[startup] Removed legacy seeded courses from localStorage');
 }
 localStorage.setItem('alamin_courses_initialized', '1');
 
-// ── اختبار اتصال Firebase عند التحميل ──
+// دالة لحذف الكورسات الافتراضية من Firebase أيضاً (تُستدعى مرة واحدة عند الحاجة)
+async function purgeDefaultCoursesFromFirebase() {
+  if (!window.db) return;
+  try {
+    // حذف من platform_courses collection
+    const snap = await window.db.collection('platform_courses').get({ source: 'server' });
+    const batch = window.db.batch();
+    let deleteCount = 0;
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data && _legacySeedCourseTitles.has(data.title)) {
+        batch.delete(doc.ref);
+        deleteCount++;
+      }
+    });
+    if (deleteCount > 0) {
+      await batch.commit();
+      console.log('[purgeDefaultCourses] Deleted', deleteCount, 'default courses from platform_courses');
+    }
+
+    // حذف المرجع من courses_list index أيضاً
+    const indexDoc = await window.db.collection('platform_data').doc('courses_list').get({ source: 'server' });
+    if (indexDoc.exists) {
+      const data = indexDoc.data() || {};
+      const items = Array.isArray(data.items) ? data.items : [];
+      const cleaned = items.filter(c => !_legacySeedCourseTitles.has(c && c.title));
+      if (cleaned.length !== items.length) {
+        await window.db.collection('platform_data').doc('courses_list').set({ items: cleaned, updatedAt: Date.now() });
+        console.log('[purgeDefaultCourses] Removed', items.length - cleaned.length, 'default courses from courses_list index');
+      }
+    }
+  } catch(e) {
+    console.warn('[purgeDefaultCourses] error:', e.message);
+  }
+}
+
+// ── اختبار اتصال Firebase عند التحميل + حذف الكورسات الافتراضية ──
 (async () => {
-  // Live students listener is ACTIVE — syncs new registrations from login page in real-time
   // انتظر db
   if (!window.db) {
     await new Promise(r => {
@@ -2526,7 +2579,7 @@ localStorage.setItem('alamin_courses_initialized', '1');
     showNotification('⚠️ Firebase غير متاح — تحقق من ملف firebase-config.js', 'error');
     return;
   }
-  // اختبار قراءة وكتابة
+  // اختبار الاتصال
   try {
     window.db.collection('platform_data').doc('_connectivity_test').set({ ts: Date.now() }).catch(()=>{});
     console.log('[STARTUP] ✅ Firebase read/write OK');
@@ -2538,6 +2591,13 @@ localStorage.setItem('alamin_courses_initialized', '1');
         'error'
       );
     }
+  }
+
+  // حذف الكورسات الافتراضية من Firebase (تلقائياً عند أول فتح)
+  const purgeFlag = sessionStorage.getItem('_defaultCoursesPurged');
+  if (!purgeFlag) {
+    sessionStorage.setItem('_defaultCoursesPurged', '1');
+    await purgeDefaultCoursesFromFirebase();
   }
 })();
 
@@ -2562,31 +2622,24 @@ let _coursesSyncVersion = 0;
   }
 
   try {
-    // ── LIVE LISTENER بدل قراءة لمرة واحدة ──
-    // onSnapshot بيفتح اتصال Real-Time مع Firestore: أي تعديل يحصل من أي جهاز
-    // (إضافة/تعديل/حذف كورس) بيوصل هنا فوراً بدون الحاجة لعمل Refresh يدوي،
-    // وبيمنع ظهور نسخة قديمة/مخزنة (Cache) بدل آخر بيانات فعلية.
-    window.db.collection('platform_data').doc('courses_list')
-      .onSnapshot({ includeMetadataChanges: false }, async (doc) => {
-        let fbCourses = await loadCoursesFromFirebase();
-        if (!fbCourses || !fbCourses.length) {
-          if (doc.exists) {
-            const data = doc.data() || {};
-            const rawFbCourses = Array.isArray(data.items) ? data.items : [];
-            fbCourses = getPublishedCoursePayload(rawFbCourses);
-          } else {
-            fbCourses = [];
-          }
-        }
+    // ── LIVE LISTENER على platform_courses collection (البيانات الكاملة) ──
+    // onSnapshot بيفتح اتصال Real-Time مع Firestore: أي تعديل (إضافة/تعديل/حذف كورس)
+    // بيوصل فوراً لكل الأجهزة بدون Refresh يدوي.
+    window.db.collection('platform_courses')
+      .onSnapshot({ includeMetadataChanges: false }, async (snapshot) => {
+        const items = [];
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (data && data.id) items.push(data);
+        });
+        const fbCourses = getPublishedCoursePayload(items);
 
-        // Fix 1: حدّث دايماً حتى لو الـ array فاضية (مش بس لو length > 0)
         courses = fbCourses;
         localStorage.setItem('alamin_courses', JSON.stringify(courses));
         localStorage.setItem('alamin_courses_initialized', '1');
         localStorage.setItem('alamin_courses_fb_migrated', '1');
-        console.log('[courses-live] تحديث فوري:', courses.length, 'كورس (from server:', !doc.metadata.fromCache, ')');
+        console.log('[courses-live] تحديث فوري من platform_courses:', courses.length, 'كورس (from server:', !snapshot.metadata.fromCache, ')');
 
-        // Fix 2 + 3: استدعاء الدوال الصح بدل renderCourses/refreshCoursesUI اللي مش موجودين
         const activePage = document.querySelector('.page.active');
         if (activePage) {
           const pageId = activePage.id.replace('page-', '');
@@ -2595,60 +2648,71 @@ let _coursesSyncVersion = 0;
           if (pageId === 'overview') { try { renderOverview(); } catch(e) {} }
         }
       }, (err) => {
-        console.error('[courses-live] onSnapshot error:', err);
+        console.error('[courses-live] onSnapshot error on platform_courses:', err);
+        // fallback: استمع على courses_list index
+        try {
+          window.db.collection('platform_data').doc('courses_list')
+            .onSnapshot({ includeMetadataChanges: false }, async (doc) => {
+              let fbCourses = [];
+              if (doc.exists) {
+                const data = doc.data() || {};
+                fbCourses = getPublishedCoursePayload(Array.isArray(data.items) ? data.items : []);
+              }
+              courses = fbCourses;
+              localStorage.setItem('alamin_courses', JSON.stringify(courses));
+              console.log('[courses-live-fallback] من courses_list:', courses.length, 'كورس');
+              const activePage = document.querySelector('.page.active');
+              if (activePage) {
+                const pageId = activePage.id.replace('page-', '');
+                if (pageId === 'courses') { try { renderCoursesAdmin(); } catch(e) {} }
+                if (pageId === 'overview') { try { renderOverview(); } catch(e) {} }
+              }
+            }, () => {});
+        } catch(_) {}
       });
   } catch (e) { console.error('[courses-init] listener setup failed', e); }
 
   try {
-    const doc = await window.db.collection('platform_data').doc('courses_list').get({ source: 'server' });
-    const fromCollection = await loadCoursesFromFirebase();
-    let fbCourses = fromCollection && fromCollection.length ? fromCollection : [];
-    if (doc.exists) {
-      const data = doc.data() || {};
-      const rawFbCourses = Array.isArray(data.items) ? data.items : [];
-      fbCourses = fromCollection && fromCollection.length ? fromCollection : getPublishedCoursePayload(rawFbCourses);
-      if (fbCourses.length !== rawFbCourses.length) {
-        await pushCoursesToFirebase(fbCourses);
-        console.log('[courses-init] Removed legacy seeded courses from Firebase');
-      }
-    }
+    // ── الجلب المباشر الأولي (one-time fetch) من platform_courses ──
+    // الـ onSnapshot هيفضل يحدث في الخلفية، لكن نجلب مرة فورية عشان نعرض الداشبورد بسرعة
+    const fbCourses = await loadCoursesFromFirebase();
 
-    if (fbCourses.length > 0) {
-      // Firebase له بيانات → استخدمها كمصدر موثوق
+    if (fbCourses && fbCourses.length > 0) {
+      // Firebase فيه كورسات حقيقية → استخدمها
       courses = fbCourses;
       localStorage.setItem('alamin_courses', JSON.stringify(courses));
       localStorage.setItem('alamin_courses_initialized', '1');
       localStorage.setItem('alamin_courses_fb_migrated', '1');
-      console.log('[courses-init] Loaded', courses.length, 'courses from Firebase');
+      console.log('[courses-init] ✅ Loaded', courses.length, 'courses from Firebase');
     } else {
-      // Firebase مفيهوش كورسات (الدوكيومنت فاضي أو مش موجود).
-      // قبل ما نمسح أي حاجة، نتأكد إن مفيش كورسات حقيقية متخزنة محلياً بس ولسه ما اتزامنتش مع Firebase
-      // (ده بيحصل مثلاً لو الكورس اتحفظ في نسخة قديمة من الموقع قبل ما مزامنة Firebase تتضاف، أو لو رفع Firebase فشل بصمت قبل كده).
+      // Firebase مفيهوش كورسات — تحقق من كورسات محلية حقيقية غير مرفوعة بعد
       const localCourses = JSON.parse(localStorage.getItem('alamin_courses') || '[]')
         .filter(c => !_legacySeedCourseTitles.has(c && c.title));
       const alreadyMigrated = localStorage.getItem('alamin_courses_fb_migrated') === '1';
 
       if (localCourses.length > 0 && !alreadyMigrated) {
-        console.warn('[courses-init] Firebase فاضي لكن فيه', localCourses.length, 'كورس محفوظ محلياً بس — هنرفعهم على Firebase بدل ما نمسحهم.');
+        // كورسات محلية لم تُرفع بعد → ارفعها على Firebase
+        console.warn('[courses-init] Firebase فاضي لكن فيه', localCourses.length, 'كورس محلي — جاري رفعها على Firebase');
         courses = localCourses;
         const pushed = await pushCoursesToFirebase(localCourses);
         if (pushed) {
           localStorage.setItem('alamin_courses_fb_migrated', '1');
           localStorage.setItem('alamin_courses', JSON.stringify(localCourses));
-          showNotification('⚠️ لقينا كورسات كانت محفوظة على الجهاز ده بس ولسه ما اتنشرتش على Firebase — تم رفعها ونشرها دلوقتي', 'warning');
+          showNotification('⚠️ تم رفع الكورسات المحفوظة محلياً إلى Firebase ونشرها', 'warning');
           console.log('[courses-init] Migrated', localCourses.length, 'local-only course(s) to Firebase');
         } else {
-          showNotification('⚠️ في كورسات محفوظة على هذا الجهاز فقط ولسه معملهاش رفع لـ Firebase. اتأكد من الاتصال وجرّب تفتح صفحة الكورسات تاني.', 'warning');
-          console.warn('[courses-init] Failed to migrate local-only courses to Firebase — kept them in memory/local for now');
+          showNotification('⚠️ في كورسات محفوظة على هذا الجهاز فقط — تأكد من الاتصال وجرّب مرة أخرى', 'warning');
+          console.warn('[courses-init] Failed to migrate local courses to Firebase');
         }
       } else {
-        // مفيش كورسات محلية حقيقية للاسترجاع، فعلاً مفيش كورسات منشورة.
+        // لا يوجد أي كورسات في Firebase أو محلياً — الداشبورد فارغ فعلاً
         courses = [];
         localStorage.removeItem('alamin_courses');
-        console.log('[courses-init] No published courses in Firebase and nothing real to migrate locally');
+        console.log('[courses-init] No published courses anywhere — dashboard is empty');
       }
     }
 
+    // حدّث الصفحة النشطة
     const activePage = document.querySelector('.page.active');
     if (activePage) {
       const id = activePage.id.replace('page-', '');
@@ -2658,6 +2722,16 @@ let _coursesSyncVersion = 0;
     }
   } catch(e) {
     console.warn('[courses-init] Firebase load error:', e.code, e.message);
+    // fallback: استخدم ما هو محفوظ محلياً
+    const localCourses = JSON.parse(localStorage.getItem('alamin_courses') || '[]')
+      .filter(c => !_legacySeedCourseTitles.has(c && c.title));
+    courses = localCourses;
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+      const id = activePage.id.replace('page-', '');
+      if (id === 'courses') renderCoursesAdmin();
+      if (id === 'overview') renderOverview();
+    }
   }
 })();
 
@@ -2820,16 +2894,36 @@ async function pushCoursesToFirebase(coursesArray) {
   }
 }
 
-// loadCoursesFromFirebase — helper مستخدم في renderStudentCourses
+// loadCoursesFromFirebase — يقرأ من platform_courses (البيانات الكاملة) أولاً،
+// ثم courses_list (الـ index) كـ fallback
 async function loadCoursesFromFirebase() {
   if (!window.db) return null;
+  try {
+    // أولاً: حاول قراءة الكورسات الكاملة من platform_courses collection
+    const snap = await window.db.collection('platform_courses').get();
+    if (!snap.empty) {
+      const items = [];
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data && data.id) items.push(data);
+      });
+      if (items.length > 0) {
+        console.log('[Firebase] loadCoursesFromFirebase: loaded', items.length, 'courses from platform_courses');
+        return getPublishedCoursePayload(items);
+      }
+    }
+  } catch(e) { console.warn('[Firebase] platform_courses read failed:', e.code, e.message); }
+
+  // ثانياً: fallback على courses_list index
   try {
     const doc = await window.db.collection('platform_data').doc('courses_list').get();
     if (doc.exists) {
       const data = doc.data();
-      return getPublishedCoursePayload(Array.isArray(data.items) ? data.items : []);
+      const items = Array.isArray(data.items) ? data.items : [];
+      console.log('[Firebase] loadCoursesFromFirebase: loaded', items.length, 'courses from courses_list (index)');
+      return getPublishedCoursePayload(items);
     }
-  } catch(e) { console.warn('[Firebase] Course load failed:', e.code, e.message); }
+  } catch(e) { console.warn('[Firebase] courses_list read failed:', e.code, e.message); }
   return null;
 }
 
@@ -3239,8 +3333,17 @@ async function addLessonToCourse(courseId, lesson){
 }
 
 async function initStudentsPage(){
-  renderStudentsTable(); // عرض فوري من الكاش المحلي
-  await syncPlatformStudents(false); // جلب من Firebase في الخلفية
+  // أولاً: عرض ما هو محفوظ محلياً فوراً (لو فيه بيانات)
+  const localUsers = getUsers();
+  if (localUsers.length > 0) {
+    renderStudentsTable();
+  } else {
+    // عرض loading state إذا localStorage فارغ
+    const tbody = document.getElementById('studentsTableBody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">⏳</div><p>جاري تحميل بيانات الطلاب من قاعدة البيانات...</p></div></td></tr>';
+  }
+  // ثم جلب أحدث البيانات من Firebase
+  await syncPlatformStudents(false);
 }
 async function updateLesson(courseId, lessonId, updates){
   const cs = getCourses();
@@ -3830,10 +3933,58 @@ function getCourseOrderValue(c){
   return Number.isFinite(v) ? v : 9999;
 }
 
+// جلب الكورسات من Firebase يدوياً وتحديث العرض
+async function reloadCoursesFromFirebase() {
+  const loadingMsg = document.getElementById('coursesLoadingMsg');
+  const grid = document.getElementById('coursesAdminGrid');
+  if (loadingMsg) loadingMsg.style.display = 'block';
+  if (grid) grid.style.opacity = '0.4';
+
+  try {
+    const fbCourses = await loadCoursesFromFirebase();
+    if (fbCourses && fbCourses.length > 0) {
+      courses = fbCourses;
+      localStorage.setItem('alamin_courses', JSON.stringify(courses));
+      showNotification(`✅ تم تحميل ${courses.length} كورس من قاعدة البيانات`, 'success');
+    } else {
+      // تحقق من platform_courses مباشرة كآخر محاولة
+      if (window.db) {
+        const snap = await window.db.collection('platform_courses').get({ source: 'server' });
+        if (!snap.empty) {
+          const items = [];
+          snap.forEach(doc => { const d = doc.data(); if (d && d.id) items.push(d); });
+          courses = getPublishedCoursePayload(items);
+          localStorage.setItem('alamin_courses', JSON.stringify(courses));
+          showNotification(`✅ تم تحميل ${courses.length} كورس من قاعدة البيانات`, 'success');
+        } else {
+          showNotification('ℹ️ لا توجد كورسات في قاعدة البيانات بعد', 'info');
+          courses = [];
+        }
+      }
+    }
+  } catch(e) {
+    console.error('[reloadCoursesFromFirebase] error:', e);
+    showNotification('❌ فشل تحميل الكورسات: ' + (e.message || e.code || 'تحقق من الاتصال'), 'error');
+  } finally {
+    if (loadingMsg) loadingMsg.style.display = 'none';
+    if (grid) grid.style.opacity = '1';
+    renderCoursesAdmin();
+  }
+}
+
 function renderCoursesAdmin(){
   const grid=document.getElementById('coursesAdminGrid');
   // ترتيب العرض داخل لوحة التحكم نفسها يطابق ترتيب ظهور الكورسات بالصفحة الرئيسية
   const sortedCourses = [...courses].sort((a,b)=> getCourseOrderValue(a)-getCourseOrderValue(b) || (a.id-b.id));
+  if(!sortedCourses.length){
+    grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#aaa;">
+      <div style="font-size:64px;margin-bottom:16px">📚</div>
+      <p style="font-size:16px;margin-bottom:16px;">لا توجد كورسات مضافة بعد في قاعدة البيانات</p>
+      <p style="font-size:13px;color:#bbb;margin-bottom:24px;">اضغط "تحديث من قاعدة البيانات" للتحقق، أو أضف كورساً جديداً</p>
+      <button onclick="reloadCoursesFromFirebase()" style="background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;padding:10px 22px;border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;">🔄 تحميل من قاعدة البيانات</button>
+    </div>`;
+    return;
+  }
   grid.innerHTML=sortedCourses.map((c,displayIndex)=>{
     const thumbHTML = c.thumbnail
       ? `<img src="${c.thumbnail}" style="max-width:100%;max-height:200px;object-fit:contain;display:block;margin:auto">`
@@ -6749,22 +6900,30 @@ function isSystemStudentDoc(doc, data) {
 // ─── جلب كل طلاب المنصة من Firebase تلقائياً ───────────────
 async function syncPlatformStudents(showNotif = true) {
   if (!window.db) {
-    if (showNotif) showNotification('⚠️ Firebase غير متاح', 'error');
-    return;
+    // لو Firebase مش جاهز، انتظر لحد 5 ثواني
+    await new Promise(resolve => {
+      const t = setInterval(() => { if (window.db) { clearInterval(t); resolve(); } }, 200);
+      setTimeout(() => { clearInterval(t); resolve(); }, 5000);
+    });
+    if (!window.db) {
+      if (showNotif) showNotification('⚠️ Firebase غير متاح — يُعرض ما هو مخزن محلياً', 'warning');
+      renderStudentsTable();
+      renderOverview();
+      return;
+    }
   }
-  if (showNotif) showNotification('🔄 جاري جلب بيانات الطلاب...', 'info');
-
-  const users = getUsers();
-  let added = 0;
+  if (showNotif) showNotification('🔄 جاري جلب بيانات الطلاب من قاعدة البيانات...', 'info');
 
   try {
+    // جلب كل الطلاب من Firebase مباشرةً (source: server يتجاوز الكاش)
     const snapshot = await window.db.collection('students').get({ source: 'server' });
+    const allUsers = [];
     snapshot.forEach(doc => {
       const data = doc.data() || {};
-      if (data.role === 'admin') return; // تجاهل الأدمن فقط
+      if (data.role === 'admin') return; // تجاهل الأدمن
       const id = String(data.id || data.phone || data.qrCode || doc.id);
       if (!id) return;
-      const incoming = {
+      allUsers.push({
         ...data,
         id,
         firestoreDocId: doc.id,
@@ -6779,30 +6938,25 @@ async function syncPlatformStudents(showNotif = true) {
         status: data.status || 'active',
         enrolledCourses: data.enrolledCourses || [],
         joinDate: data.joinDate || (data.registeredAt ? data.registeredAt.slice(0,10) : '-')
-      };
-      const existingIndex = users.findIndex(u =>
-        String(u.id) === id ||
-        (incoming.phone && String(u.phone||'') === incoming.phone)
-      );
-      if (existingIndex > -1) {
-        users[existingIndex] = { ...users[existingIndex], ...incoming };
-      } else {
-        users.push(incoming);
-        added++;
-      }
+      });
     });
 
-    saveUsers(users);
-    renderStudentsTable();
-    renderOverview();
+    // استبدال localStorage بالبيانات الحديثة من Firebase (المصدر الموثوق)
+    saveUsers(allUsers);
+    console.log('[syncPlatformStudents] ✅ loaded', allUsers.length, 'students from Firebase');
 
-    if (showNotif) showNotification(`✅ تم تحديث بيانات ${users.length} طالب (${added} جديد)`, 'success');
-  } catch (err) {
-    console.warn('[syncPlatformStudents] فشل الجلب:', err.code || err.message || err);
-    saveUsers(users);
     renderStudentsTable();
     renderOverview();
-    if (showNotif) showNotification('⚠️ فشل جلب الطلاب: ' + (err.message || err.code || err), 'error');
+    const badge = document.getElementById('studentsBadge');
+    if (badge) badge.textContent = allUsers.length;
+
+    if (showNotif) showNotification(`✅ تم تحميل بيانات ${allUsers.length} طالب من قاعدة البيانات`, 'success');
+  } catch (err) {
+    console.warn('[syncPlatformStudents] فشل الجلب من Firebase:', err.code || err.message || err);
+    // fallback على localStorage
+    renderStudentsTable();
+    renderOverview();
+    if (showNotif) showNotification('⚠️ فشل جلب الطلاب: ' + (err.message || err.code || 'تحقق من اتصال الإنترنت'), 'error');
   }
 }
 // للتوافق مع الأجزاء القديمة التي تستدعي هذا الاسم
@@ -8009,6 +8163,26 @@ if(currentUser && currentUser.role === 'student') {
   }
   showPage('overview');
   renderPaymentsTable();
+
+  // ── جلب فوري من Firebase عند فتح الداشبورد ──
+  // الكورسات: onSnapshot شغال في الخلفية، لكن نجلب مرة أولى فورية لو courses فارغة
+  if (!courses.length) {
+    (async () => {
+      try {
+        const fb = await loadCoursesFromFirebase();
+        if (fb && fb.length) {
+          courses = fb;
+          localStorage.setItem('alamin_courses', JSON.stringify(courses));
+          renderOverview();
+          console.log('[startup] Loaded', courses.length, 'courses from Firebase on init');
+        }
+      } catch(e) { console.warn('[startup] courses init error:', e.message); }
+    })();
+  }
+  // الطلاب: watchStudentsCollection شغال، لكن نعمل جلب مباشر في الخلفية عشان البيانات تظهر فوراً
+  (async () => {
+    await syncPlatformStudents(false);
+  })();
 
   // ─── تهيئة قوائم الصفوف الدراسية من grade-mapping.js ───
   // ===== Color Picker =====
