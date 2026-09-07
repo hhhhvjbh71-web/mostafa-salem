@@ -1118,6 +1118,24 @@
        Only new additions: reveal animation + marquee pause
     ===================================================== */
 
+    // ── تنظيف الكورسات الافتراضية من localStorage (مرة واحدة عند التحميل)
+    (function purgeLegacyCoursesFromStorage() {
+      try {
+        const legacyTitles = new Set([
+          'المراجعة النهائية الصف الأول الثانوي','المراجعة النهائية الصف الثاني الثانوي',
+          'مراجعة التربية الدينية الصف الثالث','كورس تجريبي','كورس نموذجي','اختبار كورس',
+          'Demo Course','Test Course','Sample Course',
+          'Complete Beginner English','Grammar Mastery Course','Thanaweya Amma Prep'
+        ]);
+        const raw = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+        if (Array.isArray(raw) && raw.some(c => legacyTitles.has(c && c.title))) {
+          const cleaned = raw.filter(c => c && !legacyTitles.has(c.title));
+          localStorage.setItem('alamin_courses', JSON.stringify(cleaned));
+          console.log('[index] تم حذف', raw.length - cleaned.length, 'كورس افتراضي من localStorage');
+        }
+      } catch(e) {}
+    })();
+
     // ── SPLASH
     (function(){
       const s = document.getElementById('splashScreen');
@@ -1201,18 +1219,14 @@
     }, {threshold:.1, rootMargin:'0px 0px -30px 0px'});
     document.querySelectorAll('[data-r]').forEach(el => revObs.observe(el));
 
-    // ── COURSES — ORIGINAL LOGIC (100% unchanged) ──
-    const fallbackCourses = [
-      { id:'demo-1', title:'Complete Beginner English', grade:'all', type:'free',
-        desc:'Start from scratch! Master the fundamentals of English grammar, vocabulary and pronunciation.',
-        price:0, oldPrice:null, emoji:'📗', bg:'linear-gradient(135deg,#0C4A6E,#0369A1)' },
-      { id:'demo-2', title:'Grammar Mastery Course', grade:'1', type:'paid',
-        desc:'Deep dive into English grammar. From tenses to conditionals — master every rule with practice.',
-        price:150, oldPrice:250, emoji:'📘', bg:'linear-gradient(135deg,#1E3A5F,#1D4ED8)' },
-      { id:'demo-3', title:'Thanaweya Amma Prep', grade:'3', type:'paid',
-        desc:'Complete exam preparation for Thanaweya Amma. All units covered with exam strategies.',
-        price:200, oldPrice:350, emoji:'🏆', bg:'linear-gradient(135deg,#451A03,#92400E)' }
-    ];
+    // ── COURSES — Firebase is the single source of truth. No demo/fallback courses. ──
+    // عناوين الكورسات الافتراضية المحظور عرضها
+    const _legacySeedTitles = new Set([
+      'المراجعة النهائية الصف الأول الثانوي','المراجعة النهائية الصف الثاني الثانوي',
+      'مراجعة التربية الدينية الصف الثالث','كورس تجريبي','كورس نموذجي','اختبار كورس',
+      'Demo Course','Test Course','Sample Course',
+      'Complete Beginner English','Grammar Mastery Course','Thanaweya Amma Prep'
+    ]);
 
     let liveCourses = null;
     let currentCourseFilter = 'all';
@@ -1251,50 +1265,84 @@
 
     (function loadCachedCourses() {
       try {
-        const cached = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+        // فقط كورسات حقيقية من الكاش (بدون legacy/demo)
+        const cached = JSON.parse(localStorage.getItem('alamin_courses') || '[]')
+          .filter(c => c && c.id && !_legacySeedTitles.has(c.title));
         if (Array.isArray(cached) && cached.length) applyCourses(cached);
-      } catch(e) {}
+        else renderCourses(currentCourseFilter); // عرض loading state
+      } catch(e) { renderCourses(currentCourseFilter); }
     })();
 
     // Live storage sync between dashboard tab and index page
     window.addEventListener('storage', e => {
       if (e.key === 'alamin_courses') {
         try {
-          const cached = JSON.parse(e.newValue || '[]');
-          if (Array.isArray(cached)) applyCourses(cached);
+          const cached = JSON.parse(e.newValue || '[]')
+            .filter(c => c && c.id && !_legacySeedTitles.has(c.title));
+          applyCourses(cached);
         } catch(_) {}
       }
     });
     window.addEventListener('focus', () => {
       try {
-        const cached = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+        const cached = JSON.parse(localStorage.getItem('alamin_courses') || '[]')
+          .filter(c => c && c.id && !_legacySeedTitles.has(c.title));
         if (Array.isArray(cached) && cached.length) applyCourses(cached);
       } catch(_) {}
     });
 
     (function subscribeToCoursesLive() {
-      function attach() {
-        if (!window.db) return false;
+      let attached = false;
+      function attachPrimary() {
+        // الاستماع على platform_courses (البيانات الكاملة) — نفس ما يفعله الداشبورد
+        if (!window.db || attached) return false;
+        try {
+          window.db.collection('platform_courses')
+            .onSnapshot(
+              { includeMetadataChanges: false },
+              snapshot => {
+                const items = [];
+                snapshot.forEach(doc => {
+                  const d = doc.data();
+                  if (d && d.id && !_legacySeedTitles.has(d.title)) items.push(d);
+                });
+                attached = true;
+                applyCourses(items);
+                try { localStorage.setItem('alamin_courses', JSON.stringify(items)); } catch(_) {}
+                console.log('[courses] ✅ Live sync from platform_courses:', items.length, 'courses (from server:', !snapshot.metadata.fromCache, ')');
+              },
+              err => {
+                console.warn('[courses] platform_courses snapshot error:', err.code, err.message);
+                // fallback: courses_list index
+                attachFallback();
+              }
+            );
+          attached = true;
+        } catch(e) { return false; }
+        return true;
+      }
+      function attachFallback() {
+        if (!window.db) return;
         try {
           window.db.collection('platform_data').doc('courses_list')
             .onSnapshot(
               { includeMetadataChanges: false },
               doc => {
-                const items = doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [];
+                const items = (doc.exists && Array.isArray(doc.data().items) ? doc.data().items : [])
+                  .filter(c => c && c.id && !_legacySeedTitles.has(c.title));
                 applyCourses(items);
                 try { localStorage.setItem('alamin_courses', JSON.stringify(items)); } catch(_) {}
-                console.log('[courses] ✅ Live sync:', items.length, 'courses');
+                console.log('[courses] ✅ Live sync from courses_list (fallback):', items.length, 'courses');
               },
-              err => console.warn('[courses] Firebase live sync error:', err.code, err.message)
+              err => console.warn('[courses] courses_list snapshot error:', err.code, err.message)
             );
-        } catch(e) { return false; }
-        return true;
+        } catch(e) {}
       }
       // Retry every 150ms for up to 10 seconds
       let tries = 0;
       const t = setInterval(() => {
         tries++;
-        if (attach() || tries > 66) clearInterval(t);
+        if (attachPrimary() || tries > 66) clearInterval(t);
       }, 150);
     })();
 
@@ -1302,7 +1350,17 @@
       filter = filter || 'all';
       const grid = document.getElementById('coursesGrid');
       if (!grid) return;
-      const source = liveCourses && liveCourses.length ? liveCourses : fallbackCourses.map(normalizeCourse);
+
+      // لو Firebase لسه بيحمّل وما فيش بيانات حقيقية → loading state
+      if (!liveCourses) {
+        grid.innerHTML = `<div class="courses-empty">
+          <span class="e-icon">⏳</span>
+          <p>جاري تحميل الكورسات...</p>
+        </div>`;
+        return;
+      }
+
+      const source = liveCourses;
       const list = filter === 'all' ? source :
                    filter === 'free' ? source.filter(c => c.isFree) :
                    source.filter(c => c.grade === filter || c.grade === 'all');
