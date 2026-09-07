@@ -1301,15 +1301,23 @@
             .onSnapshot(
               { includeMetadataChanges: false },
               snapshot => {
+                const fromServer = !snapshot.metadata.fromCache;
                 const items = [];
                 snapshot.forEach(doc => {
                   const d = doc.data();
                   if (d && d.id && !_legacySeedTitles.has(d.title)) items.push(d);
                 });
                 attached = true;
+                // FIX: لو الـ snapshot جاية من الكاش وفيها 0 كورسات،
+                // ممكن الكاش يكون فاضي على الجهاز ده بينما الـ server عنده كورسات.
+                // في الحالة دي: ما نطبقش الـ snapshot الفاضية — نستنى الـ server.
+                if (!fromServer && items.length === 0) {
+                  console.log('[courses] snapshot كاش فارغة — بانتظار الـ server...');
+                  return;
+                }
                 applyCourses(items);
                 try { localStorage.setItem('alamin_courses', JSON.stringify(items)); } catch(_) {}
-                console.log('[courses] ✅ Live sync from platform_courses:', items.length, 'courses (from server:', !snapshot.metadata.fromCache, ')');
+                console.log('[courses] ✅ Live sync from platform_courses:', items.length, 'courses (from server:', fromServer, ')');
               },
               err => {
                 console.warn('[courses] platform_courses snapshot error:', err.code, err.message);
@@ -1344,6 +1352,29 @@
         tries++;
         if (attachPrimary() || tries > 66) clearInterval(t);
       }, 150);
+
+      // FIX — Fallback مباشر من الـ server:
+      // لو بعد 5 ثواني لسه ما فيش كورسات ظهرت (مثلاً الـ cache فاضي والـ snapshot
+      // بطيئة أو فاشلة)، نجيب مرة واحدة من الـ server مباشرة.
+      setTimeout(async () => {
+        if (liveCourses && liveCourses.length > 0) return; // عندنا بيانات بالفعل
+        if (!window.db) return;
+        try {
+          const snap = await window.db.collection('platform_courses').get({ source: 'server' });
+          const serverItems = [];
+          snap.forEach(doc => {
+            const d = doc.data();
+            if (d && d.id && !_legacySeedTitles.has(d.title)) serverItems.push(d);
+          });
+          if (serverItems.length > 0) {
+            console.log('[courses] ✅ Direct server fetch fallback:', serverItems.length, 'courses');
+            applyCourses(serverItems);
+            try { localStorage.setItem('alamin_courses', JSON.stringify(serverItems)); } catch(_) {}
+          }
+        } catch(e) {
+          console.warn('[courses] Direct server fetch failed:', e.message);
+        }
+      }, 5000);
     })();
 
     function renderCourses(filter) {

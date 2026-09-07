@@ -2781,9 +2781,7 @@ function watchStudentsCollection(dbInstance, label) {
   try {
     dbInstance.collection('students')
       .onSnapshot({ includeMetadataChanges: false }, (snapshot) => {
-        // FIX: نستخدم snapshot.docs (كل الطلاب) مش snapshot.docChanges() (التغييرات بس)
-        // المشكلة كانت: لما داشبورد بيفتح في متصفح جديد، localStorage فاضي،
-        // وdocChanges() بيجيب بس اللي اتغير من بعد ما الlistener اشترك مش كل الطلاب الموجودين.
+        const fromServer = !snapshot.metadata.fromCache;
         const allUsers = [];
         snapshot.docs.forEach(doc => {
           const data = doc.data() || {};
@@ -2810,8 +2808,24 @@ function watchStudentsCollection(dbInstance, label) {
           });
         });
 
+        // FIX — Race Condition Guard:
+        // لو الـ snapshot جاية من الكاش (مش من الـ server) وفيها 0 طلاب،
+        // ممكن يكون الكاش فاضي على الجهاز الجديد بينما الـ server عنده بيانات.
+        // في الحالة دي: ما نمسحش البيانات الموجودة في localStorage —
+        // وننتظر الـ snapshot التالية اللي هتيجي من الـ server.
+        if (!fromServer && allUsers.length === 0) {
+          const existing = getUsers();
+          if (existing.length > 0) {
+            console.log(`[students-live:${label}] snapshot كاش فارغة — محافظ على البيانات المحلية (${existing.length} طالب) وبانتظر الـ server`);
+            // حدّث الشارة بس بدون ما نمسح البيانات
+            const badge = document.getElementById('studentsBadge');
+            if (badge) badge.textContent = existing.length;
+            return; // ← مهم: لا تكتب فوق البيانات الصحيحة
+          }
+        }
+
         saveUsers(allUsers);
-        console.log(`[students-live:${label}] تحديث فوري لعدد الطلاب:`, allUsers.length, '(from server:', !snapshot.metadata.fromCache, ')');
+        console.log(`[students-live:${label}] تحديث الطلاب:`, allUsers.length, '(from server:', fromServer, ')');
 
         const activePage = document.querySelector('.page.active');
         if (activePage) {
@@ -2865,9 +2879,18 @@ async function pushCoursesToFirebase(coursesArray) {
     }
 
     const existingSnap = await window.db.collection('platform_courses').get();
-    const nextIds = new Set(cleanItems.map(c => String(c.id)));
+    // FIX — تحقق من وجود id صحيح لكل كورس قبل الكتابة على Firestore.
+    // كورس بدون id بيتكتب بـ doc id = "undefined" ومش بيظهر في index.html.
+    const validItems = cleanItems.filter(course => {
+      if (!course || !course.id || String(course.id) === 'undefined' || String(course.id) === 'null') {
+        console.warn('[Firebase] كورس بدون id صحيح — تم تخطيه:', course && course.title);
+        return false;
+      }
+      return true;
+    });
+    const nextIds = new Set(validItems.map(c => String(c.id)));
     const batch = window.db.batch();
-    cleanItems.forEach(course => {
+    validItems.forEach(course => {
       batch.set(window.db.collection('platform_courses').doc(String(course.id)), {
         ...course,
         updatedAt: Date.now()
@@ -2877,15 +2900,17 @@ async function pushCoursesToFirebase(coursesArray) {
       if (!nextIds.has(String(doc.id))) batch.delete(doc.ref);
     });
 
+    // استخدم validItems للـ index أيضاً (نفس الفلتر)
+    const validIndexItems = getCourseIndexPayload(validItems);
     const indexRef = window.db.collection('platform_data').doc('courses_list');
     batch.set(indexRef, {
-      items: indexItems,
+      items: validIndexItems,
       updatedAt: Date.now()
     });
 
     await batch.commit();
     _coursesDirty = false;
-    console.log('[Firebase] ✅ courses saved successfully —', cleanItems.length, 'full courses + index');
+    console.log('[Firebase] ✅ courses saved successfully —', validItems.length, 'full courses + index');
     return true;
   } catch(e) {
     console.warn('[Firebase] write note:', e.message);
@@ -3302,8 +3327,10 @@ function getDailyVisits(days){
 
 async function addCourse(course){
   const cs = getCourses();
-  course.id = Date.now();
-  course.lessons = course.lessons||[];
+  // FIX: تأكد إن الـ id دايماً رقم فريد وغير فارغ
+  course.id = Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  course.created = course.created || new Date().toISOString();
+  course.lessons = course.lessons || [];
   cs.push(course);
   await saveCourses(cs);
   return course;
@@ -3333,7 +3360,7 @@ async function addLessonToCourse(courseId, lesson){
 }
 
 async function initStudentsPage(){
-  // أولاً: عرض ما هو محفوظ محلياً فوراً (لو فيه بيانات)
+  // أولاً: عرض ما هو محفوظ محلياً فوراً (لو فيه بيانات) — عشان ما يبقاش فيه وقت انتظار
   const localUsers = getUsers();
   if (localUsers.length > 0) {
     renderStudentsTable();
@@ -3342,7 +3369,9 @@ async function initStudentsPage(){
     const tbody = document.getElementById('studentsTableBody');
     if (tbody) tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">⏳</div><p>جاري تحميل بيانات الطلاب من قاعدة البيانات...</p></div></td></tr>';
   }
-  // ثم جلب أحدث البيانات من Firebase
+  // FIX: دايماً اجلب من الـ server لما بيفتح تاب الطلاب —
+  // مش بس لما localStorage فاضي. ده بيضمن إن أي طالب سجّل من جهاز تاني
+  // بيظهر فوراً حتى لو الـ onSnapshot جاب بيانات قديمة من الكاش.
   await syncPlatformStudents(false);
 }
 async function updateLesson(courseId, lessonId, updates){
