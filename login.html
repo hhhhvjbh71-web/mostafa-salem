@@ -1077,6 +1077,22 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   if (!user)                         return showError('لا يوجد حساب بهذا الرقم — أنشئ حساباً جديداً');
   if (user.password !== hashPass(pass)) return showError('كلمة المرور غير صحيحة');
 
+  // مزامنة أحدث الكورسات المفعلة من Firestore للحساب
+  try {
+    const remote = await fetchStudentFromFirebase(phone);
+    if (remote) {
+      const remoteEnrolled = Array.isArray(remote.enrolledCourses) ? remote.enrolledCourses : [];
+      const localEnrolled  = Array.isArray(user.enrolledCourses) ? user.enrolledCourses : [];
+      const mergedEnrolled = Array.from(new Set([...localEnrolled.map(String), ...remoteEnrolled.map(String)]));
+      user.enrolledCourses = mergedEnrolled;
+      const idx = users.findIndex(u => normalizePhone(u.phone) === phone);
+      if (idx > -1) {
+        users[idx].enrolledCourses = mergedEnrolled;
+        saveUsers(users);
+      }
+    }
+  } catch(_) {}
+
   const remember = document.getElementById('rememberMe').checked;
   saveSession(user, remember);
 

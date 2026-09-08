@@ -2109,55 +2109,139 @@ let currentSegmentId  = null;
 const paymentReceiverNumber = '';
 
 // ═══════════════════════════════════════════════════════════
-// SYNC ENROLLED COURSES FROM FIRESTORE
+// ENROLLMENT & ACCESS CONTROL (PERMANENT PERSISTENCE)
 // ═══════════════════════════════════════════════════════════
-async function syncStudentDataFromFirestore(){
-  const user = getCurrentUser();
-  if(!user || user.role === 'admin' || !user.phone || !window.db) return;
-  try{
-    const snap = await window.db.collection('students').doc(String(user.phone)).get();
-    if(snap.exists){
-      const db = snap.data();
-      const localC = user.enrolledCourses || [];
-      const dbC    = db.enrolledCourses    || [];
-      const hasDiff = localC.length !== dbC.length ||
-                      !localC.every(c => dbC.includes(c));
-      if(hasDiff){
-        user.enrolledCourses = dbC;
-        localStorage.setItem('alamin_current', JSON.stringify(user));
-        location.reload();
+
+// يجمع كل الكورسات المفعلة للطالب من جميع مصادر التخزين المحلية لضمان عدم ضياع أي تفعيل
+function getEnrolledCoursesForUser(user){
+  const set = new Set();
+  if (user && Array.isArray(user.enrolledCourses)) {
+    user.enrolledCourses.forEach(id => { if(id !== undefined && id !== null && id !== '') set.add(String(id).trim()); });
+  }
+  // فحص alamin_current
+  try {
+    const cur = JSON.parse(localStorage.getItem('alamin_current') || 'null');
+    if (cur && Array.isArray(cur.enrolledCourses)) {
+      cur.enrolledCourses.forEach(id => { if(id !== undefined && id !== null && id !== '') set.add(String(id).trim()); });
+    }
+  } catch(_) {}
+  // فحص alamin_session_remember
+  try {
+    const raw = localStorage.getItem('alamin_session_remember');
+    if (raw) {
+      const s = JSON.parse(raw);
+      if (s && s.user && Array.isArray(s.user.enrolledCourses)) {
+        s.user.enrolledCourses.forEach(id => { if(id !== undefined && id !== null && id !== '') set.add(String(id).trim()); });
       }
     }
-  }catch(e){ console.warn('[sync] failed:', e); }
+  } catch(_) {}
+  // فحص alamin_users
+  try {
+    const users = JSON.parse(localStorage.getItem('alamin_users') || '[]');
+    const u = users.find(x =>
+      (user?.phone && String(x.phone).trim() === String(user.phone).trim()) ||
+      (user?.id && String(x.id).trim() === String(user.id).trim())
+    );
+    if (u && Array.isArray(u.enrolledCourses)) {
+      u.enrolledCourses.forEach(id => { if(id !== undefined && id !== null && id !== '') set.add(String(id).trim()); });
+    }
+  } catch(_) {}
+  // فحص sessionStorage
+  try {
+    const sess = JSON.parse(sessionStorage.getItem('alamin_current') || 'null');
+    if (sess && Array.isArray(sess.enrolledCourses)) {
+      sess.enrolledCourses.forEach(id => { if(id !== undefined && id !== null && id !== '') set.add(String(id).trim()); });
+    }
+  } catch(_) {}
+  return Array.from(set);
 }
 
-// ═══════════════════════════════════════════════════════════
-// ACCESS CONTROL
-// ═══════════════════════════════════════════════════════════
+// مزامنة الكورسات من Firestore بدون مسح أي كورس مفعل محلياً (Union Merge)
+async function syncStudentDataFromFirestore(){
+  const user = getCurrentUser();
+  if(!user || user.role === 'admin' || !window.db) return;
+  try{
+    const candidateIds = [user.phone, user.id, user.firestoreDocId, user.qrCode]
+      .filter(Boolean)
+      .map(v => String(v).trim());
+    
+    let dbData = null;
+    let foundDocId = null;
+    for(const did of candidateIds){
+      const snap = await window.db.collection('students').doc(did).get();
+      if(snap.exists){
+        dbData = snap.data();
+        foundDocId = did;
+        break;
+      }
+    }
+
+    if(dbData && Array.isArray(dbData.enrolledCourses)){
+      const localList = getEnrolledCoursesForUser(user);
+      const localSet  = new Set(localList);
+      const dbSet     = new Set(dbData.enrolledCourses.map(v => String(v).trim()));
+
+      // دمج الكورسات (Union) — لا يُحذف أي كورس أبداً
+      const merged = Array.from(new Set([...localSet, ...dbSet]));
+
+      // إذا كانت Firestore تحتوي كورسات جديدة لم تُسجل محلياً بعد:
+      if(merged.length > localSet.size){
+        user.enrolledCourses = merged;
+        grantAccess(null); // يحفظ الـ merged في كل وحدات التخزين
+      }
+
+      // إذا كان لدى الطالب كورس مفعّل محلياً ولم يُسجل في Firestore بعد:
+      if(merged.length > dbSet.size && foundDocId){
+        await window.db.collection('students').doc(foundDocId).set({ enrolledCourses: merged }, { merge:true });
+      }
+    }
+  }catch(e){ console.warn('[sync] error:', e); }
+}
+
 function hasCourseAccess(courseId){
   const user = getCurrentUser();
   if(!user) return false;
   if(user.role === 'admin') return true;
 
-  // الكورسات المجانية متاحة تلقائياً لجميع الطلاب المسجلين
+  const targetId = String(courseId).trim();
+
+  // 1. الكورسات المجانية متاحة تلقائياً
   try {
     const allCourses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
-    const course = allCourses.find(c => String(c.id) === String(courseId));
+    const course = allCourses.find(c => String(c.id).trim() === targetId);
     if(course && (course.type === 'free' || parseFloat(course.price || 0) === 0)) {
       return true;
     }
   } catch(e) {}
 
-  return Array.isArray(user.enrolledCourses) &&
-         user.enrolledCourses.some(id => String(id) === String(courseId));
+  // 2. فحص الكورسات المفعلة للطالب من جميع وحدات التخزين
+  const enrolledList = getEnrolledCoursesForUser(user);
+  if(enrolledList.some(id => String(id).trim() === targetId)){
+    return true;
+  }
+
+  // 3. فحص إذا كان الطالب مشتركاً في كورس مجمع (Bundle) يشمل هذا الكورس
+  try {
+    const allCourses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+    const parentBundle = allCourses.find(c =>
+      c.courseType === 'bundle' &&
+      Array.isArray(c.childCourseIds) &&
+      c.childCourseIds.some(cid => String(cid).trim() === targetId)
+    );
+    if(parentBundle && enrolledList.some(id => String(id).trim() === String(parentBundle.id).trim())){
+      return true;
+    }
+  } catch(e) {}
+
+  return false;
 }
 
 async function checkCenterSubscription(user, courseId){
   if(!window.db || !user) return false;
   try{
-    const code = String(user.qrCode || user.phone || user.id || '');
+    const code = String(user.qrCode || user.phone || user.id || '').trim();
     if(!code) return false;
-    const cId  = String(courseId);
+    const cId  = String(courseId).trim();
     const s1   = await window.db.collection('platform_subscriptions')
                    .where('studentCode','==',code).where('course_id','==',cId).limit(1).get();
     if(!s1.empty) return true;
@@ -2178,37 +2262,85 @@ async function checkCenterSubscription(user, courseId){
 
 // يرجّع IDs الكورس نفسه + كل الكورسات الفرعية لو كان كورساً مجمعاً (بدون نسخ أي محتوى)
 function resolveEnrollIds(courseId){
-  const allCourses = Array.isArray(window.__allCourses) ? window.__allCourses : [];
-  const course = allCourses.find(c => String(c.id) === String(courseId));
-  const ids = new Set([courseId]);
+  if(courseId === null || courseId === undefined) return [];
+  const allCourses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+  const course = allCourses.find(c => String(c.id).trim() === String(courseId).trim());
+  const ids = new Set([String(courseId).trim()]);
   if(course && course.courseType === 'bundle' && Array.isArray(course.childCourseIds)){
-    course.childCourseIds.forEach(cid => ids.add(cid));
+    course.childCourseIds.forEach(cid => {
+      if(cid !== undefined && cid !== null && cid !== '') ids.add(String(cid).trim());
+    });
   }
   return Array.from(ids);
 }
 
+// تفعيل وتثبيت وصول الكورس نهائياً في جميع وحدات التخزين المحلية
 function grantAccess(courseId){
   const user = getCurrentUser();
   if(!user) return false;
-  if(!Array.isArray(user.enrolledCourses)) user.enrolledCourses = [];
-  const idsToGrant = resolveEnrollIds(courseId);
-  idsToGrant.forEach(cid => {
-    if(!user.enrolledCourses.some(c => String(c) === String(cid)))
-      user.enrolledCourses.push(cid);
-  });
-  localStorage.setItem('alamin_current', JSON.stringify(user));
+
+  const currentEnrolled = new Set(getEnrolledCoursesForUser(user));
+  if(courseId !== null && courseId !== undefined){
+    const idsToGrant = resolveEnrollIds(courseId);
+    idsToGrant.forEach(cid => currentEnrolled.add(String(cid).trim()));
+  }
+  const updatedEnrolled = Array.from(currentEnrolled);
+
+  user.enrolledCourses = updatedEnrolled;
+
+  // 1. تحديث alamin_current
+  try { localStorage.setItem('alamin_current', JSON.stringify(user)); } catch(_){}
+
+  // 2. تحديث alamin_session_remember لو كانت جلسة "تذكرني" نشطة
+  try {
+    const raw = localStorage.getItem('alamin_session_remember');
+    if(raw){
+      const s = JSON.parse(raw);
+      if(s && s.user){
+        s.user.enrolledCourses = updatedEnrolled;
+        localStorage.setItem('alamin_session_remember', JSON.stringify(s));
+      }
+    }
+  } catch(_){}
+
+  // 3. تحديث sessionStorage
+  try { sessionStorage.setItem('alamin_current', JSON.stringify(user)); } catch(_){}
+
+  // 4. تحديث alamin_users
+  try {
+    const users = JSON.parse(localStorage.getItem('alamin_users') || '[]');
+    let changed = false;
+    users.forEach(u => {
+      const matchPhone = user.phone && String(u.phone).trim() === String(user.phone).trim();
+      const matchId    = user.id && String(u.id).trim() === String(user.id).trim();
+      if(matchPhone || matchId){
+        u.enrolledCourses = updatedEnrolled;
+        changed = true;
+      }
+    });
+    if(changed) localStorage.setItem('alamin_users', JSON.stringify(users));
+  } catch(_){}
+
   return true;
 }
 
+// حفظ التفعيل في قاعدة بيانات Firestore تحت جميع معرفات الطالب المحتملة
 async function syncStudentCourseAccess(user, courseId){
-  if(!window.db || !(user?.phone || user?.id)) return;
+  if(!window.db || !user) return;
   try{
-    const docId = String(user.phone || user.id);
-    const idsToGrant = resolveEnrollIds(courseId);
-    const enrolled = Array.isArray(user.enrolledCourses)
-      ? [...new Set([...user.enrolledCourses, ...idsToGrant])] : idsToGrant;
-    await window.db.collection('students').doc(docId).set({ enrolledCourses: enrolled }, { merge:true });
-  }catch(e){ console.warn('[syncAccess]', e); }
+    const idsToGrant = courseId ? resolveEnrollIds(courseId) : [];
+    const enrolled = Array.from(new Set([...getEnrolledCoursesForUser(user), ...idsToGrant]));
+
+    const candidateIds = [user.phone, user.id, user.firestoreDocId, user.qrCode]
+      .filter(Boolean)
+      .map(v => String(v).trim());
+
+    const updatePromises = candidateIds.map(did =>
+      window.db.collection('students').doc(did).set({ enrolledCourses: enrolled }, { merge:true })
+    );
+    await Promise.all(updatePromises);
+    console.log('[syncAccess] ✅ Course enrolled permanently in Firestore for:', candidateIds);
+  }catch(e){ console.warn('[syncAccess] error:', e); }
 }
 
 // يحسب عدد الفيديوهات الفعلي داخل كورس (يُقرأ مباشرة من بيانات الكورس الأصلي، بدون أي نسخ)
@@ -2429,9 +2561,13 @@ async function verifyCourseCode(courseId){
   try { await markVoucherUsed(match, user, courseId); }
   catch (error) { showNotification(error.message || 'تعذر استخدام الكود؛ حاول مرة أخرى.', 'error'); return; }
   grantAccess(courseId);
-  await syncStudentCourseAccess(user, courseId);
+  const updatedUser = getCurrentUser(); // إعادة القراءة بعد grantAccess عشان enrolledCourses تبقى محدّثة
+  await syncStudentCourseAccess(updatedUser, courseId);
   showNotification('✅ تم تفعيل الكورس بنجاح!','ok');
-  setTimeout(()=>renderCoursePage(), 600);
+  // إخفاء صندوق القفل فوراً
+  const gateEl = document.getElementById('accessGate');
+  if(gateEl){ gateEl.style.display = 'none'; gateEl.innerHTML = ''; }
+  setTimeout(()=>renderCoursePage(), 300);
 }
 
 function normalizePhone(phone){
@@ -3242,22 +3378,21 @@ async function renderCoursePage(){
         <button id="subscribeBtn" class="btn-gate-action free-btn">اشترك مجاناً الآن 🎉</button>
       </div>`;
     setTimeout(()=>{
-      document.getElementById('subscribeBtn')?.addEventListener('click', ()=>{
+      document.getElementById('subscribeBtn')?.addEventListener('click', async ()=>{
         const u = getCurrentUser();
-        if(!u.enrolledCourses) u.enrolledCourses = [];
-        const idsToGrant = resolveEnrollIds(course.id);
-        idsToGrant.forEach(cid => {
-          if(!u.enrolledCourses.some(c=>String(c)===String(cid))) u.enrolledCourses.push(cid);
-        });
-        localStorage.setItem('alamin_current', JSON.stringify(u));
-        if(window.db) window.db.collection('students').doc(String(u.phone||u.id)).set({enrolledCourses:u.enrolledCourses},{merge:true}).catch(console.warn);
+        grantAccess(course.id);
+        const freshUser = getCurrentUser();
+        await syncStudentCourseAccess(freshUser, course.id);
+        gate.style.display = 'none';
+        gate.innerHTML = '';
         showNotification('✅ تم الاشتراك بنجاح!','ok');
-        setTimeout(()=>location.reload(), 800);
+        setTimeout(()=>renderCoursePage(), 300);
       });
     }, 50);
 
   } else {
     gate.style.display = 'none';
+    gate.innerHTML = '';
   }
 }
 
