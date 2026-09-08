@@ -1460,6 +1460,23 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
     <!-- VOUCHERS PAGE -->
     <div class="page" id="page-vouchers">
 
+      <!-- Header & Sync -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div>
+          <h2 style="font-size:22px;font-weight:900;margin:0 0 6px 0;display:flex;align-items:center;gap:10px">
+            <span>🎟️</span> أكواد التفعيل (Course Activation Codes)
+          </h2>
+          <p style="margin:0;font-size:14px;color:var(--text2)">
+            توليد وإدارة دفعات أكواد التفعيل المكونة من 6 أرقام فقط لكل كورس، مع حفظ فوري ومؤكد في قاعدة البيانات السحابية.
+          </p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button onclick="syncVouchersWithServer()" id="btnSyncVouchers" style="padding:9px 18px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);transition:all 0.2s">
+            <span id="vcSyncIcon">🔄</span> تحديث من السيرفر
+          </button>
+        </div>
+      </div>
+
       <!-- Stats row -->
       <div class="stats-row" style="margin-bottom:24px">
         <div class="stat-card">
@@ -1467,214 +1484,214 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
           <div><div class="stat-label">إجمالي الأكواد</div><div class="stat-val" id="vcTotal">0</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:#e8f4ff">✅</div>
-          <div><div class="stat-label">غير مستخدمة</div><div class="stat-val" id="vcUnused">0</div></div>
+          <div class="stat-icon" style="background:#e8f4ff">🟢</div>
+          <div><div class="stat-label">أكواد متاحة (غير مستخدمة)</div><div class="stat-val" id="vcUnused" style="color:var(--success,#16a34a)">0</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:#fce8ff">🔓</div>
-          <div><div class="stat-label">مستخدمة</div><div class="stat-val" id="vcUsed">0</div></div>
+          <div class="stat-icon" style="background:#fce8ff">🔒</div>
+          <div><div class="stat-label">أكواد مفعلة (مستخدمة)</div><div class="stat-val" id="vcUsed" style="color:var(--primary)">0</div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:#fff8e8">📆</div>
-          <div><div class="stat-label">أكواد هذا الشهر</div><div class="stat-val" id="vcThisMonth">0</div></div>
+          <div class="stat-icon" style="background:#fff8e8">📦</div>
+          <div><div class="stat-label">إجمالي الدفعات</div><div class="stat-val" id="vcBatchesCount">0</div></div>
         </div>
       </div>
 
-      <!-- Tabs -->
+      <!-- GENERATOR CARD -->
+      <div class="table-card" style="padding:26px;margin-bottom:24px;border:1px solid var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.04);position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;right:0;left:0;height:4px;background:linear-gradient(90deg,var(--primary),#06b6d4,#10b981)"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+          <span style="font-size:24px">⚡</span>
+          <div>
+            <h3 style="font-size:18px;font-weight:900;margin:0">توليد دفعة أكواد تفعيل جديدة</h3>
+            <p style="margin:2px 0 0 0;font-size:13px;color:var(--text2)">حدد الكورس واسم الدفعة وعدد الأكواد (كل كود يتكون من 6 أرقام ويُحفظ فوراً في قاعدة البيانات Firestore)</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));gap:16px;margin-bottom:18px">
+          <!-- Course Selection -->
+          <div>
+            <label style="display:block;font-weight:800;font-size:14px;margin-bottom:8px">1. اختيار الكورس <span style="color:var(--danger)">*</span></label>
+            <select id="vcCourseId" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none;font-weight:700">
+              <option value="">-- اختر الكورس المطلوب تفعيله --</option>
+            </select>
+          </div>
+
+          <!-- Batch Name -->
+          <div>
+            <label style="display:block;font-weight:800;font-size:14px;margin-bottom:8px">2. اسم الدفعة / رأس القائمة <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="vcBatchName" placeholder="مثال: الدفعة الأولى، سنتر النور، مراجعة شهر 10..." style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none;font-weight:700">
+            <!-- Quick Suggestions -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+              <span onclick="setBatchSuggestion('الدفعة الأولى')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text2);user-select:none">الدفعة الأولى</span>
+              <span onclick="setBatchSuggestion('الدفعة الثانية')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text2);user-select:none">الدفعة الثانية</span>
+              <span onclick="setBatchSuggestion('سنتر الحصة')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text2);user-select:none">سنتر الحصة</span>
+              <span onclick="setBatchSuggestion('طلاب الأونلاين')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text2);user-select:none">طلاب الأونلاين</span>
+              <span onclick="setBatchSuggestion('مكافأة التفوق')" style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text2);user-select:none">مكافأة التفوق</span>
+            </div>
+          </div>
+
+          <!-- Count Selection -->
+          <div>
+            <label style="display:block;font-weight:800;font-size:14px;margin-bottom:8px">3. عدد الأكواد <span style="color:var(--danger)">*</span></label>
+            <input type="number" id="vcCount" value="20" min="1" max="500" style="width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none;font-weight:800">
+            <!-- Quick Count Chips -->
+            <div style="display:flex;gap:6px;margin-top:6px">
+              <span onclick="setCountQuick(10)" style="font-size:11px;padding:3px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;font-weight:700;color:var(--text2);user-select:none">10</span>
+              <span onclick="setCountQuick(20)" style="font-size:11px;padding:3px 10px;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer;font-weight:700;user-select:none">20</span>
+              <span onclick="setCountQuick(50)" style="font-size:11px;padding:3px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;font-weight:700;color:var(--text2);user-select:none">50</span>
+              <span onclick="setCountQuick(100)" style="font-size:11px;padding:3px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;font-weight:700;color:var(--text2);user-select:none">100</span>
+              <span onclick="setCountQuick(200)" style="font-size:11px;padding:3px 10px;border-radius:6px;background:var(--bg);border:1px solid var(--border);cursor:pointer;font-weight:700;color:var(--text2);user-select:none">200</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+          <button id="btnGenerateCodes" onclick="generateVouchers()" style="flex:1;min-width:280px;padding:14px 28px;background:linear-gradient(135deg,var(--primary),#0284c7);color:white;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 6px 20px rgba(2,132,199,0.3);display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s">
+            <span id="vcGenIcon">⚡</span> توليد وحفظ الأكواد في قاعدة البيانات
+          </button>
+        </div>
+
+        <div id="vcGenerateStatus" style="display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:700"></div>
+      </div>
+
+      <!-- NEW BATCH SPOTLIGHT BOX (Appears immediately after generation) -->
+      <div id="vcNewBatchBox" style="display:none;margin-bottom:24px;padding:22px;background:linear-gradient(135deg,rgba(16,185,129,0.07),rgba(6,182,212,0.07));border:2px solid #10b981;border-radius:16px;animation:dashToastIn .3s ease">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+          <div>
+            <div style="display:inline-flex;align-items:center;gap:8px;background:#10b981;color:white;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:900;margin-bottom:8px">
+              ✓ تم التوليد والحفظ بنجاح
+            </div>
+            <h4 id="newBatchTitle" style="font-size:18px;font-weight:900;margin:0">الدفعة: الدفعة الأولى</h4>
+            <div id="newBatchDetails" style="font-size:13px;color:var(--text2);margin-top:4px">الكورس: ... | العدد: 20 كود (6 أرقام)</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="copyLatestBatchCodes()" style="padding:9px 16px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px">
+              📋 نسخ كل الأكواد
+            </button>
+            <button onclick="printLatestBatch()" style="padding:9px 16px;background:var(--primary);color:white;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px">
+              🖨️ طباعة بطاقات هذه الدفعة
+            </button>
+            <button onclick="exportLatestBatchTxt()" style="padding:9px 16px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px">
+              📥 تحميل ملف نصي (TXT)
+            </button>
+          </div>
+        </div>
+
+        <!-- Chips of generated codes -->
+        <div id="newBatchChips" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:10px;max-height:220px;overflow-y:auto;padding:8px 4px">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- TABS -->
       <div style="display:flex;gap:10px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:0">
-        <button class="vc-tab active" onclick="switchVcTab('generate')" id="tab-generate" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid var(--primary);color:var(--primary);font-weight:800;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">🔧 توليد أكواد</button>
-        <button class="vc-tab" onclick="switchVcTab('list')" id="tab-list" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text2);font-weight:700;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">📋 قائمة الأكواد</button>
+        <button class="vc-tab active" onclick="switchVcTab('batches')" id="tab-batches" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid var(--primary);color:var(--primary);font-weight:800;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">📦 دفعات الأكواد</button>
+        <button class="vc-tab" onclick="switchVcTab('list')" id="tab-list" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text2);font-weight:700;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">📋 كل الأكواد (قائمة كاملة)</button>
         <button class="vc-tab" onclick="switchVcTab('print')" id="tab-print" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text2);font-weight:700;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">🖨️ طباعة الأكواد</button>
-        <button class="vc-tab" onclick="switchVcTab('verify')" id="tab-verify" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text2);font-weight:700;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">🔍 التحقق من كود</button>
+        <button class="vc-tab" onclick="switchVcTab('verify')" id="tab-verify" style="padding:11px 20px;background:none;border:none;border-bottom:3px solid transparent;color:var(--text2);font-weight:700;font-size:15px;cursor:pointer;font-family:'Tajawal',sans-serif">🔍 فحص وتحقق من كود</button>
       </div>
 
-      <!-- GENERATE TAB -->
-      <div id="vc-tab-generate" class="vc-pane">
-        <div class="table-card" style="padding:28px">
-          <h3 style="font-size:19px;font-weight:900;margin-bottom:24px">🔧 توليد أكواد تفعيل جديدة</h3>
-          <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--text2)">
-            💡 اختر الكورس وحدد عدد الأكواد. كل كود مكوّن من 6 أرقام ويُستخدم مرة واحدة فقط لتفعيل الكورس المختار.
-          </div>
-          <div style="display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:20px">
-            <div class="modal-form">
-              <div class="form-group">
-                <label>اسم الشهر / الفترة</label>
-                <input type="text" id="vcMonth" placeholder="مثال: شهر نوفمبر 2026" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-              </div>
-            </div>
-            <div class="modal-form">
-              <div class="form-group">
-                <label>الصف الدراسي</label>
-                <select id="vcGrade" onchange="populateVoucherCourses();toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                  <option value="">اختر الصف الدراسي</option>
-                  <option value="prep1">الصف الأول الإعدادي</option>
-                  <option value="prep2">الصف الثاني الإعدادي</option>
-                  <option value="prep3">الصف الثالث الإعدادي</option>
-                  <option value="1">الصف الأول الثانوي</option>
-                  <option value="2">الصف الثاني الثانوي</option>
-                  <option value="3">الصف الثالث الثانوي</option>
-                </select>
-              </div>
-            </div>
-            <div class="modal-form">
-              <div class="form-group">
-                <label>الكورس</label>
-                <select id="vcCourseId" onchange="toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                  <option value="">اختر الكورس</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div id="vcTrackInfo" style="display:none;margin-bottom:20px;padding:12px 18px;border-radius:10px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);font-size:14px;font-weight:700;color:#7c3aed"></div>
-
-          <div style="display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:24px">
-            <div class="modal-form">
-              <div class="form-group">
-                <label>طريقة توليد الأكواد</label>
-                <select id="vcGenType" onchange="toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                  <option value="students">لكل الطلاب المطابقين تلقائياً (الصف + الشُعبة)</option>
-                  <option value="list">قائمة طلاب مختارة يدوياً</option>
-                </select>
-              </div>
-            </div>
-            <div id="vcCountWrap" class="modal-form">
-              <div class="form-group">
-                <label id="vcCountLabel">عدد الأكواد المطلوبة</label>
-                <input type="number" id="vcCount" value="20" min="1" max="500" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-              </div>
-            </div>
-          </div>
-
-          <!-- Student list selector (shown when type=list) -->
-          <div id="vcStudentListWrap" style="display:none;margin-bottom:20px">
-            <label style="display:block;font-weight:700;font-size:14px;margin-bottom:8px">اختر الطلاب من القائمة (الطلاب المطابقين للصف والشُعبة المختارة)</label>
-            <div style="border:2px solid var(--border);border-radius:12px;max-height:240px;overflow-y:auto;padding:12px" id="vcStudentCheckList"></div>
-            <div style="margin-top:10px;display:flex;gap:10px">
-              <button onclick="selectAllStudents(true)" style="padding:7px 14px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:'Tajawal',sans-serif">تحديد الكل</button>
-              <button onclick="selectAllStudents(false)" style="padding:7px 14px;background:var(--bg);border:2px solid var(--border);border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:'Tajawal',sans-serif">إلغاء الكل</button>
-              <span id="vcSelectedCount" style="margin-top:8px;font-size:13px;color:var(--text2)">0 طالب مختار</span>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-            <button onclick="generateVouchers()" style="padding:13px 28px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(139,105,20,.3)">🎟️ توليد الأكواد الآن</button>
-            <button onclick="gotoPrintFromGenerate()" style="padding:13px 24px;background:var(--bg);border:2px solid var(--border);border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:15px;cursor:pointer;color:var(--text)">🖨️ اذهب للطباعة</button>
-          </div>
-
-          <!-- Preview of last generated -->
-          <div id="vcPreview" style="display:none;margin-top:24px;padding:18px;background:var(--bg);border-radius:12px;border:1px solid var(--border)">
-            <div style="font-weight:800;font-size:15px;margin-bottom:14px">🆕 الأكواد المولّدة للتو:</div>
-            <div id="vcPreviewGrid" style="display:flex;flex-wrap:wrap;gap:10px"></div>
-          </div>
+      <!-- BATCHES VIEW PANE -->
+      <div id="vc-tab-batches" class="vc-pane">
+        <div id="batchesContainer" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:16px">
+          <!-- Rendered by JS -->
         </div>
       </div>
 
-      <!-- LIST TAB -->
+      <!-- ALL CODES LIST PANE -->
       <div id="vc-tab-list" class="vc-pane" style="display:none">
         <div class="table-card">
-          <div class="table-header">
-            <h3>📋 جميع أكواد التفعيل</h3>
-            <div class="table-search" style="gap:8px">
-              <input type="text" id="vcSearch" placeholder="بحث بالكود أو الشهر..." oninput="renderVouchersTable()" style="padding:9px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none;width:200px">
-              <select id="vcFilterStatus" onchange="renderVouchersTable()" style="padding:9px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="">كل الحالات</option>
-                <option value="unused">غير مستخدمة</option>
-                <option value="used">مستخدمة</option>
-              </select>
-              <select id="vcFilterGrade" onchange="renderVouchersTable()" style="padding:9px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="">كل الصفوف</option>
-                <option value="prep1">أول إعدادي</option>
-                <option value="prep2">تاني إعدادي</option>
-                <option value="prep3">تالت إعدادي</option>
-                <option value="1">أول ثانوي</option>
-                <option value="2">تاني ثانوي</option>
-                <option value="3">تالت ثانوي</option>
-                <option value="all">كل الصفوف</option>
-              </select>
-              <select id="vcFilterType" onchange="renderVouchersTable()" style="padding:9px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="all">كل الشُعب</option>
-                <option value="علمي">علمي</option>
-                <option value="أدبي">أدبي</option>
-              </select>
-              <button onclick="deleteAllUsed()" style="padding:9px 14px;background:#fff0f3;color:#c0392b;border:1px solid #ffd0d8;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:13px;cursor:pointer">🗑️ حذف المستخدمة</button>
-            </div>
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>الكود</th>
-                <th>الشهر / الفترة</th>
-                <th>الصف</th>
-                <th>الكورس</th>
-                <th>مرتبط بطالب</th>
-                <th>تاريخ التوليد</th>
-                <th>الحالة</th>
-                <th>الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody id="vouchersTableBody">
-              <tr><td colspan="9"><div class="empty-state"><div class="icon">🎟️</div><p>لا توجد أكواد مولدة</p></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PRINT TAB -->
-      <div id="vc-tab-print" class="vc-pane" style="display:none">
-        <div class="table-card" style="padding:24px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-            <h3 style="font-size:19px;font-weight:900">🖨️ طباعة أكواد التفعيل</h3>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              <select id="printGrade" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="">كل الصفوف</option>
-                <option value="prep1">أول إعدادي</option>
-                <option value="prep2">تاني إعدادي</option>
-                <option value="prep3">تالت إعدادي</option>
-                <option value="1">أول ثانوي</option>
-                <option value="2">تاني ثانوي</option>
-                <option value="3">تالت ثانوي</option>
-                <option value="all">كل الصفوف</option>
-              </select>
-              <select id="printCourse" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
+          <div class="table-header" style="flex-wrap:wrap;gap:12px">
+            <h3 style="font-size:17px;font-weight:900;margin:0">قائمة أكواد التفعيل 🎟️</h3>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <input type="text" id="searchVcCode" placeholder="ابحث برقم الكود، الطالب، الدفعة..." oninput="filterVouchersTable()" style="padding:8px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none;min-width:180px">
+              <select id="filterVcCourse" onchange="filterVouchersTable()" style="padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
                 <option value="">كل الكورسات</option>
               </select>
-              <select id="printStudentType" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="all">كل الشُعب</option>
-                <option value="علمي">علمي</option>
-                <option value="أدبي">أدبي</option>
+              <select id="filterVcBatch" onchange="filterVouchersTable()" style="padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+                <option value="">كل الدفعات</option>
               </select>
-              <select id="printMonth" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                <option value="">كل الشهور</option>
-              </select>
-              <select id="printStatus" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
+              <select id="filterVcStatus" onchange="filterVouchersTable()" style="padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+                <option value="all">كل الحالات</option>
                 <option value="unused">غير مستخدمة فقط</option>
-                <option value="">الكل</option>
+                <option value="used">مستخدمة فقط</option>
               </select>
-              <button onclick="doPrint()" style="padding:10px 22px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:14px;cursor:pointer">🖨️ طباعة الآن</button>
+              <button onclick="exportAllVouchersCsv()" style="padding:8px 14px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:13px;cursor:pointer;color:var(--text)">
+                📊 تصدير Excel/CSV
+              </button>
             </div>
           </div>
-          <div id="printPreviewInfo" style="font-size:14px;color:var(--text2);margin-bottom:16px"></div>
-          <!-- Print preview area -->
-          <div id="printArea" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px;background:white;border-radius:12px;border:2px dashed var(--border)">
-            <!-- rendered by JS -->
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px">#</th>
+                  <th>كود التفعيل (6 أرقام)</th>
+                  <th>اسم الدفعة</th>
+                  <th>الكورس المرتبط</th>
+                  <th>الحالة</th>
+                  <th>تاريخ التوليد</th>
+                  <th>طالب التفعيل</th>
+                  <th style="width:120px">إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="vouchersTableBody">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- VERIFY TAB -->
-      <div id="vc-tab-verify" class="vc-pane" style="display:none">
-        <div class="table-card" style="padding:32px;max-width:560px">
-          <h3 style="font-size:19px;font-weight:900;margin-bottom:24px">🔍 التحقق من صحة كود تفعيل</h3>
-          <div style="margin-bottom:16px">
-            <label style="display:block;font-weight:700;font-size:14px;margin-bottom:8px">أدخل الكود</label>
-            <div style="display:flex;gap:10px">
-              <input type="text" id="verifyCodeInput" placeholder="أدخل الكود هنا" style="flex:1;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Tajawal',sans-serif;font-size:15px;background:var(--bg);color:var(--text);outline:none;font-weight:700;letter-spacing:2px;text-transform:uppercase">
-              <button onclick="verifyCode()" style="padding:13px 24px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:15px;cursor:pointer">تحقق</button>
+      <!-- PRINT TAB PANE -->
+      <div id="vc-tab-print" class="vc-pane" style="display:none">
+        <div class="table-card" style="padding:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px">
+            <div>
+              <h3 style="font-size:18px;font-weight:900;margin:0 0 4px 0">🖨️ طباعة بطاقات أكواد التفعيل</h3>
+              <p style="margin:0;font-size:13px;color:var(--text2)">تخصيص البطاقات للطباعة الورقية وتوزيعها على الطلاب</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <select id="printCourseSelect" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+                <option value="">كل الكورسات</option>
+              </select>
+              <select id="printBatchSelect" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+                <option value="">كل الدفعات</option>
+              </select>
+              <select id="printStatusSelect" onchange="renderPrintPreview()" style="padding:9px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);color:var(--text);outline:none">
+                <option value="unused">غير مستخدمة فقط</option>
+                <option value="all">كل الأكواد</option>
+              </select>
+              <button onclick="doPrint()" style="padding:10px 24px;background:linear-gradient(135deg,var(--primary),var(--primary-dark,#0284c7));color:white;border:none;border-radius:10px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 12px rgba(2,132,199,0.3)">
+                🖨️ طباعة الآن
+              </button>
             </div>
           </div>
-          <div id="verifyResult" style="display:none;padding:18px;border-radius:12px;margin-top:8px"></div>
+          <div id="printPreviewInfo" style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:16px"></div>
+          <!-- Print preview grid -->
+          <div id="printArea" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));gap:14px;padding:16px;background:white;border-radius:12px;border:2px dashed var(--border)">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- VERIFY TAB PANE -->
+      <div id="vc-tab-verify" class="vc-pane" style="display:none">
+        <div class="table-card" style="padding:32px;max-width:580px">
+          <h3 style="font-size:19px;font-weight:900;margin-bottom:8px">🔍 التحقق الفوري من صحة كود تفعيل</h3>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:20px">أدخل كود التفعيل المكون من 6 أرقام لمعرفة حالته، الكورس، الدفعة، والطالب الذي استخدمه</p>
+          <div style="margin-bottom:16px">
+            <label style="display:block;font-weight:700;font-size:14px;margin-bottom:8px">كود التفعيل (6 أرقام)</label>
+            <div style="display:flex;gap:10px">
+              <input type="text" id="verifyCodeInput" maxlength="6" placeholder="مثال: 481902" onkeypress="if(event.key==='Enter')verifyCode()" style="flex:1;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-family:monospace;font-size:20px;letter-spacing:4px;text-align:center;background:var(--bg);color:var(--text);outline:none;font-weight:900">
+              <button onclick="verifyCode()" style="padding:13px 28px;background:linear-gradient(135deg,var(--primary),var(--primary-dark,#0284c7));color:white;border:none;border-radius:12px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:15px;cursor:pointer">
+                فحص الكود
+              </button>
+            </div>
+          </div>
+          <div id="verifyResult" style="display:none;padding:18px;border-radius:12px;margin-top:12px;line-height:1.7"></div>
         </div>
       </div>
 
@@ -6476,7 +6493,7 @@ async function openQuizDetailedResults(quizId) {
       }
     } catch(e) { console.warn('Failed to load quiz attempts from Firebase:', e); }
   }
-  
+
   // Fallback: تحميل محاولات محددة من localStorage
   if (!attemptsList.length) {
     const localAttempts = JSON.parse(localStorage.getItem('alamin_quiz_attempts') || '{}');
@@ -6487,7 +6504,7 @@ async function openQuizDetailedResults(quizId) {
       }
     });
   }
-  
+
   // إذا لم توجد محاولات، سنولد محاولات وهمية للطلاب المسجلين فقط لأغراض العرض والتجربة
   if (!attemptsList.length) {
     const students = filterUsersByGradeAndType(getUsers(), quiz.grade, 'center');
@@ -6527,20 +6544,20 @@ async function openQuizDetailedResults(quizId) {
       ];
     }
   }
-  
+
   window._currentQuizAttempts = attemptsList;
-  
+
   // تحديث الإحصائيات الفورية
   const total = attemptsList.length;
   const passed = attemptsList.filter(a => a.score >= (quiz.totalPoints * (quiz.passingGrade / 100))).length;
   const failed = total - passed;
   const avg = total ? Math.round(attemptsList.reduce((sum, a) => sum + (a.percentage || 0), 0) / total) : 0;
-  
+
   document.getElementById('resStatTotal').textContent = total;
   document.getElementById('resStatPassed').textContent = passed;
   document.getElementById('resStatFailed').textContent = failed;
   document.getElementById('resStatAvg').textContent = avg + '%';
-  
+
   // فتح الـ Modal
   document.getElementById('resultsQuizDetailModal').classList.add('open');
   switchResTab('list');
@@ -6550,11 +6567,11 @@ function switchResTab(tab) {
   window._activeResTab = tab;
   document.querySelectorAll('#resultsQuizDetailModal .activation-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('tabResBtn' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
-  
+
   document.getElementById('tabResContentList').style.display = tab === 'list' ? 'table' : 'none';
   document.getElementById('tabResContentMissing').style.display = tab === 'missing' ? 'table' : 'none';
   document.getElementById('tabResContentHonor').style.display = tab === 'honor' ? 'table' : 'none';
-  
+
   renderResTabContent();
 }
 
@@ -6564,7 +6581,7 @@ function renderResTabContent() {
   const attempts = window._currentQuizAttempts;
   const term = document.getElementById('resSearchInput').value.toLowerCase();
   const statusFilter = document.getElementById('resFilterStatus').value;
-  
+
   if (tab === 'list') {
     const tbody = document.getElementById('resListTableBody');
     const filtered = attempts.filter(a => {
@@ -6928,28 +6945,6 @@ function renderViewsTable() {
   `).join('');
 }
 function filterViews() { renderViewsTable(); }
-
-// ---- VOUCHERS ----
-let vouchersData = JSON.parse(localStorage.getItem('alamin_vouchers') || '[]');
-function sameCourseStudentVoucher(voucher, courseId, studentId) {
-  return voucher && String(voucher.courseId || '') === String(courseId || '') && String(voucher.linkedStudentId || '') === String(studentId || '');
-}
-function saveVouchersData() {
-  localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
-}
-async function loadVouchersFromFirebase() {
-  if (!window.db) return false;
-  try {
-    const snapshot = await window.db.collection('course_codes').get({ source: 'server' });
-    vouchersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    saveVouchersData();
-    return true;
-  } catch (error) {
-    console.warn('[vouchers] Firebase load failed:', error);
-    showNotification('⚠️ تعذر تحميل أكواد التفعيل من Firebase.', 'error');
-    return false;
-  }
-}
 function normalizeImportedStudentGrade(data) {
   // يفوّض لـ grade-mapping.js (متاح كـ window global)
   if (window.normalizeGrade) {
@@ -7041,459 +7036,929 @@ async function syncPlatformStudents(showNotif = true) {
 async function syncCenterStudentsFromFirebase() {
   return syncPlatformStudents(false);
 }
-async function initVouchersPage() {
-  await syncCenterStudentsFromFirebase();
-  await loadVouchersFromFirebase();
-  populateVoucherCourses();
-  populateVoucherStudents();
-  populatePrintCourseOptions();
-  populatePrintMonthOptions();
-  toggleGenType();
-  renderVouchersStats();
-  renderVouchersTable();
-  renderPrintPreview();
+
+// ══════════════════════════════════════════════════════════════
+// ⚡ NEVER GIVE UP - محرك أكواد التفعيل المتقدم (6 أرقام)
+// ══════════════════════════════════════════════════════════════
+let vouchersData = JSON.parse(localStorage.getItem('alamin_vouchers') || '[]');
+let latestGeneratedBatch = null;
+
+function saveVouchersData() {
+  try {
+    localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
+  } catch(e) {
+    console.warn('[vouchers] Local storage save error:', e);
+  }
 }
-function switchVcTab(id) {
-  document.querySelectorAll('.vc-tab').forEach(btn => {
-    const active = btn.id === 'tab-' + id;
-    btn.classList.toggle('active', active);
-    btn.style.borderBottom = active ? '3px solid var(--primary)' : '3px solid transparent';
-    btn.style.color = active ? 'var(--primary)' : 'var(--text2)';
-    btn.style.fontWeight = active ? '800' : '700';
-  });
-  document.querySelectorAll('.vc-pane').forEach(p => p.style.display = 'none');
-  const selected = document.getElementById('vc-tab-' + id);
-  if(selected) selected.style.display = 'block';
-  if(id === 'list') renderVouchersTable();
-  if(id === 'print') renderPrintPreview();
-  if(id === 'verify') document.getElementById('verifyResult').style.display = 'none';
-}
-function gotoPrintFromGenerate() {
-  const grade = document.getElementById('vcGrade').value;
-  const courseId = document.getElementById('vcCourseId').value;
-  const month = document.getElementById('vcMonth').value.trim();
-  const printGrade = document.getElementById('printGrade');
-  const printCourse = document.getElementById('printCourse');
-  const printMonth = document.getElementById('printMonth');
-  if(printGrade) printGrade.value = grade || 'all';
-  if(printCourse) printCourse.value = courseId || '';
-  if(printMonth) {
-    if(month) {
-      if(!Array.from(printMonth.options).some(opt => opt.value === month)) {
-        printMonth.innerHTML += `<option value="${month}">${month}</option>`;
+
+// ── تحميل ومزامنة الأكواد من قاعدة بيانات Firestore ──
+async function loadVouchersFromFirebase() {
+  if (!window.db) return false;
+  try {
+    const snapshot = await window.db.collection('course_codes').get({ source: 'server' });
+    const items = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data) {
+        items.push({
+          id: doc.id,
+          code: doc.id,
+          ...data
+        });
       }
-      printMonth.value = month;
-    } else {
-      printMonth.value = '';
-    }
+    });
+    // ترتيب الأحدث أولاً
+    items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    vouchersData = items;
+    saveVouchersData();
+    console.log('[vouchers] Loaded', vouchersData.length, 'codes from Firestore');
+    return true;
+  } catch (error) {
+    console.warn('[vouchers] Firebase load failed:', error);
+    return false;
   }
-  switchVcTab('print');
-  doPrint();
 }
-// ✅ دالة مركزية: ترجع الطلاب المطابقين لصف وكورس معين (بما فيها شُعبة الكورس لو ثانوي)
-function getMatchingStudentsForCourse(grade, course) {
-  let users = getUsers().filter(u => u.name && String(u.grade) === String(grade));
-  const isSecondary = typeof isSecondaryGrade === 'function' ? isSecondaryGrade(grade) : ['1','2','3'].includes(grade);
-  if (isSecondary && course && course.track && course.track !== 'both') {
-    users = users.filter(u => u.track === course.track);
-  }
-  return users;
+
+// ── توليد كود فريد مكون من 6 أرقام فقط (مثال: 481902) ──
+function generateUnique6DigitCode(existingSet) {
+  let code = '';
+  let attempts = 0;
+  do {
+    // رقم من 100000 إلى 999999 (6 أرقام حتماً وبدون أحرف)
+    code = String(Math.floor(100000 + Math.random() * 900000));
+    attempts++;
+  } while (existingSet.has(code) && attempts < 50000);
+  existingSet.add(code);
+  return code;
 }
-function updateVcTrackInfo(course) {
-  const info = document.getElementById('vcTrackInfo');
-  if (!info) return;
-  if (!course) { info.style.display = 'none'; return; }
-  const isSecondary = typeof isSecondaryGrade === 'function' ? isSecondaryGrade(course.grade) : ['1','2','3'].includes(course.grade);
-  if (!isSecondary) { info.style.display = 'none'; return; }
-  const track = course.track || 'both';
-  info.style.display = 'block';
-  info.textContent = track === 'both'
-    ? '📌 هذا الكورس متاح لطلاب علمي وأدبي معاً — سيتم توليد أكواد لكل طلاب الصف.'
-    : `📌 هذا الكورس مخصص لطلاب "${track}" فقط — سيتم توليد الأكواد لهم فقط دون الشُعبة الأخرى.`;
-}
-function toggleGenType() {
-  const courseId = document.getElementById('vcCourseId').value;
-  const course = courses.find(c => String(c.id) === String(courseId));
-  updateVcTrackInfo(course);
-}
-function selectAllStudents(selectAll) {
-  document.querySelectorAll('.vc-student-checkbox').forEach(cb => cb.checked = selectAll);
-  updateSelectedCount();
-}
-function updateSelectedCount() {
-  const count = document.querySelectorAll('.vc-student-checkbox:checked').length;
-  document.getElementById('vcSelectedCount').textContent = `${count} طالب مختار`;
-}
-function getSelectedStudentIds() {
-  return Array.from(document.querySelectorAll('.vc-student-checkbox:checked')).map(cb => cb.dataset.userid);
-}
+
+// ── تعبئة قائمة الكورسات في قوائم الاختيار ──
 function populateVoucherCourses() {
-  const select = document.getElementById('vcCourseId');
-  if(!select) return;
-  const selectedCourseId = select.value;
-  const gradeEl = document.getElementById('vcGrade');
-  const selectedGrade = gradeEl ? gradeEl.value : '';
-  // فلتر الكورسات حسب الصف المختار (أو كلها لو مفيش صف محدد)
-  const filtered = selectedGrade
-    ? courses.filter(c => String(c.grade) === String(selectedGrade) || c.grade === 'all')
-    : courses;
-  select.innerHTML = '<option value="">اختر الكورس</option>' +
-    filtered.map(c => {
-      const isSecondary = typeof isSecondaryGrade === 'function' ? isSecondaryGrade(c.grade) : ['1','2','3'].includes(c.grade);
-      const trackSuffix = isSecondary && c.track && c.track !== 'both' ? ` - ${c.track}` : '';
-      return `<option value="${c.id}">${c.title}${trackSuffix} (${c.type==='paid' ? 'مدفوع' : 'مجاني'})</option>`;
-    }).join('');
-  if (filtered.some(c => String(c.id) === String(selectedCourseId))) select.value = selectedCourseId;
+  const selects = ['vcCourseId', 'filterVcCourse', 'printCourseSelect'];
+  const courseList = Array.isArray(window.courses) ? window.courses : (typeof courses !== 'undefined' ? courses : []);
+
+  selects.forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const currentVal = sel.value;
+    const isFilter = selId !== 'vcCourseId';
+
+    let html = isFilter ? '<option value="">جميع الكورسات</option>' : '<option value="">-- اختر الكورس المطلوب تفعيله --</option>';
+
+    if (courseList.length === 0) {
+      const storedCourses = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+      storedCourses.forEach(c => {
+        html += `<option value="${c.id}">${c.title || 'كورس'} (${c.grade || ''})</option>`;
+      });
+    } else {
+      courseList.forEach(c => {
+        const gradeStr = c.grade ? ` [${gradeLabel(c.grade)}]` : '';
+        html += `<option value="${c.id}">${c.title || 'كورس'}${gradeStr}</option>`;
+      });
+    }
+
+    sel.innerHTML = html;
+    if (currentVal) sel.value = currentVal;
+  });
 }
-function populateVoucherStudents() {
-  const wrap = document.getElementById('vcStudentCheckList');
-  if(!wrap) return;
-  const grade = document.getElementById('vcGrade').value;
-  const courseId = document.getElementById('vcCourseId').value;
-  const course = courses.find(c => String(c.id) === String(courseId));
-  const users = grade ? getMatchingStudentsForCourse(grade, course) : [];
-  if(!users.length) {
-    wrap.innerHTML = '<p style="color:#888">لا يوجد طلاب متاحين. اختر الصف والكورس أولاً.</p>';
-    return;
+
+// ── تعبئة قائمة الدفعات في فلاتر البحث والطباعة ──
+function populateBatchFilters() {
+  const batchSelects = ['filterVcBatch', 'printBatchSelect'];
+  const batches = [...new Set(vouchersData.map(v => v.batchName || 'الدفعة الأولى'))].filter(Boolean);
+
+  batchSelects.forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const currentVal = sel.value;
+    const isPrint = selId === 'printBatchSelect';
+
+    let html = isPrint ? '<option value="">كل الدفعات</option>' : '<option value="">جميع الدفعات</option>';
+    batches.forEach(b => {
+      html += `<option value="${b}">${b}</option>`;
+    });
+    sel.innerHTML = html;
+    if (currentVal) sel.value = currentVal;
+  });
+}
+
+// ── أدوات مساعدة للاختيار السريع للدفعة والعدد ──
+function setBatchSuggestion(name) {
+  const input = document.getElementById('vcBatchName');
+  if (input) {
+    input.value = name;
+    input.focus();
   }
-  wrap.innerHTML = users.map(u => `
-    <label style="display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer">
-      <input type="checkbox" class="vc-student-checkbox" data-userid="${u.id}" onchange="updateSelectedCount()">
-      <span>${u.name} - <span style="color:#555">${gradeLabel(u.grade)}${u.track ? ' | ' + u.track : ''}</span></span>
-    </label>`).join('');
-  updateSelectedCount();
 }
-function populatePrintCourseOptions() {
-  const select = document.getElementById('printCourse');
-  if(!select) return;
-  select.innerHTML = '<option value="">كل الكورسات</option>' + courses.map(c => `<option value="${c.id}">${c.title}</option>`).join('');
+
+function setCountQuick(count) {
+  const input = document.getElementById('vcCount');
+  if (input) {
+    input.value = count;
+  }
 }
-function populatePrintMonthOptions() {
-  const printMonth = document.getElementById('printMonth');
-  if(!printMonth) return;
-  const months = [...new Set(vouchersData.map(v => v.month).filter(Boolean))];
-  printMonth.innerHTML = '<option value="">كل الشهور</option>' + months.map(m => `<option value="${m}">${m}</option>`).join('');
+
+// ── التبديل بين التبويبات الأربعة ──
+function switchVcTab(tabId) {
+  const tabs = ['batches', 'list', 'print', 'verify'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab-vc-${t}`);
+    const pane = document.getElementById(`vc-tab-${t}`);
+    if (btn) {
+      if (t === tabId) {
+        btn.classList.add('active');
+        btn.style.color = 'var(--primary)';
+        btn.style.borderBottomColor = 'var(--primary)';
+        btn.style.background = 'rgba(2, 132, 199, 0.06)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.color = 'var(--text2)';
+        btn.style.borderBottomColor = 'transparent';
+        btn.style.background = 'transparent';
+      }
+    }
+    if (pane) {
+      pane.style.display = (t === tabId) ? 'block' : 'none';
+    }
+  });
+
+  if (tabId === 'batches') renderBatchesView();
+  if (tabId === 'list') renderVouchersTable();
+  if (tabId === 'print') renderPrintPreview();
+  if (tabId === 'verify') {
+    const res = document.getElementById('verifyResult');
+    if (res) res.style.display = 'none';
+  }
 }
+
+// ── تحديث كروت الإحصائيات الأربعة ──
 function renderVouchersStats() {
   const total = vouchersData.length;
   const used = vouchersData.filter(v => v.status === 'مستخدم').length;
   const unused = total - used;
-  const currentMonth = new Date().toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
-  const thisMonthCount = vouchersData.filter(v => v.createdAt && new Date(v.createdAt).toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' }) === currentMonth).length;
-  document.getElementById('vcTotal').textContent = total;
-  document.getElementById('vcUsed').textContent = used;
-  document.getElementById('vcUnused').textContent = unused;
-  document.getElementById('vcThisMonth').textContent = thisMonthCount;
-}
-async function generateUniqueCode(takenCodes) {
-  // takenCodes يجب أن يكون Set محمّل مسبقاً من Firebase (مرة واحدة فقط)
-  const taken = takenCodes || new Set(vouchersData.map(v => String(v.code)));
-  for (let attempt = 0; attempt < 200; attempt++) {
-    // كود مكوّن من 8 أرقام عشوائية حقيقية (أقوى من 6 أرقام)
-    const arr = new Uint32Array(1);
-    crypto.getRandomValues(arr);
-    const code = String(arr[0] % 100000000).padStart(8, '0');
-    if (!taken.has(code)) {
-      taken.add(code);
-      return code;
-    }
-  }
-  throw new Error('تعذر إنشاء كود فريد؛ حاول مرة أخرى.');
-}
-function buildCourseVoucher(code, course, offset = 0) {
-  const monthEl = document.getElementById('vcMonth');
-  const month = monthEl ? (monthEl.value || '').trim() : '';
-  return {
-    id: code,
-    code,
-    month,
-    grade: course.grade || 'all',
-    courseId: course ? course.id : '',
-    courseTitle: course ? course.title : 'غير مرتبط بكورس',
-    linkedStudentId: '',
-    linkedStudentName: '',
-    linkedStudentPhone: '',
-    linkedStudentTrack: '',
-    date: new Date().toLocaleDateString('ar-EG'),
-    createdAt: new Date().toISOString(),
-    status: 'غير مستخدم'
-  };
-}
-function filterStudentsMissingCourseCode(users, courseId) {
-  if (!courseId) return users;
-  return users.filter(user => !vouchersData.some(v => sameCourseStudentVoucher(v, courseId, user.id)));
-}
-async function generateMissingCenterCourseCodes() {
-  await syncCenterStudentsFromFirebase();
-  const courseId = document.getElementById('vcCourseId').value;
-  const course = courses.find(c => String(c.id) === String(courseId));
-  if (!course) { alert('اختار الكورس المدفوع الأول.'); return; }
-  document.getElementById('vcGrade').value = course.grade || 'all';
-  populateVoucherCourses();
-  document.getElementById('vcCourseId').value = course.id;
-  document.getElementById('vcGenType').value = 'students';
-  toggleGenType();
-  generateVouchers();
-}
-async function exportPlatformCourseCodesToSystem() {
-  if (!window.db) { alert('Firebase غير متاح حالياً. افتح النت وجرب مرة تانية.'); return; }
-  const courseId = document.getElementById('vcCourseId').value;
-  const grade = document.getElementById('vcGrade').value;
-  const exportable = vouchersData.filter(v =>
-    v.linkedStudentId &&
-    v.linkedStudentType === 'center' &&
-    v.courseId &&
-    (!courseId || String(v.courseId) === String(courseId)) &&
-    (!grade || grade === 'all' || String(v.grade) === String(grade))
-  );
-  if (!exportable.length) { alert('لا توجد أكواد طلاب سيستم مرتبطة بكورس للتصدير.'); return; }
+  const batchesCount = new Set(vouchersData.map(v => v.batchName || 'الدفعة الأولى')).size;
 
-  let batch = window.db.batch();
-  let batchCount = 0;
-  for (const voucher of exportable) {
-    const docId = `${voucher.courseId}_${voucher.linkedStudentId}`;
-    const docRef = window.db.collection('course_codes').doc(docId);
-    batch.set(docRef, {
-      ...voucher,
-      id: docId,
-      source: 'platform',
-      exportedAt: new Date().toISOString()
-    }, { merge: true });
-    voucher.exportedToSystem = true;
-    voucher.exportedAt = new Date().toISOString();
-    batchCount++;
-    if (batchCount >= 400) {
-      await batch.commit();
-      batch = window.db.batch();
-      batchCount = 0;
-    }
-  }
-  if (batchCount) await batch.commit();
-  saveVouchersData();
-  renderVouchersTable();
-  renderPrintPreview();
-  alert(`تم تصدير ${exportable.length} كود للسيستم بنجاح.`);
+  const elTotal = document.getElementById('vcTotal');
+  const elUnused = document.getElementById('vcUnused');
+  const elUsed = document.getElementById('vcUsed');
+  const elBatches = document.getElementById('vcBatchesCount');
+
+  if (elTotal) elTotal.textContent = total.toLocaleString('ar-EG');
+  if (elUnused) elUnused.textContent = unused.toLocaleString('ar-EG');
+  if (elUsed) elUsed.textContent = used.toLocaleString('ar-EG');
+  if (elBatches) elBatches.textContent = batchesCount.toLocaleString('ar-EG');
 }
+
+// ══════════════════════════════════════════════════════════════
+// 🚀 المحرك الأساسي: توليد الأكواد وحفظها فورياً في Firestore
+// ══════════════════════════════════════════════════════════════
 async function generateVouchers() {
-  const courseId = document.getElementById('vcCourseId').value;
-  const course = courses.find(c => String(c.id) === String(courseId));
-  const count = Number.parseInt(document.getElementById('vcCount').value, 10);
-  const month = (document.getElementById('vcMonth').value || '').trim();
+  const courseSelect = document.getElementById('vcCourseId');
+  const courseId = courseSelect ? courseSelect.value.trim() : '';
 
-  if (!course) { alert('من فضلك اختار كورساً أولاً.'); return; }
-  if (!Number.isInteger(count) || count < 1 || count > 500) { alert('اكتب عدد أكواد من 1 إلى 500.'); return; }
-  if (!window.db) { showNotification('❌ Firebase غير متاح.', 'error'); return; }
-
-  // ── 1. جلب الأكواد الموجودة من Firebase مرة واحدة (بدل call لكل كود) ──
-  showNotification('⏳ جارٍ التحقق من الأكواد الموجودة...', 'info');
-  let remoteExisting = new Set();
-  try {
-    const snap = await window.db.collection('course_codes').get({ source: 'server' });
-    snap.forEach(doc => remoteExisting.add(doc.id));
-  } catch(e) {
-    console.warn('[vouchers] Could not pre-fetch existing codes, using local only:', e.message);
-  }
-  const taken = new Set([
-    ...vouchersData.map(v => String(v.code)),
-    ...remoteExisting
-  ]);
-
-  // ── 2. توليد الأكواد محلياً بدون network calls إضافية ──
-  const batch = [];
-  for (let i = 0; i < count; i++) {
-    const code = await generateUniqueCode(taken);
-    const voucher = buildCourseVoucher(code, course, i);
-    if (month) voucher.month = month;
-    batch.push(voucher);
-  }
-
-  // ── 3. حفظ في Firebase على دفعات (max 400 لكل batch) مع retry ──
-  showNotification('⏳ جارٍ حفظ الأكواد في Firebase...', 'info');
-  try {
-    for (let start = 0; start < batch.length; start += 400) {
-      const firestoreBatch = window.db.batch();
-      batch.slice(start, start + 400).forEach(voucher => {
-        firestoreBatch.set(
-          window.db.collection('course_codes').doc(voucher.code),
-          voucher
-        );
-      });
-      // محاولة مرة ثانية تلقائياً عند الفشل
-      let committed = false;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-          await firestoreBatch.commit();
-          committed = true;
-          break;
-        } catch(retryErr) {
-          if (attempt === 0) {
-            console.warn('[vouchers] Batch commit failed, retrying...', retryErr.message);
-            await new Promise(r => setTimeout(r, 1500));
-          } else {
-            throw retryErr;
-          }
-        }
-      }
-      if (!committed) throw new Error('فشل الحفظ بعد المحاولة الثانية.');
-    }
-  } catch (error) {
-    console.error('[vouchers] Firebase write failed:', error);
-    let reason = error.message || error.code || 'تحقق من اتصال Firebase.';
-    if (error.code === 'permission-denied') {
-      reason = 'صلاحيات Firestore تمنع الكتابة — تأكد من نشر قواعد Firestore في Firebase Console.';
-    } else if (error.code === 'unavailable' || error.message?.includes('network')) {
-      reason = 'تعذّر الوصول لـ Firebase. تحقق من الإنترنت وحاول مرة أخرى.';
-    }
-    showNotification('❌ تعذر حفظ الأكواد: ' + reason, 'error');
+  if (!courseId) {
+    alert('يرجى اختيار الكورس المراد تفعيل أكواده أولاً! 📚');
+    if (courseSelect) courseSelect.focus();
     return;
   }
 
-  // ── 4. تحديث البيانات المحلية ──
-  vouchersData = [...batch, ...vouchersData];
-  saveVouchersData();
-  populatePrintMonthOptions();
-  renderVouchersStats();
-  renderVouchersTable();
-  renderPrintPreview();
+  const courseTitle = (courseSelect && courseSelect.options[courseSelect.selectedIndex])
+    ? courseSelect.options[courseSelect.selectedIndex].text.replace(/\s*\[.*?\]$/, '')
+    : 'كورس عام';
 
-  if (batch.length) {
-    const preview = document.getElementById('vcPreview');
-    const grid = document.getElementById('vcPreviewGrid');
-    if (preview && grid) {
-      preview.style.display = 'block';
-      grid.innerHTML = batch.slice(0, 20).map(v => `
-        <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-weight:700;font-family:monospace;letter-spacing:2px">${v.code}</span>
-      `).join('');
+  const batchNameInput = document.getElementById('vcBatchName');
+  let batchName = batchNameInput ? batchNameInput.value.trim() : '';
+  if (!batchName) {
+    batchName = 'الدفعة الأولى';
+    if (batchNameInput) batchNameInput.value = batchName;
+  }
+
+  const countInput = document.getElementById('vcCount');
+  let count = parseInt(countInput ? countInput.value : '20', 10);
+  if (isNaN(count) || count <= 0) count = 20;
+  if (count > 1000) {
+    if (!confirm(`لقد طلبت توليد ${count} كود، هل تريد الاستمرار؟`)) return;
+  }
+
+  // تعطيل الزر وإظهار مؤشر التحميل
+  const btn = document.getElementById('btnGenerateCodes');
+  const originalBtnHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '⏳ جاري توليد الأكواد وحفظها بالسيرفر...';
+  }
+
+  try {
+    // تجهيز مجموعة الأكواد السابقة لضمان عدم تكرار أي كود نهائياً
+    const existingSet = new Set(vouchersData.map(v => String(v.code).trim()));
+
+    const newCodes = [];
+    const nowTimestamp = Date.now();
+    const formattedDate = new Date().toLocaleString('ar-EG', {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    for (let i = 0; i < count; i++) {
+      const code6 = generateUnique6DigitCode(existingSet);
+      newCodes.push({
+        id: code6,
+        code: code6,
+        courseId: courseId,
+        courseTitle: courseTitle,
+        batchName: batchName,
+        status: 'غير مستخدم',
+        createdAt: nowTimestamp,
+        createdAtFormatted: formattedDate,
+        linkedStudentId: null,
+        linkedStudentName: null,
+        linkedStudentPhone: null,
+        usedAt: null
+      });
+    }
+
+    // ── الحفظ في قاعدة بيانات Firestore بـ Batches (بحد أقصى 400 لكل دفعة) ──
+    let firestoreSaved = false;
+    if (window.db) {
+      try {
+        const CHUNK_SIZE = 400;
+        for (let i = 0; i < newCodes.length; i += CHUNK_SIZE) {
+          const chunk = newCodes.slice(i, i + CHUNK_SIZE);
+          const batch = window.db.batch();
+          chunk.forEach(item => {
+            const docRef = window.db.collection('course_codes').doc(item.code);
+            batch.set(docRef, {
+              code: item.code,
+              courseId: item.courseId,
+              courseTitle: item.courseTitle,
+              batchName: item.batchName,
+              status: item.status,
+              createdAt: item.createdAt,
+              createdAtFormatted: item.createdAtFormatted,
+              linkedStudentId: null,
+              linkedStudentName: null,
+              linkedStudentPhone: null,
+              usedAt: null
+            });
+          });
+          await batch.commit();
+        }
+        firestoreSaved = true;
+        console.log(`[vouchers] Successfully saved ${newCodes.length} codes to Firestore.`);
+      } catch (err) {
+        console.error('[vouchers] Error saving codes to Firestore:', err);
+        alert('تنبيه: حدث خطأ أثناء الاتصال بقاعدة البيانات. تم حفظ الأكواد محلياً مؤقتاً.');
+      }
+    }
+
+    // تحديث البيانات في الذاكرة المحلية
+    vouchersData = [...newCodes, ...vouchersData];
+    saveVouchersData();
+
+    // حفظ أحدث دفعة للعرض الفوري
+    latestGeneratedBatch = {
+      batchName: batchName,
+      courseTitle: courseTitle,
+      count: count,
+      codes: newCodes
+    };
+
+    // إظهار صندوق الدفعة الجديدة وتحديث كافة الواجهات
+    displayNewBatchSpotlight(latestGeneratedBatch);
+    renderVouchersStats();
+    populateBatchFilters();
+    renderBatchesView();
+    renderVouchersTable();
+
+    if (typeof showNotification === 'function') {
+      showNotification(`✅ تم توليد وحفظ ${count} كود بنجاح في دفعة "${batchName}"!`, 'success');
+    } else {
+      alert(`✅ تم توليد وحفظ ${count} كود بنجاح في دفعة "${batchName}"!`);
+    }
+
+  } catch (err) {
+    console.error('Code generation error:', err);
+    alert('حدث خطأ أثناء توليد الأكواد: ' + (err.message || err));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+    }
+  }
+}
+
+// ── عرض صندوق الأكواد المولدة حديثاً ──
+function displayNewBatchSpotlight(batch) {
+  const box = document.getElementById('vcNewBatchBox');
+  if (!box || !batch) return;
+
+  document.getElementById('newBatchNameDisplay').textContent = batch.batchName;
+  document.getElementById('newBatchCourseDisplay').textContent = batch.courseTitle;
+  document.getElementById('newBatchCountDisplay').textContent = `${batch.count} كود (6 أرقام)`;
+
+  const listEl = document.getElementById('newBatchCodesList');
+  if (listEl) {
+    listEl.innerHTML = batch.codes.map(c => `
+      <div onclick="copySingleCode('${c.code}')" title="انقر لنسخ الكود" style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:10px;padding:8px 12px;font-family:monospace;font-size:16px;font-weight:900;letter-spacing:2px;color:var(--primary);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s" onmouseover="this.style.borderColor='var(--primary)';this.style.transform='scale(1.05)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform='scale(1)'">
+        <span>${c.code}</span>
+        <span style="font-size:12px;opacity:0.7">📋</span>
+      </div>
+    `).join('');
+  }
+
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── نسخ كود فردي بنقرة واحدة ──
+function copySingleCode(code) {
+  navigator.clipboard.writeText(String(code)).then(() => {
+    if (typeof showNotification === 'function') {
+      showNotification(`تم نسخ الكود ${code} إلى الحافظة! 📋`, 'success');
+    } else {
+      alert(`تم نسخ الكود: ${code}`);
+    }
+  }).catch(() => {
+    prompt('انسخ الكود يدوياً:', code);
+  });
+}
+
+// ── نسخ جميع أكواد الدفعة الأخيرة ──
+function copyLatestBatchCodes() {
+  if (!latestGeneratedBatch || !latestGeneratedBatch.codes.length) return;
+  const text = latestGeneratedBatch.codes.map(c => c.code).join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    if (typeof showNotification === 'function') {
+      showNotification(`تم نسخ جميع أكواد الدفعة (${latestGeneratedBatch.codes.length} كود) بنجاح! 📋`, 'success');
+    } else {
+      alert('تم نسخ جميع الأكواد إلى الحافظة بنجاح.');
+    }
+  });
+}
+
+// ── تصدير الدفعة الأخيرة كملف نصي TXT ──
+function exportLatestBatchTxt() {
+  if (!latestGeneratedBatch || !latestGeneratedBatch.codes.length) return;
+  const b = latestGeneratedBatch;
+  let content = `==============================\n`;
+  content += `منصة أ. مصطفى سالم - NEVER GIVE UP\n`;
+  content += `دفعة الأكواد: ${b.batchName}\n`;
+  content += `الكورس: ${b.courseTitle}\n`;
+  content += `العدد: ${b.count} كود\n`;
+  content += `تاريخ التوليد: ${new Date().toLocaleString('ar-EG')}\n`;
+  content += `==============================\n\n`;
+  b.codes.forEach((c, idx) => {
+    content += `${idx + 1}. ${c.code}\n`;
+  });
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `أكواد_${b.batchName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── طباعة الدفعة الأخيرة مباشرة ──
+function printLatestBatch() {
+  if (!latestGeneratedBatch) return;
+  switchVcTab('print');
+  const sel = document.getElementById('printBatchSelect');
+  if (sel) {
+    sel.value = latestGeneratedBatch.batchName;
+    renderPrintPreview();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 📦 تبويب الدفعات (Batches View)
+// ══════════════════════════════════════════════════════════════
+function renderBatchesView() {
+  const container = document.getElementById('vcBatchesGrid');
+  if (!container) return;
+
+  if (!vouchersData.length) {
+    container.innerHTML = `
+      <div style="grid-column:1/-1;padding:48px 20px;text-align:center;color:var(--text2)">
+        <div style="font-size:48px;margin-bottom:12px">📦</div>
+        <div style="font-size:16px;font-weight:800">لا توجد أي دفعات أكواد حالياً</div>
+        <div style="font-size:13px;margin-top:6px">اختر الكورس واكتب اسم الدفعة واضغط \"توليد الأكواد وحفظها\" لبدء أول دفعة</div>
+      </div>
+    `;
+    return;
+  }
+
+  // تجميع الأكواد حسب الدفعة
+  const batchesMap = new Map();
+  vouchersData.forEach(v => {
+    const bName = v.batchName || 'الدفعة الأولى';
+    if (!batchesMap.has(bName)) {
+      batchesMap.set(bName, {
+        batchName: bName,
+        courseTitle: v.courseTitle || 'كورس',
+        courseId: v.courseId || '',
+        createdAt: v.createdAt || 0,
+        createdAtFormatted: v.createdAtFormatted || '',
+        total: 0,
+        used: 0,
+        unused: 0,
+        codes: []
+      });
+    }
+    const b = batchesMap.get(bName);
+    b.total++;
+    if (v.status === 'مستخدم') b.used++;
+    else b.unused++;
+    b.codes.push(v);
+  });
+
+  const batches = Array.from(batchesMap.values());
+  batches.sort((a, b) => b.createdAt - a.createdAt);
+
+  container.innerHTML = batches.map(b => {
+    const percentUsed = b.total ? Math.round((b.used / b.total) * 100) : 0;
+    return `
+      <div class="table-card" style="padding:20px;border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,0.03);position:relative">
+        <div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">
+            <div>
+              <span style="display:inline-block;padding:3px 10px;background:rgba(2,132,199,0.1);color:var(--primary);border-radius:6px;font-size:12px;font-weight:800;margin-bottom:6px">📦 دفعة</span>
+              <h4 style="font-size:17px;font-weight:900;margin:0;color:var(--text)">${b.batchName}</h4>
+            </div>
+            <span style="font-size:12px;color:var(--text2)">${b.createdAtFormatted || 'مؤخراً'}</span>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+            <span>📚</span> ${b.courseTitle}
+          </div>
+
+          <!-- شريط الإحصائيات -->
+          <div style="background:var(--bg);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:6px">
+              <span>إجمالي: <strong style="color:var(--text)">${b.total}</strong></span>
+              <span style="color:var(--success,#16a34a)">متاح: ${b.unused}</span>
+              <span style="color:var(--primary)">مستخدم: ${b.used}</span>
+            </div>
+            <div style="height:6px;background:var(--border);border-radius:4px;overflow:hidden">
+              <div style="height:100%;width:${percentUsed}%;background:linear-gradient(90deg,var(--primary),#10b981);border-radius:4px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- أزرار الإجراءات -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:12px">
+          <button onclick="copyBatchUnusedCodes('${b.batchName.replace(/'/g, "\\'")}')" style="flex:1;padding:8px 10px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:8px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:12px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:4px">
+            📋 نسخ المتاح
+          </button>
+          <button onclick="printBatchByName('${b.batchName.replace(/'/g, "\\'")}')" style="flex:1;padding:8px 10px;background:var(--primary);color:white;border:none;border-radius:8px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">
+            🖨️ طباعة
+          </button>
+          <button onclick="filterTableByBatch('${b.batchName.replace(/'/g, "\\'")}')" style="flex:1;padding:8px 10px;background:var(--card-bg);border:1.5px solid var(--border);border-radius:8px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:12px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;gap:4px">
+            🔍 عرض
+          </button>
+          <button onclick="deleteBatch('${b.batchName.replace(/'/g, "\\'")}')" style="padding:8px 10px;background:#fff0f3;color:var(--danger);border:1px solid #ffd0d8;border-radius:8px;font-family:'Tajawal',sans-serif;font-weight:800;font-size:12px;cursor:pointer" title="حذف الدفعة">
+            🗑️
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── نسخ الأكواد غير المستخدمة في دفعة معينة ──
+function copyBatchUnusedCodes(batchName) {
+  const codes = vouchersData
+    .filter(v => v.batchName === batchName && v.status !== 'مستخدم')
+    .map(v => v.code);
+
+  if (!codes.length) {
+    alert('لا توجد أكواد غير مستخدمة في هذه الدفعة.');
+    return;
+  }
+  navigator.clipboard.writeText(codes.join('\n')).then(() => {
+    if (typeof showNotification === 'function') {
+      showNotification(`تم نسخ ${codes.length} كود متاح من دفعة "${batchName}"! 📋`, 'success');
+    } else {
+      alert(`تم نسخ ${codes.length} كود بنجاح.`);
+    }
+  });
+}
+
+// ── طباعة دفعة بالاسم ──
+function printBatchByName(batchName) {
+  switchVcTab('print');
+  const sel = document.getElementById('printBatchSelect');
+  if (sel) {
+    sel.value = batchName;
+    renderPrintPreview();
+  }
+}
+
+// ── الانتقال لجدول الأكواد مفلتراً بالدفعة ──
+function filterTableByBatch(batchName) {
+  switchVcTab('list');
+  const sel = document.getElementById('filterVcBatch');
+  if (sel) {
+    sel.value = batchName;
+    filterVouchersTable();
+  }
+}
+
+// ── حذف دفعة كاملة ──
+async function deleteBatch(batchName) {
+  if (!confirm(`هل أنت متأكد من حذف دفعة "${batchName}" وكل الأكواد المرتبطة بها؟\nهذا الإجراء سيحذف الأكواد من قاعدة البيانات نهائياً!`)) {
+    return;
+  }
+
+  const codesToDelete = vouchersData.filter(v => v.batchName === batchName).map(v => v.code);
+
+  if (window.db && codesToDelete.length) {
+    try {
+      const CHUNK_SIZE = 400;
+      for (let i = 0; i < codesToDelete.length; i += CHUNK_SIZE) {
+        const chunk = codesToDelete.slice(i, i + CHUNK_SIZE);
+        const batch = window.db.batch();
+        chunk.forEach(code => {
+          batch.delete(window.db.collection('course_codes').doc(code));
+        });
+        await batch.commit();
+      }
+    } catch (e) {
+      console.warn('Error deleting batch from Firestore:', e);
     }
   }
 
-  toggleGenType();
-  showNotification(`✅ تم توليد وحفظ ${batch.length} كود تفعيل في Firebase بنجاح!`, 'success');
+  vouchersData = vouchersData.filter(v => v.batchName !== batchName);
+  saveVouchersData();
+  renderVouchersStats();
+  populateBatchFilters();
+  renderBatchesView();
+  renderVouchersTable();
+
+  if (typeof showNotification === 'function') {
+    showNotification(`تم حذف دفعة "${batchName}" بنجاح`, 'info');
+  }
 }
+
+// ══════════════════════════════════════════════════════════════
+// 📋 جدول كل الأكواد (Full Table & Filters)
+// ══════════════════════════════════════════════════════════════
+function filterVouchersTable() {
+  renderVouchersTable();
+}
+
 function renderVouchersTable() {
   const tbody = document.getElementById('vouchersTableBody');
-  const search = document.getElementById('vcSearch').value.trim().toUpperCase();
-  const statusFilter = document.getElementById('vcFilterStatus').value;
-  const gradeFilter = document.getElementById('vcFilterGrade').value;
-  let filtered = vouchersData.slice();
-  if (search) filtered = filtered.filter(v => v.code.includes(search) || (v.month && v.month.includes(search)) || (v.courseTitle && v.courseTitle.includes(search)) || (v.linkedStudentName && v.linkedStudentName.includes(search)));
-  if (statusFilter) filtered = filtered.filter(v => statusFilter === 'used' ? v.status === 'مستخدم' : v.status === 'غير مستخدم');
-  if (gradeFilter && gradeFilter !== 'all') filtered = filtered.filter(v => v.grade === gradeFilter);
-  const typeFilter = document.getElementById('vcFilterType')?.value || 'all';
-  if (typeFilter && typeFilter !== 'all') filtered = filtered.filter(v => v.linkedStudentTrack === typeFilter);
+  if (!tbody) return;
+
+  const search = (document.getElementById('searchVcInput')?.value || '').toLowerCase().trim();
+  const courseFilter = document.getElementById('filterVcCourse')?.value || '';
+  const batchFilter = document.getElementById('filterVcBatch')?.value || '';
+  const statusFilter = document.getElementById('filterVcStatus')?.value || '';
+
+  let filtered = [...vouchersData];
+
+  if (search) {
+    filtered = filtered.filter(v => {
+      const codeMatch = String(v.code).toLowerCase().includes(search);
+      const studentMatch = (v.linkedStudentName || '').toLowerCase().includes(search);
+      const phoneMatch = String(v.linkedStudentPhone || '').includes(search);
+      const batchMatch = (v.batchName || '').toLowerCase().includes(search);
+      return codeMatch || studentMatch || phoneMatch || batchMatch;
+    });
+  }
+
+  if (courseFilter) {
+    filtered = filtered.filter(v => String(v.courseId || '') === String(courseFilter));
+  }
+
+  if (batchFilter) {
+    filtered = filtered.filter(v => (v.batchName || '') === batchFilter);
+  }
+
+  if (statusFilter) {
+    filtered = filtered.filter(v => (v.status || 'غير مستخدم') === statusFilter);
+  }
+
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">🎟️</div><p>لا توجد أكواد مطابقة للبحث</p></div></td></tr>';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align:center;padding:36px;color:var(--text2);font-weight:700">
+          لا توجد أكواد مطابقة لخيارات الفلترة الحالية
+        </td>
+      </tr>
+    `;
     return;
   }
-  tbody.innerHTML = filtered.map((v, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td style="font-family:monospace;font-size:16px;font-weight:bold;letter-spacing:2px">${v.code}</td>
-      <td>${v.month || 'غير محدد'}</td>
-      <td><span class="badge ${gradeClass(v.grade)}">${gradeLabel(v.grade)}</span></td>
-      <td>${v.courseTitle || '-'}</td>
-      <td>${v.linkedStudentTrack || '-'}</td>
-      <td>${v.linkedStudentName || '-'}</td>
-      <td>${v.date}</td>
-      <td><span class="badge ${v.status === 'مستخدم' ? 'inactive' : 'active'}">${v.status}</span></td>
-      <td><div class="action-btns"><button class="btn-view" onclick="verifyCode('${v.code}')">عرض</button><button class="btn-delete" onclick="deleteVoucher(${v.id})">حذف</button></div></td>
-    </tr>`).join('');
+
+  tbody.innerHTML = filtered.map((v, i) => {
+    const isUsed = v.status === 'مستخدم';
+    const statusBadge = isUsed
+      ? '<span class="badge inactive" style="background:#fff0f3;color:#e11d48;border:1px solid #ffd0d8">مستخدم</span>'
+      : '<span class="badge active" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0">غير مستخدم</span>';
+
+    const studentInfo = isUsed
+      ? `<div style="font-size:12px;line-height:1.4">
+          <strong style="color:var(--text)">${v.linkedStudentName || 'طالب'}</strong>
+          ${v.linkedStudentPhone ? `<div style="color:var(--text2);direction:ltr;text-align:right">${v.linkedStudentPhone}</div>` : ''}
+          ${v.usedAt ? `<div style="font-size:11px;color:var(--text2)">${v.usedAt}</div>` : ''}
+        </div>`
+      : '<span style="color:var(--text2);font-size:12px">—</span>';
+
+    return `
+      <tr>
+        <td style="font-weight:800;color:var(--text2);font-size:12px">${i + 1}</td>
+        <td>
+          <div style="display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1.5px solid var(--border);padding:4px 10px;border-radius:8px">
+            <span style="font-family:monospace;font-size:16px;font-weight:900;letter-spacing:2px;color:var(--text)">${v.code}</span>
+            <button onclick="copySingleCode('${v.code}')" title="نسخ الكود" style="background:none;border:none;cursor:pointer;padding:0;font-size:12px;opacity:0.7">📋</button>
+          </div>
+        </td>
+        <td><span style="font-weight:700;font-size:13px">${v.batchName || 'الدفعة الأولى'}</span></td>
+        <td><span style="font-weight:800;font-size:13px;color:var(--primary)">${v.courseTitle || 'كورس'}</span></td>
+        <td>${statusBadge}</td>
+        <td style="font-size:12px;color:var(--text2)">${v.createdAtFormatted || '—'}</td>
+        <td>${studentInfo}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <button onclick="copySingleCode('${v.code}')" class="btn-view" style="padding:4px 8px;font-size:12px" title="نسخ الكود">📋</button>
+            <button onclick="deleteVoucher('${v.code}')" class="btn-delete" style="padding:4px 8px;font-size:12px" title="حذف الكود">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
-function deleteVoucher(id) {
-  if(!confirm('هل أنت متأكد من حذف هذا الكود؟')) return;
-  vouchersData = vouchersData.filter(v => v.id !== id);
-  localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
+
+// ── حذف كود فردي ──
+async function deleteVoucher(code) {
+  if (!confirm(`هل أنت متأكد من حذف الكود ${code}؟`)) return;
+
+  if (window.db) {
+    try {
+      await window.db.collection('course_codes').doc(code).delete();
+    } catch(e) {
+      console.warn('Error deleting voucher from Firestore:', e);
+    }
+  }
+
+  vouchersData = vouchersData.filter(v => v.code !== code);
+  saveVouchersData();
   renderVouchersStats();
+  populateBatchFilters();
+  renderBatchesView();
   renderVouchersTable();
-  renderPrintPreview();
+
+  if (typeof showNotification === 'function') {
+    showNotification(`تم حذف الكود ${code} بنجاح`, 'info');
+  }
 }
-function deleteAllUsed() {
-  if(!confirm('هل تريد حذف جميع الأكواد المستخدمة نهائياً؟')) return;
+
+// ── تصدير جدول الأكواد كملف Excel / CSV ──
+function exportAllVouchersCsv() {
+  if (!vouchersData.length) {
+    alert('لا توجد بيانات لتصديرها.');
+    return;
+  }
+  let csv = '\uFEFF'; // UTF-8 BOM لدعم الحروف العربية في Excel
+  csv += 'الكود,اسم الدفعة,الكورس المرتبط,الحالة,تاريخ التوليد,اسم الطالب,رقم الموبايل,تاريخ الاستخدام\n';
+
+  vouchersData.forEach(v => {
+    const row = [
+      `"${v.code}"`,
+      `"${(v.batchName || '').replace(/"/g, '""')}"`,
+      `"${(v.courseTitle || '').replace(/"/g, '""')}"`,
+      `"${v.status || ''}"`,
+      `"${v.createdAtFormatted || ''}"`,
+      `"${(v.linkedStudentName || '').replace(/"/g, '""')}"`,
+      `"${v.linkedStudentPhone || ''}"`,
+      `"${v.usedAt || ''}"`
+    ];
+    csv += row.join(',') + '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `أكواد_تفعيل_المنصة_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── حذف جميع الأكواد المستخدمة لتنظيف النظام ──
+async function deleteAllUsed() {
+  const usedCodes = vouchersData.filter(v => v.status === 'مستخدم').map(v => v.code);
+  if (!usedCodes.length) {
+    alert('لا توجد أكواد مستخدمة لحذفها.');
+    return;
+  }
+  if (!confirm(`هل أنت متأكد من حذف ${usedCodes.length} كود مستخدم نهائياً من قاعدة البيانات؟`)) {
+    return;
+  }
+
+  if (window.db) {
+    try {
+      const CHUNK_SIZE = 400;
+      for (let i = 0; i < usedCodes.length; i += CHUNK_SIZE) {
+        const chunk = usedCodes.slice(i, i + CHUNK_SIZE);
+        const batch = window.db.batch();
+        chunk.forEach(code => {
+          batch.delete(window.db.collection('course_codes').doc(code));
+        });
+        await batch.commit();
+      }
+    } catch(e) {
+      console.warn('Firestore deleteAllUsed error:', e);
+    }
+  }
+
   vouchersData = vouchersData.filter(v => v.status !== 'مستخدم');
-  localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
+  saveVouchersData();
   renderVouchersStats();
+  renderBatchesView();
   renderVouchersTable();
-  renderPrintPreview();
-  showAlert('تم حذف جميع الأكواد المستخدمة.');
+  if (typeof showNotification === 'function') {
+    showNotification(`تم تنظيف وحذف ${usedCodes.length} كود مستخدم بنجاح.`, 'success');
+  }
 }
-function verifyCode(code = '') {
-  const input = code || document.getElementById('verifyCodeInput').value.trim().toUpperCase();
-  if(!input){alert('أدخل كود للتحقق');return;}
-  if(code) document.getElementById('verifyCodeInput').value = code;
-  const voucher = vouchersData.find(v => v.code === input);
-  const result = document.getElementById('verifyResult');
-  result.style.display = 'block';
-  if(!voucher) {
-    result.style.background = '#fff0f3';
-    result.style.color = '#c0392b';
-    result.innerHTML = `<strong>الكود غير صالح أو غير موجود.</strong>`;
+
+// ══════════════════════════════════════════════════════════════
+// 🖨️ طباعة بطاقات الأكواد (Print Engine)
+// ══════════════════════════════════════════════════════════════
+function renderPrintPreview() {
+  const courseId = document.getElementById('printCourseSelect')?.value || '';
+  const batchName = document.getElementById('printBatchSelect')?.value || '';
+  const status = document.getElementById('printStatusSelect')?.value || 'unused';
+
+  let filtered = [...vouchersData];
+
+  if (courseId) {
+    filtered = filtered.filter(v => String(v.courseId || '') === String(courseId));
+  }
+  if (batchName) {
+    filtered = filtered.filter(v => (v.batchName || '') === batchName);
+  }
+  if (status === 'unused') {
+    filtered = filtered.filter(v => v.status !== 'مستخدم');
+  }
+
+  const printArea = document.getElementById('printArea');
+  const infoEl = document.getElementById('printPreviewInfo');
+
+  if (infoEl) {
+    infoEl.textContent = `عرض ${filtered.length} بطاقة كود جاهزة للطباعة ${status === 'unused' ? '(الأكواد المتاحة فقط)' : ''}`;
+  }
+
+  if (!printArea) return;
+
+  if (!filtered.length) {
+    printArea.innerHTML = '<div style="grid-column:1/-1;color:#888;padding:32px;text-align:center;font-weight:700">لا توجد بطاقات أكواد مطابقة لخيارات الطباعة</div>';
     return;
   }
-  const activateButton = voucher.status === 'غير مستخدم' ? `<button onclick="activateVoucher('${voucher.code}')" style="margin-top:14px;padding:10px 18px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:white;border:none;border-radius:12px;cursor:pointer;font-weight:700">تفعيل الكود الآن</button>` : '';
-  result.style.background = voucher.status === 'غير مستخدم' ? '#e8fff3' : '#fff8e8';
-  result.style.color = '#0f5132';
-  result.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr;gap:10px">
-      <div><strong>الكود:</strong> ${voucher.code}</div>
-      <div><strong>الشهر / الفترة:</strong> ${voucher.month || 'غير محدد'}</div>
-      <div><strong>الصف:</strong> ${gradeLabel(voucher.grade)}</div>
-      <div><strong>الكورس:</strong> ${voucher.courseTitle || '-'}</div>
-      <div><strong>مرتبط بطالب:</strong> ${voucher.linkedStudentName || '-'}</div>
-      <div><strong>رقم الموبايل:</strong> ${voucher.linkedStudentPhone || '-'}</div>
-      <div><strong>تاريخ التوليد:</strong> ${voucher.date}</div>
-      <div><strong>الحالة:</strong> ${voucher.status}</div>
-      ${activateButton}
-    </div>`;
+
+  printArea.innerHTML = filtered.map(v => `
+    <div style="background:#ffffff;border:2px dashed #0284c7;border-radius:14px;padding:16px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;gap:8px;page-break-inside:avoid">
+      <div style="border-bottom:1px solid #e2e8f0;padding-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:11px;font-weight:900;color:#0284c7">⚡ NEVER GIVE UP</span>
+        <span style="font-size:10px;color:#64748b">${v.batchName || 'الدفعة الأولى'}</span>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:800;color:#0f172a;margin-bottom:4px">📚 ${v.courseTitle || 'كورس'}</div>
+        <div style="font-size:11px;color:#64748b">أ. مصطفى سالم</div>
+      </div>
+      <div style="background:#f8fafc;border:1.5px solid #cbd5e1;border-radius:10px;padding:10px;text-align:center;margin:4px 0">
+        <div style="font-size:10px;color:#64748b;margin-bottom:2px">كود التفعيل الخاص بك</div>
+        <div style="font-family:monospace;font-size:22px;font-weight:900;letter-spacing:4px;color:#0284c7">${v.code}</div>
+      </div>
+      <div style="font-size:10px;color:#64748b;text-align:center;line-height:1.4">
+        ادخل هذا الكود المكون من 6 أرقام في خانة "تفعيل بكود" داخل المنصة لفتح الكورس فوراً.
+      </div>
+    </div>
+  `).join('');
 }
-function activateVoucher(code) {
-  const voucher = vouchersData.find(v => v.code === code);
-  if(!voucher) return;
-  if(voucher.status === 'مستخدم') { alert('الكود مستخدم بالفعل'); return; }
-  if(!confirm('هل تريد تفعيل هذا الكود وتغييره إلى مستخدم؟')) return;
-  voucher.status = 'مستخدم';
-  voucher.usedAt = new Date().toLocaleDateString('ar-EG');
-  localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
-  renderVouchersStats();
-  renderVouchersTable();
-  verifyCode(code);
-  showAlert('تم تفعيل الكود بنجاح.');
+
+function doPrint() {
+  window.print();
 }
-function renderPrintPreview() {
-  const grade = document.getElementById('printGrade').value;
-  const courseId = document.getElementById('printCourse').value;
-  const studentType = document.getElementById('printStudentType').value;
-  const month = document.getElementById('printMonth').value;
-  const status = document.getElementById('printStatus').value;
-  let filtered = vouchersData.slice();
-  if(status) filtered = filtered.filter(v => status === 'unused' ? v.status === 'غير مستخدم' : true);
-  if(grade && grade !== 'all') filtered = filtered.filter(v => v.grade === grade);
-  if(courseId) filtered = filtered.filter(v => v.courseId && v.courseId.toString() === courseId);
-  if(studentType && studentType !== 'all') filtered = filtered.filter(v => v.linkedStudentTrack === studentType);
-  if(month) filtered = filtered.filter(v => v.month === month);
-  const preview = document.getElementById('printArea');
-  preview.innerHTML = filtered.length ? filtered.map(v => `
-    <div style="min-width:210px;padding:16px;border:1px dashed var(--border);border-radius:18px;background:#fff;display:flex;flex-direction:column;gap:10px">
-      <div style="font-size:13px;color:#888">الكود</div>
-      <div style="font-family:monospace;font-size:18px;font-weight:900;letter-spacing:2px">${v.code}</div>
-      ${v.linkedStudentName ? `<div style="font-size:13px"><strong>اسم الطالب:</strong> ${v.linkedStudentName}</div>` : ''}
-      ${v.linkedStudentPhone ? `<div style="font-size:13px"><strong>الموبايل:</strong> ${v.linkedStudentPhone}</div>` : ''}
-      <div style="font-size:13px"><strong>الصف:</strong> ${gradeLabel(v.grade)}</div>
-      ${v.linkedStudentTrack ? `<div style="font-size:13px"><strong>الشُعبة:</strong> ${v.linkedStudentTrack}</div>` : ''}
-      <div style="font-size:13px"><strong>الفترة:</strong> ${v.month || 'غير محدد'}</div>
-      <div style="font-size:13px"><strong>الكورس:</strong> ${v.courseTitle || 'غير مرتبط'}</div>
-      <div style="font-size:13px"><span class="badge ${v.status === 'مستخدم' ? 'inactive' : 'active'}">${v.status}</span></div>
-    </div>`).join('') : '<div style="grid-column:1/-1;color:#888;padding:24px;text-align:center">لا توجد أكواد للطباعة</div>';
-  const info = document.getElementById('printPreviewInfo');
-  const parts = [];
-  if(grade && grade !== 'all') parts.push(`الصف: ${gradeLabel(grade)}`);
-  if(courseId) {
-    const course = courses.find(c => c.id.toString() === courseId);
-    if(course) parts.push(`الكورس: ${course.title}`);
+
+// ══════════════════════════════════════════════════════════════
+// 🔍 فحص وتحقق فوري من كود تفعيل (Verify Engine)
+// ══════════════════════════════════════════════════════════════
+async function verifyCode() {
+  const input = document.getElementById('verifyCodeInput');
+  const resEl = document.getElementById('verifyResult');
+  if (!input || !resEl) return;
+
+  const code = input.value.trim();
+  if (!code) {
+    alert('يرجى إدخال الكود أولاً!');
+    input.focus();
+    return;
   }
-  if(studentType && studentType !== 'all') parts.push(`الشُعبة: ${studentType}`);
-  if(month) parts.push(`الفترة: ${month}`);
-  if(status) parts.push(status === 'unused' ? 'غير مستخدمة فقط' : 'الكل');
-  info.textContent = `عرض ${filtered.length} أكواد${parts.length ? ' - ' + parts.join(' | ') : ''}`;
+
+  resEl.style.display = 'block';
+  resEl.style.background = 'rgba(2, 132, 199, 0.08)';
+  resEl.style.border = '1px solid rgba(2, 132, 199, 0.3)';
+  resEl.style.color = 'var(--primary)';
+  resEl.innerHTML = '⏳ جاري فحص الكود في قاعدة البيانات...';
+
+  // البحث أولاً في الذاكرة المحلية
+  let found = vouchersData.find(v => String(v.code).trim() === code);
+
+  // إذا لم نجده، نبحث مباشرة في Firestore
+  if (!found && window.db) {
+    try {
+      const snap = await window.db.collection('course_codes').doc(code).get({ source: 'server' });
+      if (snap.exists) {
+        found = { id: snap.id, code: snap.id, ...snap.data() };
+        vouchersData.unshift(found);
+        saveVouchersData();
+      }
+    } catch(e) {
+      console.warn('[verify] Firebase lookup failed:', e);
+    }
+  }
+
+  if (!found) {
+    resEl.style.background = 'rgba(239, 68, 68, 0.1)';
+    resEl.style.border = '1.5px solid #ef4444';
+    resEl.style.color = '#dc2626';
+    resEl.innerHTML = `
+      <div style="font-size:16px;font-weight:900;margin-bottom:6px">❌ الكود غير صحيح أو غير موجود</div>
+      <div style="font-size:13px">لم يتم العثور على الكود <code>${code}</code> في قاعدة البيانات. تأكد من إدخال 6 أرقام صحيحة.</div>
+    `;
+    return;
+  }
+
+  if (found.status === 'مستخدم') {
+    resEl.style.background = 'rgba(234, 88, 12, 0.1)';
+    resEl.style.border = '1.5px solid #ea580c';
+    resEl.style.color = '#c2410c';
+    resEl.innerHTML = `
+      <div style="font-size:16px;font-weight:900;margin-bottom:8px">🔒 الكود مُستخدم بالفعل</div>
+      <div style="font-size:13px;line-height:1.8">
+        <strong>الكورس:</strong> ${found.courseTitle || 'كورس'}<br>
+        <strong>الدفعة:</strong> ${found.batchName || 'الدفعة الأولى'}<br>
+        <strong>مُستخدم بواسطة الطالب:</strong> ${found.linkedStudentName || 'طالب'}<br>
+        <strong>رقم هاتف الطالب:</strong> ${found.linkedStudentPhone || '—'}<br>
+        <strong>تاريخ الاستخدام:</strong> ${found.usedAt || '—'}
+      </div>
+    `;
+  } else {
+    resEl.style.background = 'rgba(16, 185, 129, 0.1)';
+    resEl.style.border = '1.5px solid #10b981';
+    resEl.style.color = '#047857';
+    resEl.innerHTML = `
+      <div style="font-size:16px;font-weight:900;margin-bottom:8px">✅ الكود صالح ومتاح للتفعيل!</div>
+      <div style="font-size:13px;line-height:1.8">
+        <strong>الكود:</strong> <code style="font-size:18px;font-weight:900">${found.code}</code> (6 أرقام)<br>
+        <strong>الكورس المرتبط:</strong> ${found.courseTitle || 'كورس'}<br>
+        <strong>الدفعة:</strong> ${found.batchName || 'الدفعة الأولى'}<br>
+        <strong>تاريخ التوليد:</strong> ${found.createdAtFormatted || '—'}<br>
+        <strong>الحالة:</strong> متاح للاستخدام مرة واحدة من قِبل أي طالب.
+      </div>
+    `;
+  }
+}
+
+// ── زر التحديث اليدوي من السيرفر ──
+async function syncVouchersWithServer() {
+  const icon = document.getElementById('vcSyncIcon');
+  if (icon) icon.style.display = 'inline-block';
+  if (icon) icon.style.animation = 'spin 0.8s linear infinite';
+
+  await loadVouchersFromFirebase();
+  populateBatchFilters();
+  renderVouchersStats();
+  renderBatchesView();
+  renderVouchersTable();
+
+  if (icon) icon.style.animation = 'none';
+  if (typeof showNotification === 'function') {
+    showNotification('تمت مزامنة الأكواد مع السيرفر بنجاح ✅', 'success');
+  }
+}
+
+// ── الدالة الرئيسية لتهيئة صفحة الأكواد عند الفتح ──
+async function initVouchersPage() {
+  populateVoucherCourses();
+  renderVouchersStats();
+  populateBatchFilters();
+  renderBatchesView();
+  renderVouchersTable();
+
+  // جلب من Firebase في الخلفية
+  await loadVouchersFromFirebase();
+  populateBatchFilters();
+  renderVouchersStats();
+  renderBatchesView();
+  renderVouchersTable();
 }
 function doPrint() {
   window.print();
