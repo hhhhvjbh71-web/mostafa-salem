@@ -1899,7 +1899,8 @@
       padding: 0 14px;
       border-top: 0 solid var(--border);
       background: rgba(248, 250, 252, .55);
-      transition: max-height .38s cubic-bezier(.4, 0, .2, 1), padding .38s cubic-bezier(.4, 0, .2, 1);
+      transition: max-height .35s cubic-bezier(.4, 0, .2, 1), padding .35s cubic-bezier(.4, 0, .2, 1), opacity .25s ease;
+      opacity: 0;
     }
 
     [data-theme="dark"] .lecture-body {
@@ -1907,8 +1908,10 @@
     }
 
     .lecture-card.open .lecture-body {
+      max-height: 2500px;
       padding: 14px 14px 14px;
       border-top: 1px solid var(--border);
+      opacity: 1;
     }
 
     .lecture-body-inner {
@@ -4524,16 +4527,18 @@
     let _currentLessonRef = null;
     function setupContinueLessonButton(courseId, lessons, openedSet) {
       const nextLesson = lessons.find(ls => !openedSet.has(String(ls.id))) || lessons[lessons.length - 1];
-      _currentLessonRef = nextLesson ? { courseId, lessonId: nextLesson.id } : null;
+      _currentLessonRef = nextLesson ? { courseId, lessonId: String(nextLesson.id) } : null;
       const sub = document.getElementById('continueLessonSub');
       if (sub) sub.textContent = nextLesson ? nextLesson.title : 'لا يوجد دروس بعد';
     }
     function continueCurrentLesson() {
       if (!_currentLessonRef) { showNotification('لا يوجد درس متاح للمتابعة حالياً', 'error'); return; }
-      const card = document.querySelector(`.lecture-card[data-lesson-unit="${_currentLessonRef.lessonId}"]`);
+      const targetId = String(_currentLessonRef.lessonId);
+      const card = Array.from(document.querySelectorAll('.lecture-card'))
+        .find(c => String(c.getAttribute('data-lesson-unit')) === targetId);
       if (card) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        if (!card.classList.contains('open')) toggleLesson(_currentLessonRef.courseId, _currentLessonRef.lessonId);
+        if (!card.classList.contains('open')) toggleLesson(card, _currentLessonRef.courseId, targetId);
       }
     }
     function downloadCourseContent() {
@@ -4543,7 +4548,6 @@
     function escapeHTML(val) {
       return String(val ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[ch]));
     }
-    function escapeSel(v) { return window.CSS?.escape ? CSS.escape(String(v)) : String(v).replace(/["\\]/g, '\\$&'); }
     function fixDriveUrl(url) {
       if (!url) return url;
       const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
@@ -4562,12 +4566,14 @@
     };
 
     function renderContentItem(lessonId, item) {
+      const safeLessonId = escapeHTML(String(lessonId));
+      const safeLessonIdJs = String(lessonId).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
       if (item.type === 'video') {
         const safeId = String(item.id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         // حالة المشاهدة: completed (أخضر) / current (أزرق متحرك) / pending (رمادي)
         const status = item.watchStatus || 'pending';
         const statusIcon = status === 'completed' ? '<i class="fas fa-check"></i>' : '<i class="fas fa-play"></i>';
-        return `<div class="content-item type-video status-${status}" data-lesson="${lessonId}" data-segment="${escapeHTML(item.id)}" onclick="selectLessonSegment(${lessonId},'${safeId}')">
+        return `<div class="content-item type-video status-${status}" data-lesson="${safeLessonId}" data-segment="${escapeHTML(String(item.id))}" onclick="selectLessonSegment('${safeLessonIdJs}','${safeId}')">
       <span class="item-status-bar"></span>
       <div class="item-left">
         <span class="item-play-circle">${statusIcon}</span>
@@ -4589,7 +4595,7 @@
         const cls = item.locked ? 'content-item type-quiz locked' : 'content-item type-quiz';
         const safeQId = String(item.quizId).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const action = item.locked ? `showNotification('تم حل هذا الاختبار من قبل','error')` : `startQuiz('${safeQId}')`;
-        return `<div class="${cls}" data-lesson="${lessonId}" onclick="${action}">
+        return `<div class="${cls}" data-lesson="${safeLessonId}" onclick="${action}">
       <span class="item-status-bar ${item.locked ? 'bar-completed' : 'bar-pending'}"></span>
       <div class="item-left">
         <span class="item-play-circle ico-locked"><i class="fas ${item.locked ? 'fa-lock' : 'fa-pen-clip'}"></i></span>
@@ -4599,7 +4605,7 @@
     </div>`;
       }
       if (item.type === 'assignment') {
-        return `<div class="content-item type-assignment" data-lesson="${lessonId}" onclick="${item.onclick || ''}">
+        return `<div class="content-item type-assignment" data-lesson="${safeLessonId}" onclick="${item.onclick || ''}">
       <div class="item-left">
         <span class="item-ico-box"><i class="fas fa-list-check"></i></span>
         <span class="item-texts"><span class="it-title">${escapeHTML(item.title)}</span><span class="it-sub">واجب</span></span>
@@ -4608,7 +4614,7 @@
     </div>`;
       }
       if (item.type === 'review') {
-        return `<div class="content-item type-review" data-lesson="${lessonId}" onclick="${item.onclick || ''}">
+        return `<div class="content-item type-review" data-lesson="${safeLessonId}" onclick="${item.onclick || ''}">
       <div class="item-left">
         <span class="item-ico-box"><i class="fas fa-rotate"></i></span>
         <span class="item-texts"><span class="it-title">${escapeHTML(item.title)}</span><span class="it-sub">مراجعة</span></span>
@@ -4622,41 +4628,64 @@
     // ═══════════════════════════════════════════════════════════
     // TOGGLE LESSON ACCORDION
     // ═══════════════════════════════════════════════════════════
-    function toggleLesson(courseId, lessonId) {
-      if (!hasCourseAccess(courseId)) {
+    function toggleLesson(targetOrCourseId, maybeCourseId, maybeLessonId) {
+      let card = null;
+      let courseId = null;
+      let lessonId = null;
+
+      if (targetOrCourseId && targetOrCourseId.nodeType === 1) {
+        card = targetOrCourseId.closest('.lecture-card');
+        courseId = maybeCourseId || card?.dataset?.courseId || currentCourseId;
+        lessonId = maybeLessonId || card?.dataset?.lessonUnit || '';
+      } else {
+        courseId = targetOrCourseId || currentCourseId;
+        lessonId = String(maybeCourseId != null ? maybeCourseId : (maybeLessonId || ''));
+        if (lessonId) {
+          card = Array.from(document.querySelectorAll('.lecture-card'))
+            .find(c => String(c.getAttribute('data-lesson-unit')) === lessonId);
+        }
+      }
+
+      if (!card) return;
+
+      if (courseId && !hasCourseAccess(courseId)) {
         showNotification('🔒 يجب الاشتراك في الكورس أولاً', 'error');
         document.getElementById('accessGate')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
-      const card = document.querySelector(`.lecture-card[data-lesson-unit="${escapeSel(lessonId)}"]`);
-      if (card) {
-        const wasOpen = card.classList.contains('open');
-        card.classList.toggle('open');
-        animateAccordionBody(card, !wasOpen);
-        // Mark lesson as opened/visited for progress tracking
-        if (!wasOpen) {
-          saveOpenedLesson(courseId, lessonId);
-          // Recalculate progress
-          const courses = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
-          const course = courses.find(c => String(c.id) === String(courseId));
-          if (course && course.lessons) {
-            const opened = loadOpenedLessons(courseId);
-            updateProgress(opened.size, course.lessons.length);
-          }
+
+      const wasOpen = card.classList.contains('open');
+      card.classList.toggle('open');
+      animateAccordionBody(card, !wasOpen);
+
+      // Mark lesson as opened/visited for progress tracking
+      if (!wasOpen && lessonId) {
+        saveOpenedLesson(courseId, lessonId);
+        // Recalculate progress
+        const courses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+        const course = window.__currentCourse || courses.find(c => String(c.id) === String(courseId));
+        if (course && course.lessons) {
+          const opened = loadOpenedLessons(courseId);
+          updateProgress(opened.size, course.lessons.length);
         }
       }
     }
 
-    // أنيميشن ناعم للأكورديون عبر max-height (لا حركة مبالغ فيها، سريع)
+    // أنيميشن ناعم للأكورديون عبر max-height وتمدد سلس
     function animateAccordionBody(card, opening) {
       const body = card.querySelector('.lecture-body');
       if (!body) return;
       if (opening) {
-        body.style.maxHeight = body.scrollHeight + 'px';
-        // بعد انتهاء الترانزيشن نسمح للمحتوى بالتمدد الطبيعي لو تغيّر حجمه (فيديو محمّل لاحقاً مثلاً)
-        setTimeout(() => { if (card.classList.contains('open')) body.style.maxHeight = body.scrollHeight + 'px'; }, 400);
+        const fullH = Math.max(body.scrollHeight, 250);
+        body.style.maxHeight = fullH + 'px';
+        setTimeout(() => {
+          if (card.classList.contains('open')) body.style.maxHeight = 'none';
+        }, 360);
       } else {
-        body.style.maxHeight = '0px';
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          body.style.maxHeight = '0px';
+        });
       }
     }
 
@@ -4667,7 +4696,7 @@
       const courseId = parseInt(new URLSearchParams(location.search).get('course'), 10);
       if (!hasCourseAccess(courseId)) { showNotification('🔒 فعّل الكورس أولاً', 'error'); return; }
 
-      const courses = JSON.parse(localStorage.getItem('alamin_courses') || '[]');
+      const courses = Array.isArray(window.__allCourses) ? window.__allCourses : JSON.parse(localStorage.getItem('alamin_courses') || '[]');
       const course = window.__currentCourse || courses.find(c => String(c.id) === String(courseId));
       const lesson = course ? (course.lessons || []).find(l => String(l.id) === String(lessonId)) : null;
       if (!lesson) return;
@@ -4686,7 +4715,8 @@
       wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       document.querySelectorAll('.content-item').forEach(el => el.classList.remove('active'));
-      const sel = document.querySelector(`.content-item[data-lesson="${lessonId}"][data-segment="${escapeSel(seg.id)}"]`);
+      const allItems = Array.from(document.querySelectorAll('.content-item'));
+      const sel = allItems.find(el => el.getAttribute('data-lesson') === String(lessonId) && el.getAttribute('data-segment') === String(seg.id));
       if (sel) sel.classList.add('active');
 
       renderVideo(seg.videoUrl, seg);
@@ -5058,9 +5088,11 @@
             else it.watchStatus = 'pending';
           });
 
-          const safeLsId = escapeSel(ls.id || ('ls_' + i));
-          return `<div class="lecture-card" data-lesson-unit="${safeLsId}" data-unit-theme="${(i % 5) + 1}">
-        <div class="lecture-header" onclick="toggleLesson('${courseId}','${safeLsId}')">
+          const rawLsId = String(ls.id != null ? ls.id : ('ls_' + i));
+          const safeAttrId = escapeHTML(rawLsId);
+          const safeCourseId = escapeHTML(String(courseId));
+          return `<div class="lecture-card" data-lesson-unit="${safeAttrId}" data-course-id="${safeCourseId}" data-unit-theme="${(i % 5) + 1}">
+        <div class="lecture-header" onclick="toggleLesson(this, '${safeCourseId}', '${safeAttrId}')">
           <div class="lecture-num">${i + 1}</div>
           <div class="lecture-info">
             <div class="lecture-title">${escapeHTML(ls.title || ('الدرس ' + (i + 1)))}</div>
@@ -5072,10 +5104,10 @@
           </div>
           <div class="lecture-arrow"><i class="fas fa-chevron-down"></i></div>
         </div>
-        <div class="lecture-body" id="lessonBody_${safeLsId}">
+        <div class="lecture-body" id="lessonBody_${safeAttrId}">
           <div class="lecture-body-inner">
             ${items.length
-              ? items.map(item => renderContentItem(safeLsId, item)).join('')
+              ? items.map(item => renderContentItem(rawLsId, item)).join('')
               : '<div style="text-align:center;padding:16px;color:var(--text2);">⚠️ لا توجد محتويات لهذا الدرس بعد</div>'}
           </div>
         </div>
@@ -5090,11 +5122,12 @@
         updateProgress(openedSet.size, lessons.length);
         // Also restore open state visually (بدون أنيميشن لحظة التحميل)
         openedSet.forEach(lid => {
-          const card = document.querySelector(`.lecture-card[data-lesson-unit="${lid}"]`);
+          const card = Array.from(document.querySelectorAll('.lecture-card'))
+            .find(c => String(c.getAttribute('data-lesson-unit')) === String(lid));
           if (card) {
             card.classList.add('open');
             const body = card.querySelector('.lecture-body');
-            if (body) body.style.maxHeight = body.scrollHeight + 'px';
+            if (body) body.style.maxHeight = 'none';
           }
         });
 
