@@ -1,18 +1,18 @@
 // ============================================================
-// FIREBASE CONFIG — Mostafa Salem English Academy (moustafa-salem-elbatta)
+// FIREBASE CONFIG — Mostafa Salem English Academy (taninya-dea03)
 // Compat SDK build (matches firebase-app-compat.js / firestore-compat.js
 // / auth-compat.js / functions-compat.js already used across the project
 // — NOT the modular v9+ "firebase/app" import syntax).
 // ============================================================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD-n6H_HV04Lv0sFXZmqUgxGqfgEBzyq18",
-  authDomain: "moustafa-salem-elbatta.firebaseapp.com",
-  projectId: "moustafa-salem-elbatta",
-  storageBucket: "moustafa-salem-elbatta.firebasestorage.app",
-  messagingSenderId: "1064963048969",
-  appId: "1:1064963048969:web:967a520038a1e42fe75ad8",
-  measurementId: "G-HDC120H5M9"
+  apiKey: "AIzaSyCG6cBPsLRdSZc7r5mOo3hakVMguPI8gt0",
+  authDomain: "taninya-dea03.firebaseapp.com",
+  projectId: "taninya-dea03",
+  storageBucket: "taninya-dea03.firebasestorage.app",
+  messagingSenderId: "1014776531393",
+  appId: "1:1014776531393:web:7e35de769db3274e044740",
+  measurementId: "G-ETT283NP64"
 };
 
 firebase.initializeApp(firebaseConfig);
