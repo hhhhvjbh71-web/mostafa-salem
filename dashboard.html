@@ -7282,13 +7282,18 @@ async function generateVouchers() {
     for (let start = 0; start < batch.length; start += 400) {
       const firestoreBatch = window.db.batch();
       batch.slice(start, start + 400).forEach(voucher => {
-        firestoreBatch.create(window.db.collection('course_codes').doc(voucher.code), voucher);
+        // تم التحقق من عدم وجود الـ document قبل التوليد. `set` مدعومة في
+        // Firebase Compat على المتصفح، بعكس `create` المتاحة في بعض SDKs الأخرى.
+        firestoreBatch.set(window.db.collection('course_codes').doc(voucher.code), voucher);
       });
       await firestoreBatch.commit();
     }
   } catch (error) {
     console.error('[vouchers] Firebase write failed:', error);
-    showNotification('❌ تعذر حفظ الأكواد في Firebase. لم يتم اعتماد أي كود.', 'error');
+    const reason = error.code === 'permission-denied'
+      ? 'صلاحيات Firestore تمنع الكتابة. انشر قواعد Firestore في المشروع الجديد.'
+      : (error.message || error.code || 'تحقق من اتصال Firebase.');
+    showNotification('❌ تعذر حفظ الأكواد في Firebase: ' + reason, 'error');
     return;
   }
   vouchersData = [...batch, ...vouchersData];
