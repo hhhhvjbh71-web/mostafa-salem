@@ -3,7 +3,7 @@
 // Mr. Mostafa Salem
 // ============================================================
 
-const CACHE_VERSION = 'never-give-up-shell-v4';
+const CACHE_VERSION = 'never-give-up-shell-v5';
 const OFFLINE_URL = 'offline.html';
 
 const SHELL_ASSETS = [
@@ -15,7 +15,6 @@ const SHELL_ASSETS = [
   'lessons.html',
   'manifest.json',
   'offline.html',
-  'firebase-config.js',
   'i18n.js',
   'grade-mapping.js',
   'session-guard.js',
@@ -89,6 +88,13 @@ self.addEventListener('fetch', (event) => {
 
   // Third-party / Firebase requests: always go to network untouched.
   if (isThirdParty(url)) return;
+
+  // A stale Firebase configuration can point a browser at a different project
+  // and make all live collections look empty. Always fetch it from the network.
+  if (url.pathname.endsWith('/firebase-config.js')) {
+    event.respondWith(fetch(req));
+    return;
+  }
 
   // Same-origin static assets (icons, manifest, local scripts): cache-first.
   event.respondWith(

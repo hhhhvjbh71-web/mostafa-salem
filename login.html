@@ -1007,22 +1007,18 @@ document.getElementById('registerForm').addEventListener('submit', async functio
   };
   newUser.qrCode = newUser.id;
 
-  // حفظ محلي فوري
+  // لا ننشئ حساباً محلياً فقط: يجب تأكيد الحفظ في Firebase أولاً حتى يظهر
+  // في الداشبورد وعلى كل المتصفحات.
+  const synced = await syncStudentToFirebase(newUser);
+  btn.disabled = false; btn.textContent = '🎉 إنشاء الحساب';
+  if (!synced) {
+    return showError('تعذر حفظ الحساب في قاعدة البيانات. تحقق من الاتصال ثم أعد المحاولة.');
+  }
+
   users.push(newUser);
   saveUsers(users);
-
-  // حفظ الجلسة مباشرةً (تذكرني دائماً عند التسجيل)
   saveSession(newUser, true);
-
-  // مزامنة Firebase
-  const synced = await syncStudentToFirebase(newUser);
-  if (!synced) scheduleFirebaseRetry(newUser);
-
-  btn.disabled = false; btn.textContent = '🎉 إنشاء الحساب';
-  showSuccess(synced
-    ? 'تم إنشاء الحساب بنجاح! جاري التحويل...'
-    : 'تم إنشاء الحساب! سيتم المزامنة قريباً...'
-  );
+  showSuccess('تم إنشاء الحساب بنجاح! جاري التحويل...');
 
   // التحويل إلى الصفحة الرئيسية (index) بعد التسجيل
   setTimeout(() => { window.location.href = getNextUrl('index.html'); }, 1400);

@@ -2649,6 +2649,7 @@ let _coursesSyncVersion = 0;
         }
       }, (err) => {
         console.error('[courses-live] onSnapshot error on platform_courses:', err);
+        reportFirebaseSyncError(err);
         // fallback: استمع على courses_list index
         try {
           window.db.collection('platform_data').doc('courses_list')
@@ -2837,6 +2838,7 @@ function watchStudentsCollection(dbInstance, label) {
         if (badge) badge.textContent = allUsers.length;
       }, (err) => {
         console.error(`[students-live:${label}] onSnapshot error:`, err);
+        reportFirebaseSyncError(err);
       });
   } catch (e) {
     console.error(`[students-live:${label}] listener setup failed`, e);
@@ -2863,7 +2865,7 @@ async function pushCoursesToFirebase(coursesArray) {
     });
   }
   if (!window.db) {
-    console.warn('[Firebase] db not ready within 2.5s, saved to localStorage');
+    console.warn('[Firebase] db not ready within 2.5s; course was not saved');
     return false;
   }
 
@@ -2878,7 +2880,6 @@ async function pushCoursesToFirebase(coursesArray) {
       return false;
     }
 
-    const existingSnap = await window.db.collection('platform_courses').get();
     // FIX — تحقق من وجود id صحيح لكل كورس قبل الكتابة على Firestore.
     // كورس بدون id بيتكتب بـ doc id = "undefined" ومش بيظهر في index.html.
     const validItems = cleanItems.filter(course => {
@@ -2888,7 +2889,6 @@ async function pushCoursesToFirebase(coursesArray) {
       }
       return true;
     });
-    const nextIds = new Set(validItems.map(c => String(c.id)));
     const batch = window.db.batch();
     validItems.forEach(course => {
       batch.set(window.db.collection('platform_courses').doc(String(course.id)), {
@@ -2896,25 +2896,26 @@ async function pushCoursesToFirebase(coursesArray) {
         updatedAt: Date.now()
       }, { merge: true });
     });
-    existingSnap.forEach(doc => {
-      if (!nextIds.has(String(doc.id))) batch.delete(doc.ref);
-    });
+    await batch.commit();
 
-    // استخدم validItems للـ index أيضاً (نفس الفلتر)
-    const validIndexItems = getCourseIndexPayload(validItems);
-    const indexRef = window.db.collection('platform_data').doc('courses_list');
-    batch.set(indexRef, {
-      items: validIndexItems,
+    // لا نستخدم قائمة المتصفح لحذف مستندات موجودة على السيرفر: قد يكون جهاز آخر
+    // أضاف كورساً قبل أن تصل له الـ snapshot. نعيد بناء الفهرس من المصدر الفعلي.
+    const serverSnap = await window.db.collection('platform_courses').get({ source: 'server' });
+    const serverCourses = [];
+    serverSnap.forEach(doc => {
+      const data = doc.data();
+      if (data && data.id) serverCourses.push(data);
+    });
+    await window.db.collection('platform_data').doc('courses_list').set({
+      items: getCourseIndexPayload(serverCourses),
       updatedAt: Date.now()
     });
 
-    await batch.commit();
     _coursesDirty = false;
-    console.log('[Firebase] ✅ courses saved successfully —', validItems.length, 'full courses + index');
+    console.log('[Firebase] ✅ courses saved successfully —', validItems.length, 'course(s) written and index rebuilt from server');
     return true;
   } catch(e) {
     console.warn('[Firebase] write note:', e.message);
-    // تم الحفظ محلياً بالفعل في saveCourses
     return false;
   }
 }
@@ -3009,6 +3010,22 @@ function showNotification(msg, type){
   el.style.cssText = `background:var(--card-bg,#fff);border:1.5px solid ${c2.border};color:${c2.color};background-color:${c2.bg};border-radius:12px;padding:10px 20px;font-size:.85rem;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.15);font-family:'Tajawal',sans-serif;animation:dashToastIn .3s ease;pointer-events:none;white-space:nowrap;`;
   c.appendChild(el);
   setTimeout(() => el.remove(), 3000);
+}
+
+let _firebaseErrorWasShown = false;
+function reportFirebaseSyncError(err) {
+  console.error('[Firebase sync]', err);
+  if (_firebaseErrorWasShown) return;
+  _firebaseErrorWasShown = true;
+  const message = String((err && err.message) || '');
+  const apiDisabled = err && err.code === 'permission-denied' &&
+    /Firestore API has not been used|Firestore API.*disabled/i.test(message);
+  showNotification(
+    apiDisabled
+      ? '🔴 خدمة Cloud Firestore معطّلة في مشروع Firebase. فعّلها من Firebase Console ثم حدّث الصفحة.'
+      : '🔴 تعذر الاتصال بقاعدة Firebase. راجع الإنترنت وقواعد Firestore.',
+    'error'
+  );
 }
 if (!document.getElementById('dash-toast-style')) {
   const styleTag = document.createElement('style');
@@ -3148,19 +3165,19 @@ function getJsonSizeBytes(value){
 async function saveCourses(c){
   _coursesDirty = true;
   const cleanCourses = getPublishedCoursePayload(c);
-  // Always update in-memory and local storage immediately
-  courses = cleanCourses;
+  // Firestore هو المصدر الأساسي: لا نعلن نجاحاً محلياً قبل تأكيد الكتابة على السيرفر.
   try {
-    localStorage.setItem('alamin_courses', JSON.stringify(cleanCourses));
-    localStorage.setItem('alamin_courses_updated', Date.now().toString());
-    localStorage.setItem('alamin_courses_initialized', '1');
-  } catch(e) {
-    console.warn('[Courses] LocalStorage write error:', e);
-  }
-
-  // Then sync with Firebase (if available)
-  try {
-    return await pushCoursesToFirebase(cleanCourses);
+    const synced = await pushCoursesToFirebase(cleanCourses);
+    if (!synced) return false;
+    courses = cleanCourses;
+    try {
+      localStorage.setItem('alamin_courses', JSON.stringify(cleanCourses));
+      localStorage.setItem('alamin_courses_updated', Date.now().toString());
+      localStorage.setItem('alamin_courses_initialized', '1');
+    } catch(e) {
+      console.warn('[Courses] Local cache write error:', e);
+    }
+    return true;
   } catch(e) {
     console.warn('[Courses] Firebase sync error:', e);
     return false;
@@ -3542,7 +3559,7 @@ async function saveEditedLesson(){
 
   const ok = await saveCourses(cs);
   if(ok) showNotification('✅ تم حفظ التعديلات ونشرها للطلاب', 'success');
-  else showNotification('✅ تم الحفظ محلياً — تحقق من الاتصال', 'warning');
+  else showNotification('❌ تعذر نشر التعديلات في Firebase؛ لم يتم اعتمادها.', 'error');
   closeModal('editLessonModal');
   renderCoursesAdmin();
 }
@@ -4095,11 +4112,30 @@ async function applyCourseOrder(id){
 }
 async function deleteCourse(id){
   if(!confirm('حذف هذا الكورس؟')) return;
-  courses=courses.filter(c=>c.id!=id);
-  const ok = await saveCourses(courses);
-  renderCoursesAdmin();
-  if(ok) showNotification('🗑️ تم حذف الكورس وتحديث Firebase بنجاح', 'success');
-  else showNotification('🗑️ تم الحذف محلياً — تأكد من اتصال الإنترنت', 'warning');
+  if (!window.db) {
+    showNotification('❌ Firebase غير متاح؛ لم يتم حذف الكورس محلياً.', 'error');
+    return;
+  }
+  try {
+    await window.db.collection('platform_courses').doc(String(id)).delete();
+    const serverSnap = await window.db.collection('platform_courses').get({ source: 'server' });
+    const serverCourses = [];
+    serverSnap.forEach(doc => {
+      const data = doc.data();
+      if (data && data.id) serverCourses.push(data);
+    });
+    await window.db.collection('platform_data').doc('courses_list').set({
+      items: getCourseIndexPayload(serverCourses),
+      updatedAt: Date.now()
+    });
+    courses = serverCourses;
+    localStorage.setItem('alamin_courses', JSON.stringify(courses));
+    renderCoursesAdmin();
+    showNotification('🗑️ تم حذف الكورس من Firebase وتحديث كل الأجهزة', 'success');
+  } catch (e) {
+    console.error('[deleteCourse] Firebase delete failed:', e);
+    showNotification('❌ لم يتم حذف الكورس من قاعدة البيانات: ' + (e.message || e.code || ''), 'error');
+  }
 }
 
 function openEditCourse(id){
