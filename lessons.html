@@ -4774,31 +4774,29 @@
           } catch (e) { console.warn('[playerjs]', e); startVpTimeTracking(videoId); }
         } else { startVpTimeTracking(videoId); }
 
-        // 2) YouTube — مشغّل معزول بأقصى حماية ممكنة من سياسات يوتيوب
+        // 2) YouTube — مشغّل يوتيوب رسمي وسريع
       } else if (v.includes('youtube') || v.includes('youtu.be')) {
         let id = '';
-        if (v.includes('watch')) { const m = v.match(/[?&]v=([^&]+)/); id = m ? m[1] : ''; }
-        else { const m = v.match(/youtu\.be\/([^?&]+)/); id = m ? m[1] : v.split('/').pop().split('?')[0]; }
+        const vTrim = v.trim();
+        const watchMatch = vTrim.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+        const shortMatch = vTrim.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+        const embedMatch = vTrim.match(/(?:embed|shorts|live|v)\/([a-zA-Z0-9_-]{11})/);
+        if (watchMatch) id = watchMatch[1];
+        else if (shortMatch) id = shortMatch[1];
+        else if (embedMatch) id = embedMatch[1];
+        else {
+          const fallbackMatch = vTrim.match(/([a-zA-Z0-9_-]{11})/);
+          if (fallbackMatch) id = fallbackMatch[1];
+        }
 
         if (!id) { vpEl.innerHTML = '<div style="padding:48px;text-align:center;color:#94a3b8">رابط الفيديو غير صحيح</div>'; return; }
 
-        // استخدام youtube-nocookie.com + معاملات إخفاء العناصر
-        const ytSrc = `https://www.youtube-nocookie.com/embed/${id}`
-          + `?modestbranding=1`   // تقليل ظهور شعار يوتيوب
-          + `&rel=0`              // بدون فيديوهات مقترحة من قنوات أخرى
-          + `&showinfo=0`         // إخفاء معلومات الفيديو
-          + `&iv_load_policy=3`   // إخفاء التعليقات التوضيحية
-          + `&color=white`        // شريط التقدم أبيض بدلاً من أحمر
-          + `&playsinline=1`      // تشغيل داخل الصفحة على iOS
-          + `&disablekb=0`        // السماح باختصارات لوحة المفاتيح الأساسية
-          + `&fs=1`               // السماح بوضع ملء الشاشة
-          + `&controls=1`;        // إظهار أدوات التحكم الأساسية
+        const originParam = location.protocol.startsWith('http') ? `&origin=${encodeURIComponent(location.origin)}` : '';
+        const ytSrc = `https://www.youtube.com/embed/${id}?rel=0&playsinline=1&modestbranding=1&enablejsapi=1&color=white&iv_load_policy=3${originParam}`;
 
         vpEl.innerHTML = `
       <div style="position:relative;width:100%;height:100%;border-radius:14px;overflow:hidden;background:#000">
-        <!-- طبقة شفافة فوق شعار يوتيوب في الزاوية العلوية اليسرى -->
-        <div style="position:absolute;top:0;left:0;width:180px;height:48px;z-index:10;pointer-events:none;background:transparent"></div>
-        <!-- طبقة تمنع النقر على عنوان الفيديو في الأعلى -->
+        <!-- طبقة تمنع النقر على عنوان الفيديو في الأعلى للخروج من المنصة -->
         <div style="position:absolute;top:0;left:0;right:0;height:44px;z-index:10;pointer-events:all;cursor:default;background:transparent"
              onclick="return false;" ondblclick="return false;"></div>
 
@@ -4807,13 +4805,12 @@
           style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px"
           allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;fullscreen"
           allowfullscreen
-          referrerpolicy="no-referrer-when-downgrade"
-          sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups-to-escape-sandbox"
+          referrerpolicy="strict-origin-when-cross-origin"
           loading="lazy"
           title="فيديو الدرس"></iframe>
       </div>`;
 
-        // تتبع وقت المشاهدة تقريبياً للطالب (بدون API)
+        // تتبع وقت المشاهدة تقريبياً للطالب
         startVpTimeTracking('yt_' + id);
 
         // 3) Direct video
