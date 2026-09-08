@@ -5061,7 +5061,7 @@
           created: course.created || '',
           updated: course.updated || '',
           lessonCount,
-          lessons: Array.from({ length: lessonCount }, () => ({}))
+          lessons: Array.isArray(course.lessons) && course.lessons.length ? course.lessons : []
         };
       });
     }
