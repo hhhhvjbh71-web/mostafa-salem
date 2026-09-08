@@ -1493,16 +1493,16 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
         <div class="table-card" style="padding:28px">
           <h3 style="font-size:19px;font-weight:900;margin-bottom:24px">🔧 توليد أكواد تفعيل جديدة</h3>
           <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--text2)">
-            💡 كود التفعيل يُستخدم داخل الكورس نفسه لفتحه — لا علاقة له بتسجيل الدخول. كل كود مربوط باسم طالب واحد فقط ولا يصلح لطالب آخر.
+            💡 اختر الكورس وحدد عدد الأكواد. كل كود مكوّن من 6 أرقام ويُستخدم مرة واحدة فقط لتفعيل الكورس المختار.
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:20px">
-            <div class="modal-form">
+          <div style="display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:20px">
+            <div class="modal-form" style="display:none">
               <div class="form-group">
                 <label>اسم الشهر / الفترة</label>
                 <input type="text" id="vcMonth" placeholder="مثال: شهر نوفمبر 2026" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
               </div>
             </div>
-            <div class="modal-form">
+            <div class="modal-form" style="display:none">
               <div class="form-group">
                 <label>الصف الدراسي</label>
                 <select id="vcGrade" onchange="populateVoucherCourses();toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
@@ -1520,7 +1520,7 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
               <div class="form-group">
                 <label>الكورس</label>
                 <select id="vcCourseId" onchange="toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
-                  <option value="">اختر الصف أولاً</option>
+                  <option value="">اختر الكورس</option>
                 </select>
               </div>
             </div>
@@ -1528,8 +1528,8 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
 
           <div id="vcTrackInfo" style="display:none;margin-bottom:20px;padding:12px 18px;border-radius:10px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);font-size:14px;font-weight:700;color:#7c3aed"></div>
 
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px">
-            <div class="modal-form">
+          <div style="display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:24px">
+            <div class="modal-form" style="display:none">
               <div class="form-group">
                 <label>طريقة توليد الأكواد</label>
                 <select id="vcGenType" onchange="toggleGenType()" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
@@ -1540,8 +1540,8 @@ body, .sidebar-logo-text, .topbar-title, .stat-val, .table-search input,
             </div>
             <div id="vcCountWrap" class="modal-form">
               <div class="form-group">
-                <label id="vcCountLabel">عدد الطلاب المطابقين</label>
-                <input type="number" id="vcCount" value="0" min="1" max="2000" readonly style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
+                <label id="vcCountLabel">عدد الأكواد المطلوبة</label>
+                <input type="number" id="vcCount" value="20" min="1" max="500" style="padding:12px 14px;border:2px solid var(--border);border-radius:10px;width:100%;font-family:'Tajawal',sans-serif;font-size:14px;background:var(--bg);color:var(--text);outline:none">
               </div>
             </div>
           </div>
@@ -6937,6 +6937,19 @@ function sameCourseStudentVoucher(voucher, courseId, studentId) {
 function saveVouchersData() {
   localStorage.setItem('alamin_vouchers', JSON.stringify(vouchersData));
 }
+async function loadVouchersFromFirebase() {
+  if (!window.db) return false;
+  try {
+    const snapshot = await window.db.collection('course_codes').get({ source: 'server' });
+    vouchersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    saveVouchersData();
+    return true;
+  } catch (error) {
+    console.warn('[vouchers] Firebase load failed:', error);
+    showNotification('⚠️ تعذر تحميل أكواد التفعيل من Firebase.', 'error');
+    return false;
+  }
+}
 function normalizeImportedStudentGrade(data) {
   // يفوّض لـ grade-mapping.js (متاح كـ window global)
   if (window.normalizeGrade) {
@@ -7030,6 +7043,7 @@ async function syncCenterStudentsFromFirebase() {
 }
 async function initVouchersPage() {
   await syncCenterStudentsFromFirebase();
+  await loadVouchersFromFirebase();
   populateVoucherCourses();
   populateVoucherStudents();
   populatePrintCourseOptions();
@@ -7098,29 +7112,9 @@ function updateVcTrackInfo(course) {
     : `📌 هذا الكورس مخصص لطلاب "${track}" فقط — سيتم توليد الأكواد لهم فقط دون الشُعبة الأخرى.`;
 }
 function toggleGenType() {
-  const genType = document.getElementById('vcGenType')?.value || 'students';
-  const grade = document.getElementById('vcGrade').value;
   const courseId = document.getElementById('vcCourseId').value;
   const course = courses.find(c => String(c.id) === String(courseId));
   updateVcTrackInfo(course);
-
-  const countWrap = document.getElementById('vcCountWrap');
-  const studentListWrap = document.getElementById('vcStudentListWrap');
-  const countLabel = document.getElementById('vcCountLabel');
-  const countInput = document.getElementById('vcCount');
-  if(genType === 'list') {
-    countWrap.style.display = 'none';
-    studentListWrap.style.display = 'block';
-    populateVoucherStudents();
-  } else {
-    countWrap.style.display = 'block';
-    studentListWrap.style.display = 'none';
-    countLabel.textContent = 'عدد الطلاب المطابقين';
-    const matching = grade ? getMatchingStudentsForCourse(grade, course) : [];
-    const remaining = course ? filterStudentsMissingCourseCode(matching, course.id) : matching;
-    countInput.value = remaining.length || 0;
-    countInput.readOnly = true;
-  }
 }
 function selectAllStudents(selectAll) {
   document.querySelectorAll('.vc-student-checkbox').forEach(cb => cb.checked = selectAll);
@@ -7136,15 +7130,14 @@ function getSelectedStudentIds() {
 function populateVoucherCourses() {
   const select = document.getElementById('vcCourseId');
   if(!select) return;
-  const grade = document.getElementById('vcGrade')?.value || '';
-  const filteredCourses = grade ? courses.filter(c => String(c.grade) === String(grade)) : [];
-  select.innerHTML = '<option value="">' + (grade ? 'اختر الكورس' : 'اختر الصف أولاً') + '</option>' +
-    filteredCourses.map(c => {
+  const selectedCourseId = select.value;
+  select.innerHTML = '<option value="">اختر الكورس</option>' +
+    courses.map(c => {
       const isSecondary = typeof isSecondaryGrade === 'function' ? isSecondaryGrade(c.grade) : ['1','2','3'].includes(c.grade);
       const trackSuffix = isSecondary && c.track && c.track !== 'both' ? ` - ${c.track}` : '';
       return `<option value="${c.id}">${c.title}${trackSuffix} (${c.type==='paid' ? 'مدفوع' : 'مجاني'})</option>`;
     }).join('');
-  if(filteredCourses.length === 1) select.value = filteredCourses[0].id;
+  if (courses.some(c => String(c.id) === String(selectedCourseId))) select.value = selectedCourseId;
 }
 function populateVoucherStudents() {
   const wrap = document.getElementById('vcStudentCheckList');
@@ -7186,26 +7179,30 @@ function renderVouchersStats() {
   document.getElementById('vcUnused').textContent = unused;
   document.getElementById('vcThisMonth').textContent = thisMonthCount;
 }
-function generateUniqueCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code;
-  do {
-    code = Array.from({ length: 8 }, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
-  } while (vouchersData.some(v => v.code === code));
-  return code;
+async function generateUniqueCode(takenCodes) {
+  const taken = takenCodes || new Set(vouchersData.map(v => String(v.code)));
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const values = new Uint32Array(6);
+    crypto.getRandomValues(values);
+    const code = Array.from(values, value => String(value % 10)).join('');
+    if (taken.has(code)) continue;
+    const remote = await window.db.collection('course_codes').doc(code).get({ source: 'server' });
+    if (!remote.exists) return code;
+  }
+  throw new Error('تعذر إنشاء كود فريد؛ حاول مرة أخرى.');
 }
-function buildStudentVoucher(user, course, month, fallbackGrade, offset = 0) {
+function buildCourseVoucher(code, course, offset = 0) {
   return {
-    id: Date.now() + offset,
-    code: generateUniqueCode(),
-    month,
-    grade: user ? user.grade : fallbackGrade,
+    id: code,
+    code,
+    month: '',
+    grade: course.grade || 'all',
     courseId: course ? course.id : '',
     courseTitle: course ? course.title : 'غير مرتبط بكورس',
-    linkedStudentId: user ? user.id : '',
-    linkedStudentName: user ? user.name : 'غير مرتبط',
-    linkedStudentPhone: user ? (user.phone || '') : '',
-    linkedStudentTrack: user ? (user.track || '') : '',
+    linkedStudentId: '',
+    linkedStudentName: '',
+    linkedStudentPhone: '',
+    linkedStudentTrack: '',
     date: new Date().toLocaleDateString('ar-EG'),
     createdAt: new Date().toISOString(),
     status: 'غير مستخدم'
@@ -7267,30 +7264,31 @@ async function exportPlatformCourseCodesToSystem() {
   alert(`تم تصدير ${exportable.length} كود للسيستم بنجاح.`);
 }
 async function generateVouchers() {
-  const month = document.getElementById('vcMonth').value.trim() || 'غير محدد';
-  const grade = document.getElementById('vcGrade').value;
   const courseId = document.getElementById('vcCourseId').value;
-  const course = courses.find(c => c.id.toString() === courseId);
-  const genType = document.getElementById('vcGenType').value;
-  const selectedStudentIds = getSelectedStudentIds();
-  let batch = [];
-  if (!month || month === 'غير محدد') { alert('اكتب اسم الشهر / الفترة أولاً'); return; }
-  if (!grade) { alert('اختار الصف الدراسي أولاً'); return; }
+  const course = courses.find(c => String(c.id) === String(courseId));
+  const count = Number.parseInt(document.getElementById('vcCount').value, 10);
   if (!course) { alert('اختار كورس من كورسات الصف المحدد'); return; }
-  if (genType === 'list') {
-    if (!selectedStudentIds.length) { alert('اختر طالب واحد على الأقل'); return; }
-    const users = getUsers();
-    const selectedUsers = selectedStudentIds.map(studentId => users.find(u => u.id.toString() === studentId)).filter(Boolean);
-    const missingUsers = filterStudentsMissingCourseCode(selectedUsers, course.id);
-    batch = missingUsers.map((user, i) => buildStudentVoucher(user, course, month, grade, i));
-  } else {
-    const matching = getMatchingStudentsForCourse(grade, course);
-    const users = filterStudentsMissingCourseCode(matching, course.id);
-    if (!users.length) { alert('لا يوجد طلاب متطابقين مع الصف والشُعبة المحددة، أو كلهم لديهم أكواد بالفعل.'); return; }
-    batch = users.map((user, i) => buildStudentVoucher(user, course, month, grade, i));
+  if (!Number.isInteger(count) || count < 1 || count > 500) { alert('اكتب عدد أكواد من 1 إلى 500.'); return; }
+  if (!window.db) { showNotification('❌ Firebase غير متاح؛ لم يتم إنشاء أكواد محلية.', 'error'); return; }
+
+  const taken = new Set(vouchersData.map(v => String(v.code)));
+  const batch = [];
+  for (let i = 0; i < count; i++) {
+    const code = await generateUniqueCode(taken);
+    taken.add(code);
+    batch.push(buildCourseVoucher(code, course, i));
   }
-  if (!batch.length) {
-    alert('كل الطلاب المختارين لديهم أكواد بالفعل لهذا الكورس. لم يتم توليد أكواد جديدة.');
+  try {
+    for (let start = 0; start < batch.length; start += 400) {
+      const firestoreBatch = window.db.batch();
+      batch.slice(start, start + 400).forEach(voucher => {
+        firestoreBatch.create(window.db.collection('course_codes').doc(voucher.code), voucher);
+      });
+      await firestoreBatch.commit();
+    }
+  } catch (error) {
+    console.error('[vouchers] Firebase write failed:', error);
+    showNotification('❌ تعذر حفظ الأكواد في Firebase. لم يتم اعتماد أي كود.', 'error');
     return;
   }
   vouchersData = [...batch, ...vouchersData];
@@ -7304,11 +7302,11 @@ async function generateVouchers() {
     const grid = document.getElementById('vcPreviewGrid');
     preview.style.display = 'block';
     grid.innerHTML = batch.slice(0, 10).map(v => `
-      <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-weight:700;font-family:'monospace'">${v.linkedStudentName}: ${v.code}</span>
+      <span style="display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-weight:700;font-family:'monospace'">${v.code}</span>
     `).join('');
   }
   toggleGenType();
-  alert(`تم توليد ${batch.length} كود تفعيل بنجاح! كل كود مرتبط باسم طالب ولا يصلح إلا له.`);
+  alert(`تم توليد وحفظ ${batch.length} كود تفعيل في Firebase بنجاح.`);
 }
 function renderVouchersTable() {
   const tbody = document.getElementById('vouchersTableBody');

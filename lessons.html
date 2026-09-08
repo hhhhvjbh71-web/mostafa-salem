@@ -2106,7 +2106,7 @@ function updateProgress(done, total){
 let currentCourseId   = null;
 let currentLessonId   = null;
 let currentSegmentId  = null;
-const paymentReceiverNumber = '01022704969';
+const paymentReceiverNumber = '';
 
 // ═══════════════════════════════════════════════════════════
 // SYNC ENROLLED COURSES FROM FIRESTORE
@@ -2283,27 +2283,20 @@ function getCourseDiscountInfo(course){
 // VOUCHER & PAYMENT
 // ═══════════════════════════════════════════════════════════
 async function findVoucherByCode(code){
-  const local = JSON.parse(localStorage.getItem('alamin_vouchers')||'[]');
-  const li    = local.findIndex(v => v.code === code && v.status === 'غير مستخدم');
-  if(li > -1) return { voucher: local[li], source:'local', localVouchers: local, localIndex: li };
-  if(!window.db) return null;
-  const snap = await window.db.collection('course_codes').where('code','==',code).limit(1).get();
-  if(snap.empty) return null;
-  const doc  = snap.docs[0];
-  return { voucher:{ id:doc.id, ...doc.data() }, source:'firebase', docRef: doc.ref };
+  if (!/^\d{6}$/.test(code) || !window.db) return null;
+  const direct = await window.db.collection('course_codes').doc(code).get({ source: 'server' });
+  if (direct.exists) return { voucher:{ id:direct.id, ...direct.data() }, source:'firebase', docRef: direct.ref };
+  return null;
 }
 async function markVoucherUsed(match, user, courseId){
-  if(match.source === 'local'){
-    match.localVouchers[match.localIndex].status = 'مستخدم';
-    match.localVouchers[match.localIndex].usedAt = new Date().toISOString();
-    match.localVouchers[match.localIndex].usedBy = user?.phone || '';
-    localStorage.setItem('alamin_vouchers', JSON.stringify(match.localVouchers));
-    return;
-  }
-  await match.docRef.set({
-    status:'مستخدم', usedAt:new Date().toISOString(),
-    usedBy: user?.phone || user?.id || '', usedCourseId: courseId
-  }, { merge:true });
+  await window.db.runTransaction(async transaction => {
+    const fresh = await transaction.get(match.docRef);
+    if (!fresh.exists || fresh.data().status === 'مستخدم') throw new Error('الكود مستخدم بالفعل');
+    transaction.update(match.docRef, {
+      status:'مستخدم', usedAt:new Date().toISOString(),
+      usedBy: user?.phone || user?.id || '', usedCourseId: String(courseId)
+    });
+  });
 }
 
 function switchActivationTab(tab){
@@ -2419,8 +2412,10 @@ function copyPaymentNumber(suffix){
 
 async function verifyCourseCode(courseId){
   const code = document.getElementById('voucherCodeInput')?.value.trim().toUpperCase();
-  if(!code){ showNotification('اكتب كود التفعيل أولاً','error'); return; }
-  const match   = await findVoucherByCode(code);
+  if(!/^\d{6}$/.test(code)){ showNotification('اكتب كوداً من 6 أرقام بالإنجليزية.', 'error'); return; }
+  let match;
+  try { match = await findVoucherByCode(code); }
+  catch (error) { showNotification('تعذر التحقق من الكود في Firebase. حاول مرة أخرى.', 'error'); return; }
   const voucher = match?.voucher;
   if(!voucher){ showNotification('الكود غير صحيح أو مستخدم بالفعل','error'); return; }
   if(voucher.status === 'مستخدم'){ showNotification('الكود مستخدم بالفعل','error'); return; }
@@ -2431,7 +2426,8 @@ async function verifyCourseCode(courseId){
   if(voucher.linkedStudentId && voucher.linkedStudentId !== (user?.phone || user?.id)){
     showNotification('هذا الكود مخصّص لطالب آخر','error'); return;
   }
-  await markVoucherUsed(match, user, courseId);
+  try { await markVoucherUsed(match, user, courseId); }
+  catch (error) { showNotification(error.message || 'تعذر استخدام الكود؛ حاول مرة أخرى.', 'error'); return; }
   grantAccess(courseId);
   await syncStudentCourseAccess(user, courseId);
   showNotification('✅ تم تفعيل الكورس بنجاح!','ok');
@@ -3224,65 +3220,17 @@ async function renderCoursePage(){
         <div class="gate-box">
           <div class="gate-icon">🔒</div>
           <div class="gate-title">محتوى الكورس مغلق</div>
-          <p class="gate-desc">هذا الكورس بتكلفة <strong>${course.price||'غير محدد'} ج.م</strong>. فعّل الكورس بكود التفعيل أو أرسل تفاصيل التحويل.</p>
-          <div class="act-tabs">
-            <button class="act-tab active" id="tabBtnTransfer" onclick="switchActivationTab('transfer')">💳 فودافون كاش</button>
-            <button class="act-tab" id="tabBtnCode" onclick="switchActivationTab('code')">🔑 كود التفعيل</button>
+          <p class="gate-desc">فعّل الكورس باستخدام كود التفعيل الذي استلمته من الإدارة.</p>
+          <div class="gate-input-group">
+            <label>كود التفعيل</label>
+            <input id="voucherCodeInput" class="gate-input" inputmode="numeric" maxlength="6" placeholder="مثال: 123456" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)" style="text-align:center;letter-spacing:3px;font-weight:800;" dir="ltr">
           </div>
-          <div id="tabContentCode" style="display:none;">
-            <div class="gate-input-group">
-              <label>كود التفعيل</label>
-              <input id="voucherCodeInput" class="gate-input" placeholder="أدخل الكود (مثال: XXXXXXXX)" oninput="this.value=this.value.toUpperCase()" style="text-align:center;letter-spacing:2px;font-weight:800;">
-            </div>
-            <button id="checkVoucherBtn" class="btn-gate-action">تفعيل الكود ✅</button>
-          </div>
-          <div id="tabContentTransfer" style="display:block; position:relative;">
-            <div id="transferLockOverlay" class="transfer-lock-overlay">
-              <div class="transfer-lock-icon">🔒</div>
-              <div class="transfer-lock-text">يجب قراءة تنبيه فودافون كاش أولاً</div>
-              <button type="button" class="btn-gate-action" onclick="openVodafoneWarningModal()">عرض التنبيه ⚠️</button>
-            </div>
-            <div id="transferFormFields" class="transfer-form-fields">
-              <div class="pay-info-box">
-                <div class="pay-info-title">⚠️ حوّل المبلغ أولاً ثم أرسل الطلب:</div>
-                <p style="color:var(--text2);font-size:.82rem;margin-top:6px;">قيمة الاشتراك: <strong>${course.price||'غير محدد'} ج.م</strong></p>
-                <div class="pay-num-row">
-                  <span class="pay-number" id="payNum_lessons">${paymentReceiverNumber}</span>
-                  <button class="btn-copy" onclick="copyPaymentNumber('lessons')"><span>📋</span><span id="copyText_lessons">نسخ الرقم</span></button>
-                </div>
-              </div>
-              <div class="gate-input-group">
-                <label>رقم المحفظة التي حوّلت منها</label>
-                <input id="paymentPhoneInput" class="gate-input" type="tel" placeholder="01xxxxxxxxx">
-              </div>
-              <div class="gate-input-group">
-                <label>المبلغ المحوّل (ج.م)</label>
-                <input id="paymentAmountInput" class="gate-input" type="number" min="0" placeholder="أدخل المبلغ">
-              </div>
-              <div class="gate-input-group">
-                <label>كود العملية (Reference Number) 🧾</label>
-                <input id="paymentTxCodeInput" class="gate-input" type="text" placeholder="مثال: 020635548453" dir="ltr" style="font-family:monospace;letter-spacing:1px;">
-                <small style="color:var(--text2);font-size:.78rem;display:block;margin-top:5px;">موجود في رسالة التأكيد من فودافون كاش</small>
-              </div>
-              <div class="pay-review-note">
-                ✅ بعد إدخال البيانات اضغط على إرسال طلب التفعيل.<br>
-                ⏳ سيتم مراجعة عملية الدفع وتفعيل الكورس خلال مدة تصل إلى 6 ساعات كحد أقصى.<br>
-                يرجى عدم إرسال أكثر من طلب لنفس عملية الدفع.
-              </div>
-              <button id="submitPaymentBtn" class="btn-gate-action">إرسال طلب التفعيل 🚀</button>
-            </div>
-          </div>
+          <button id="checkVoucherBtn" class="btn-gate-action">تفعيل الكود</button>
         </div>`;
-      setTimeout(()=>{
-        document.getElementById('checkVoucherBtn')?.addEventListener('click', ()=>verifyCourseCode(courseId));
-        document.getElementById('submitPaymentBtn')?.addEventListener('click', ()=>submitCoursePaymentRequest(courseId));
-        // التبويب الافتراضي هو فودافون كاش — يظهر تنبيه إجباري قبل إتاحة نموذج الدفع
-        if(!window.__vodafoneWarningConfirmed){
-          openVodafoneWarningModal();
-        } else {
-          unlockTransferForm();
-        }
+      setTimeout(() => {
+        document.getElementById('checkVoucherBtn')?.addEventListener('click', () => verifyCourseCode(courseId));
       }, 50);
+      return;
     }
 
   } else if(!hasAccess && course.type === 'free'){
