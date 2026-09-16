@@ -20,7 +20,7 @@
 'use strict';
 
 // يُحدَّث تلقائياً بواسطة update-version.sh / update-version.ps1
-const CACHE_VERSION = '20260916-0300';
+const CACHE_VERSION = '20260916-1130';
 const CACHE_NAME = 'mostafa-salem-pwa-' + CACHE_VERSION;
 
 // أصول أساسية يتم تجهيزها مسبقاً (App Shell) لدعم فتح أسرع وعمل بسيط Offline
@@ -29,8 +29,8 @@ const PRECACHE_URLS = [
     './index.html',
     './style.css',
     './manifest.json',
-    './icons/icon-192.png',
-    './icons/icon-512.png'
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // نطاقات لا يجب على الـ Service Worker التعرض لطلباتها إطلاقاً

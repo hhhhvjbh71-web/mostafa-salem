@@ -64,7 +64,7 @@
             '<div class="pwa-sheet-backdrop"></div>' +
             '<div class="pwa-sheet" role="document">' +
                 '<button class="pwa-sheet-close" aria-label="Close" type="button">&times;</button>' +
-                '<div class="pwa-sheet-icon"><img src="icons/icon-192.png" alt="" width="64" height="64"></div>' +
+                '<div class="pwa-sheet-icon"><img src="icon-192.png" alt="" width="64" height="64"></div>' +
                 '<h3 class="pwa-sheet-title">' + (isIosMode ? '📱 Install Mr. Mostafa Salem' : '📱 Install Mr. Mostafa Salem') + '</h3>' +
                 '<p class="pwa-sheet-desc">Get faster access from your home screen — open lessons, exams, and homework in one tap.</p>' +
                 (isIosMode
