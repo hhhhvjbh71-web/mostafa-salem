@@ -7314,3 +7314,164 @@ p { color: var(--text-secondary); line-height: 1.8; }
     cursor: default;
     pointer-events: auto;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PWA INSTALL PROMPT — Bottom Sheet / Modal
+   ═══════════════════════════════════════════════════════════════ */
+#pwa-install-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: var(--font-en, 'Inter', sans-serif);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+#pwa-install-modal.pwa-sheet-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.pwa-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+.pwa-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto var(--space-lg, 16px);
+  background: var(--surface, #FFFFFF);
+  border-radius: 24px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 -8px 40px rgba(15, 23, 42, 0.25), 0 24px 60px rgba(15, 23, 42, 0.15);
+  text-align: center;
+  transform: translateY(24px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#pwa-install-modal.pwa-sheet-visible .pwa-sheet {
+  transform: translateY(0);
+}
+@media (min-width: 640px) {
+  #pwa-install-modal { align-items: center; }
+  .pwa-sheet { margin-bottom: 0; }
+}
+
+.pwa-sheet-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-alt, #F5F1E8);
+  color: var(--text-secondary, #64748B);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.pwa-sheet-close:hover { background: rgba(14, 165, 233, 0.14); color: var(--primary-600, #0284C7); }
+
+.pwa-sheet-icon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 14px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.28);
+}
+.pwa-sheet-icon img { width: 100%; height: 100%; display: block; object-fit: cover; }
+
+.pwa-sheet-title {
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text-primary, #0F172A);
+  margin: 0 0 8px;
+}
+.pwa-sheet-desc {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--text-secondary, #64748B);
+  margin: 0 0 20px;
+}
+
+.pwa-btn-primary {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #F97316, #EA580C);
+  color: #FFFFFF;
+  font-family: var(--font-heading, 'Poppins', sans-serif);
+  font-weight: 700;
+  font-size: 0.98rem;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(249, 115, 22, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.pwa-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(249, 115, 22, 0.42); }
+
+.pwa-btn-secondary {
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #64748B);
+  font-family: var(--font-en, 'Inter', sans-serif);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.pwa-btn-secondary:hover { color: var(--text-primary, #0F172A); }
+
+.pwa-ios-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+  background: var(--bg-alt, #F5F1E8);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.pwa-ios-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: var(--text-primary, #0F172A);
+  line-height: 1.5;
+}
+.pwa-ios-step-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0EA5E9, #0369A1);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pwa-ios-share-glyph {
+  display: inline-block;
+  font-weight: 900;
+  color: var(--primary-600, #0284C7);
+}
+
+[data-theme="dark"] .pwa-sheet { background: var(--surface, #111827); }
+[data-theme="dark"] .pwa-sheet-close { background: rgba(255,255,255,0.08); }
+[data-theme="dark"] .pwa-ios-steps { background: rgba(255,255,255,0.06); }

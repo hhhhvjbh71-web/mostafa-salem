@@ -17,6 +17,17 @@
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://siond-a6c34.web.app/">
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json?v=20260916-0300">
+  <meta name="theme-color" content="#0EA5E9">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mostafa Salem">
+  <meta name="mobile-web-app-capable" content="yes">
+
   <meta property="og:type" content="website">
   <meta property="og:locale" content="en_US">
   <meta property="og:site_name" content="Mr. Mostafa Salem — English Teaching Platform">
@@ -80,7 +91,7 @@
     })();
   </script>
 
-  <link rel="stylesheet" href="style.css?v=20260913-1900">
+  <link rel="stylesheet" href="style.css?v=20260916-0300">
 
   <!-- ═══════════════════════════════════════════════════════════
          شاشة التحميل — هوية مستر مصطفى سالم
@@ -490,24 +501,36 @@
          ════════════════════════════════════════════════ -->
 
   <!-- 1. إعداد Firebase -->
-  <script src="firebase-config.js?v=20260913-1900"></script>
-  <script src="firebase-service.js?v=20260913-1900"></script>
+  <script src="firebase-config.js?v=20260916-0300"></script>
+  <script src="firebase-service.js?v=20260916-0300"></script>
 
   <!-- 2. البيانات والمنطق المشترك -->
-  <script src="data.js?v=20260913-1900"></script>
+  <script src="data.js?v=20260916-0300"></script>
 
   <!-- 3. قوالب HTML — مفصولة عن المنطق -->
-  <script src="templates.js?v=20260913-1900"></script>
+  <script src="templates.js?v=20260916-0300"></script>
 
   <!-- 4. الجسر مع الداشبورد -->
-  <script src="dashboard-bridge.js?v=20260913-1900"></script>
+  <script src="dashboard-bridge.js?v=20260916-0300"></script>
 
   <!-- 5. التطبيق الرئيسي -->
-  <script src="app.js?v=20260913-1900"></script>
+  <script src="app.js?v=20260916-0300"></script>
+
+  <!-- 5.5 PWA — Service Worker + نافذة التثبيت -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function (err) {
+          console.warn('[PWA] Service Worker registration failed:', err);
+        });
+      });
+    }
+  </script>
+  <script src="pwa-install.js?v=20260916-0300"></script>
 
   <!-- 6. Cache Busting — يجب أن يكون آخر script -->
   <!-- يتحقق تلقائياً من version.json ويُعيد التحميل عند وجود تحديث -->
-  <script src="cache-buster.js?v=20260913-1900"></script>
+  <script src="cache-buster.js?v=20260916-0300"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
          زر لوحة التحكم + نافذة كلمة المرور (202020)
