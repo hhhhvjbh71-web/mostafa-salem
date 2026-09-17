@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════
 //  firebase-service.js — خدمة الربط بقاعدة بيانات Google Firebase
 //  منصة مستر مصطفى سالم لتعليم اللغة الإنجليزية
-//  Project: taninya-dea03
+//  Project: mostafa-salem-manassa
 // ═══════════════════════════════════════════════════════════════════════
 
 (function (global) {
@@ -9,13 +9,13 @@
 
     // ── إعدادات Firebase الخاصة بالمشروع ──────────────────────────────
     const firebaseConfig = {
-        apiKey: "AIzaSyCG6cBPsLRdSZc7r5mOo3hakVMguPI8gt0",
-        authDomain: "taninya-dea03.firebaseapp.com",
-        projectId: "taninya-dea03",
-        storageBucket: "taninya-dea03.firebasestorage.app",
-        messagingSenderId: "1014776531393",
-        appId: "1:1014776531393:web:7e35de769db3274e044740",
-        measurementId: "G-ETT283NP64"
+        apiKey: "AIzaSyCW5RSPCMLq19j5NANHcl9Qv7mqNIwFklo",
+        authDomain: "mostafa-salem-manassa.firebaseapp.com",
+        projectId: "mostafa-salem-manassa",
+        storageBucket: "mostafa-salem-manassa.firebasestorage.app",
+        messagingSenderId: "873973892260",
+        appId: "1:873973892260:web:eea1968fbbdec4e63e9231",
+        measurementId: "G-H3D7D7H5PJ"
     };
 
     let firebaseApp = null;
@@ -55,7 +55,7 @@
             window.firebase = firebase;
             firebaseAuth = firebase.auth ? firebase.auth() : null;
             isInitialized = true;
-            console.log('🔥 [Firebase] Connected successfully to project: taninya-dea03');
+            console.log('🔥 [Firebase] Connected successfully to project: mostafa-salem-manassa');
 
             // بدء المزامنة الحية للبيانات
             startRealtimeSync();

@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════
 //  firebase-config.js — إعداد Firebase وتهيئة window.db
 //  منصة مستر مصطفى سالم لتعليم اللغة الإنجليزية
-//  Project: taninya-dea03
+//  Project: mostafa-salem-manassa
 // ═══════════════════════════════════════════════════════════════════════
 //  هذا الملف يُحمَّل مرة واحدة في <head> قبل أي script آخر يعتمد على Firebase.
 //  يُعرِّف window.db (Firestore) و window.firebase لاستخدامها في الداشبورد.
@@ -12,13 +12,13 @@
 
     // ── إعدادات مشروع Firebase الرسمي ──────────────────────────────────
     var firebaseConfig = {
-        apiKey:            "AIzaSyCG6cBPsLRdSZc7r5mOo3hakVMguPI8gt0",
-        authDomain:        "taninya-dea03.firebaseapp.com",
-        projectId:         "taninya-dea03",
-        storageBucket:     "taninya-dea03.firebasestorage.app",
-        messagingSenderId: "1014776531393",
-        appId:             "1:1014776531393:web:7e35de769db3274e044740",
-        measurementId:     "G-ETT283NP64"
+        apiKey:            "AIzaSyCW5RSPCMLq19j5NANHcl9Qv7mqNIwFklo",
+        authDomain:        "mostafa-salem-manassa.firebaseapp.com",
+        projectId:         "mostafa-salem-manassa",
+        storageBucket:     "mostafa-salem-manassa.firebasestorage.app",
+        messagingSenderId: "873973892260",
+        appId:             "1:873973892260:web:eea1968fbbdec4e63e9231",
+        measurementId:     "G-H3D7D7H5PJ"
     };
 
     // ── تهيئة Firebase مرة واحدة فقط ──────────────────────────────────
@@ -51,7 +51,7 @@
                 });
             } catch(e) {}
 
-            console.log('🔥 [firebase-config] ✅ Firebase جاهز — project: taninya-dea03 | db:', !!window.db);
+            console.log('🔥 [firebase-config] ✅ Firebase جاهز — project: mostafa-salem-manassa | db:', !!window.db);
 
             // ── جلب الكورسات فوراً لأي زائر (بدون شرط تسجيل دخول) ──────────
             // هذا يضمن ظهور الكورسات في الصفحة الرئيسية حتى في Incognito
