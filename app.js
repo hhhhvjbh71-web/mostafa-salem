@@ -467,7 +467,7 @@
                 </div>
                 <div class="footer-col">
                     <h4>Contact Us</h4>
-                    <a href="https://wa.me/201000000000" target="_blank" rel="noopener">📱 WhatsApp Support</a>
+                    <a href="https://wa.me/201022500404" target="_blank" rel="noopener">📱 WhatsApp Support</a>
                     <a href="#" target="_blank" rel="noopener">💬 Telegram Channel</a>
                     <a href="#" target="_blank" rel="noopener">📘 Facebook Page</a>
                     <a href="#login">🔑 Student Login</a>
@@ -484,7 +484,7 @@
                     <button class="footer-admin-btn" onclick="openDashModal()" title="Admin">Admin</button>
                 </div>
                 <div class="footer-social">
-                    <a href="https://wa.me/201000000000" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>
+                    <a href="https://wa.me/201022500404" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">💬</a>
                     <a href="#" aria-label="Telegram" title="Telegram">✈️</a>
                     <a href="#" aria-label="Facebook" title="Facebook">📘</a>
                 </div>
@@ -680,7 +680,7 @@
                         </div>
                         <div style="display:flex;gap:12px;flex-wrap:wrap;">
                             <a href="#courses" class="btn btn-primary btn-lg">Browse Courses &rarr;</a>
-                            <a href="https://wa.me/201000000000" target="_blank" rel="noopener" class="btn btn-outline btn-lg">💬 Contact Mr. Mostafa</a>
+                            <a href="https://wa.me/201022500404" target="_blank" rel="noopener" class="btn btn-outline btn-lg">💬 Contact Mr. Mostafa</a>
                         </div>
                     </div>
                 </div>
@@ -751,7 +751,7 @@
         </section>
 
         <!-- Floating WhatsApp Support Button -->
-        <a href="https://wa.me/201000000000" target="_blank" rel="noopener" class="floating-support-btn" title="Contact us via WhatsApp">
+        <a href="https://wa.me/201022500404" target="_blank" rel="noopener" class="floating-support-btn" title="Contact us via WhatsApp">
             <span class="floating-support-icon">💬</span>
             <span>Contact Support</span>
         </a>
@@ -1187,8 +1187,8 @@
                                         <span class="iq-prem-step-num">1</span>
                                         <span>Transfer fee (<strong>${course.price || 0} EGP</strong>) to:<br>
                                         <span class="iq-prem-vf-num"
-                                              onclick="navigator.clipboard && navigator.clipboard.writeText('01220222307').then(function(){ showToast('Number copied', 'success'); })"
-                                              title="Click to copy">📱 01220222307 <small>📋</small></span></span>
+                                              onclick="navigator.clipboard && navigator.clipboard.writeText('01022500404').then(function(){ showToast('Number copied', 'success'); })"
+                                              title="Click to copy">📱 01022500404 <small>📋</small></span></span>
                                     </div>
                                     <div class="iq-prem-step-row">
                                         <span class="iq-prem-step-num">2</span>
@@ -4080,11 +4080,11 @@
             '👤 Student Name: ' + name + '\n' +
             (phone ? '📱 Phone: ' + phone + '\n' : '') +
             '💰 Amount: ' + priceStr + ' EGP\n' +
-            '📲 Paid via Vodafone Cash: 01220222307\n\n' +
+            '📲 Paid via Vodafone Cash: 01022500404\n\n' +
             '(I will attach payment receipt in the next message)';
 
         var encoded = encodeURIComponent(message);
-        var waUrl = 'https://wa.me/201220222307?text=' + encoded;
+        var waUrl = 'https://wa.me/201022500404?text=' + encoded;
         window.open(waUrl, '_blank', 'noopener,noreferrer');
     };
 
@@ -5135,7 +5135,7 @@
                 id: 'admin_builtin',
                 name: 'Mr. Mostafa Salem',
                 email: ADMIN_EMAIL,
-                phone: '01000000000',
+                phone: '01022500404',
                 grade: 'Admin',
                 password: ADMIN_PASSWORD,
                 enrolledCourses: [],

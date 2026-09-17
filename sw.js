@@ -20,7 +20,7 @@
 'use strict';
 
 // يُحدَّث تلقائياً بواسطة update-version.sh / update-version.ps1
-const CACHE_VERSION = '20260916-1130';
+const CACHE_VERSION = '20260916-1400';
 const CACHE_NAME = 'mostafa-salem-pwa-' + CACHE_VERSION;
 
 // أصول أساسية يتم تجهيزها مسبقاً (App Shell) لدعم فتح أسرع وعمل بسيط Offline

@@ -185,7 +185,7 @@ window.Templates = (function () {
                         </div>
                         <div style="display:flex;gap:12px;flex-wrap:wrap;">
                             <a href="#courses" class="btn btn-primary btn-lg">Browse Courses &rarr;</a>
-                            <a href="https://wa.me/201000000000" target="_blank" rel="noopener"
+                            <a href="https://wa.me/201022500404" target="_blank" rel="noopener"
                                 class="btn btn-outline btn-lg">💬 Contact Mr. Mostafa</a>
                         </div>
                     </div>
@@ -611,7 +611,7 @@ window.Templates = (function () {
                 </div>
                 <div class="footer-col">
                     <h4>Contact Us</h4>
-                    <a href="https://wa.me/201000000000" target="_blank" rel="noopener">📱 WhatsApp Support</a>
+                    <a href="https://wa.me/201022500404" target="_blank" rel="noopener">📱 WhatsApp Support</a>
                     <a href="#" target="_blank" rel="noopener">💬 Telegram Channel</a>
                     <a href="#" target="_blank" rel="noopener">📘 Facebook Page</a>
                     <a href="#login">🔑 Student Login</a>
@@ -620,7 +620,7 @@ window.Templates = (function () {
             <div class="footer-bottom">
                 <span>&copy; ${year} ${config.fullName}. All rights reserved.</span>
                 <div class="footer-social">
-                    <a href="https://wa.me/201000000000" target="_blank" rel="noopener"
+                    <a href="https://wa.me/201022500404" target="_blank" rel="noopener"
                         aria-label="WhatsApp" title="WhatsApp">💬</a>
                     <a href="#" aria-label="Telegram" title="Telegram">✈️</a>
                     <a href="#" aria-label="Facebook" title="Facebook">📘</a>
