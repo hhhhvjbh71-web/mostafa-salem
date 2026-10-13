@@ -7475,3 +7475,39 @@ p { color: var(--text-secondary); line-height: 1.8; }
 [data-theme="dark"] .pwa-sheet { background: var(--surface, #111827); }
 [data-theme="dark"] .pwa-sheet-close { background: rgba(255,255,255,0.08); }
 [data-theme="dark"] .pwa-ios-steps { background: rgba(255,255,255,0.06); }
+
+/* ═══ Lesson page: sections are stacked (video → PDF → quiz → notes); the tab buttons just scroll to them ═══ */
+.lesson-tab-pane { scroll-margin-top: 90px; }
+.pdf-viewer-block .pdf-title a:hover { text-decoration: underline; }
+@media (max-width: 768px) {
+  .pdf-viewer-block .pdf-actions { padding: 12px 14px; }
+}
+
+/* ═══ Protected lesson video player (YouTube driven by the platform's own controls) ═══ */
+.lp-stage { position: absolute; inset: 0; background: #000; border-radius: inherit; overflow: hidden; direction: ltr; }
+.lp-host, .lp-host iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: inherit; }
+.lp-host { z-index: 1; }
+/* transparent layer over the whole video: no click can reach YouTube's logo / channel / title / end-screen links */
+.lp-guard { position: absolute; inset: 0; z-index: 3; background: transparent; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+.lp-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #0b0f19; color: #fff; text-align: center; padding: 20px; }
+.lp-loading { z-index: 2; }
+.lp-msg { z-index: 4; }
+.lp-boot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0b0f19; }
+.lp-spinner { width: 46px; height: 46px; border: 4px solid rgba(255,255,255,0.12); border-top-color: #F59E0B; border-radius: 50%; animation: lp-spin 0.8s linear infinite; }
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+.lp-controls { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 28px 14px 10px; color: #fff; background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0)); transition: opacity 0.25s ease; }
+.lp-stage.lp-idle .lp-controls { opacity: 0; pointer-events: none; }
+.lp-stage.lp-idle .lp-guard { cursor: none; }
+.lp-btn { min-width: 38px; height: 34px; padding: 0 10px; border: 0; border-radius: 10px; background: rgba(255,255,255,0.12); color: #fff; font-size: 1rem; font-family: inherit; font-weight: 800; cursor: pointer; line-height: 1; }
+.lp-btn:hover { background: rgba(245,158,11,0.85); }
+.lp-time { font-size: 0.8rem; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lp-seek { flex: 1; min-width: 60px; accent-color: #F59E0B; cursor: pointer; }
+.lp-vol { width: 72px; accent-color: #F59E0B; cursor: pointer; }
+.lp-stage:fullscreen, .lp-stage:-webkit-full-screen { border-radius: 0; width: 100%; height: 100%; }
+.lp-stage.lp-pseudo-fs { position: fixed; inset: 0; z-index: 9999; border-radius: 0; }
+@media (max-width: 600px) {
+  .lp-vol { display: none; }
+  .lp-controls { gap: 6px; padding: 24px 8px 8px; }
+  .lp-btn { min-width: 34px; height: 32px; padding: 0 8px; }
+  .lp-time { font-size: 0.72rem; }
+}

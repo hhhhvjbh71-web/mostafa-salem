@@ -266,12 +266,45 @@
         }
     }
 
+    // ── مزامنة الاختبارات (collection: quizzes) ──────────────────────
+    // الداشبورد بيحفظ الاختبارات في Firestore (quizzes) وفي localStorage بتاعه هو بس.
+    // من غير الاستماع ده، جهاز الطالب مكانش بيلاقي الاختبار المرتبط بالدرس أبداً
+    // (getQuizById بتقرأ من iraqiplatform_quizzes). هنا بننزّلها ونكتبها في نفس المفتاح.
+    const QUIZZES_KEY = 'iraqiplatform_quizzes';
+
+    function applyQuizzesSnapshot(snapshot) {
+        const list = [];
+        snapshot.forEach(doc => list.push(Object.assign({ id: doc.id }, doc.data())));
+        if (list.length === 0) return;   // ما نمسحش النسخة المحلية لو الرد فاضي
+        try {
+            localStorage.setItem(QUIZZES_KEY, JSON.stringify(list));
+            window.dispatchEvent(new CustomEvent('iraqiQuizzesUpdated'));
+        } catch (e) {
+            console.warn('[FirebaseService] quizzes cache error:', e.message);
+        }
+    }
+
+    function startQuizzesSync() {
+        if (!firestoreDb) return;
+        try {
+            firestoreDb.collection('quizzes').onSnapshot(
+                applyQuizzesSnapshot,
+                err => console.warn('[FirebaseService] quizzes snapshot error:', err.message)
+            );
+        } catch (e) {
+            console.warn('[FirebaseService] quizzes sync setup error:', e.message);
+        }
+    }
+
     // ── Realtime Listeners ───────────────────────────────────────────
     function startRealtimeSync() {
         if (!firestoreDb) return;
 
         // ─ المصدر الأساسي: platform_data/courses_list (يكتب فيها الداشبورد) ─
         startPlatformDataSync();
+
+        // الاختبارات المرتبطة بالدروس (عشان زرار Start Quiz يلاقي الأسئلة)
+        startQuizzesSync();
 
         // استماع للتحديثات في collection courses (للتوافق مع firebase-service القديم)
         try {
@@ -342,6 +375,9 @@
         codes: {
             sync: syncCodesFromFirestore,
             save: saveCodeToFirestore
+        },
+        quizzes: {
+            start: startQuizzesSync
         }
     };
 

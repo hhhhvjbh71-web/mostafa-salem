@@ -20,7 +20,7 @@
 'use strict';
 
 // يُحدَّث تلقائياً بواسطة update-version.sh / update-version.ps1
-const CACHE_VERSION = '20260917-1015';
+const CACHE_VERSION = '20261013-0946';
 const CACHE_NAME = 'mostafa-salem-pwa-' + CACHE_VERSION;
 
 // أصول أساسية يتم تجهيزها مسبقاً (App Shell) لدعم فتح أسرع وعمل بسيط Offline
@@ -41,7 +41,11 @@ const NEVER_INTERCEPT_PATTERNS = [
     /googleapis\.com/i,
     /gstatic\.com/i,
     /google-analytics\.com/i,
-    /googletagmanager\.com/i
+    /googletagmanager\.com/i,
+    /youtube\.com/i,
+    /youtube-nocookie\.com/i,
+    /ytimg\.com/i,
+    /googlevideo\.com/i
 ];
 
 function shouldBypass(request) {

@@ -29,6 +29,7 @@
                 const user = JSON.parse(raw);
                 if (user && user.id && (user.name || user.phone)) {
                     currentUser = user;
+                    window.currentUser = user;
                     isLoggedIn = true;
                 }
             }
@@ -38,12 +39,14 @@
     function saveSession(user) {
         localStorage.setItem(SESSION_KEY, JSON.stringify(user));
         currentUser = user;
+        window.currentUser = user;
         isLoggedIn = true;
     }
 
     function clearSession() {
         localStorage.removeItem(SESSION_KEY);
         currentUser = null;
+        window.currentUser = null;
         isLoggedIn = false;
     }
 
@@ -94,99 +97,22 @@
         window.location.hash = hash;
     }
 
-    // loadLessonIframe: plays YouTube video inside the platform after thumbnail click
-    window.loadLessonIframe = function(embedUrl, thumbEl) {
-        if (!embedUrl) return;
-        var container = document.getElementById('lessonVideoEmbedContainer');
-        if (!container) return;
-
-        // Show loading spinner
-        container.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#0a0a0a;border-radius:14px;flex-direction:column;gap:14px;">' +
-            '<div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.1);border-top-color:#F59E0B;border-radius:50%;animation:spin 0.8s linear infinite;"></div>' +
-            '<span style="color:rgba(255,255,255,0.5);font-size:0.85rem;">Loading video...</span></div>';
-
-        var sep = embedUrl.indexOf('?') > -1 ? '&' : '?';
-        var _origin = window.location.origin && window.location.origin !== 'null' ? window.location.origin : '';
-        var playUrl = embedUrl + sep + 'autoplay=1' + (_origin ? '&origin=' + encodeURIComponent(_origin) : '');
-
-        var shields = [
-            '<div class="yt-shield yt-shield-top" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-            '<div class="yt-shield yt-shield-tr" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-            '<div class="yt-shield yt-shield-tl" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-            '<div class="yt-shield yt-shield-br" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-            '<div class="yt-shield yt-shield-bl" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>'
-        ].join('');
-
-        var iframe = document.createElement('iframe');
-        iframe.frameBorder = '0';
-        iframe.allowFullscreen = true;
-        iframe.setAttribute('allow', 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-forms allow-popups');
-        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;z-index:1;display:none;';
-
-        var _handled = false;
-        var _errTimer = null;
-
-        // Detect YT error 150/151/153 via postMessage
-        function _onYTMsg(e) {
-            if (_handled) return;
-            try {
-                var d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-                var errCode = d && d.info && d.info.error;
-                if (errCode === 150 || errCode === 151 || errCode === 153) {
-                    _handled = true;
-                    clearTimeout(_errTimer);
-                    window.removeEventListener('message', _onYTMsg);
-                    window._showEmbedError(container, embedUrl);
-                }
-            } catch(_e) {}
-        }
-        window.addEventListener('message', _onYTMsg);
-
-        iframe.onload = function() {
-            if (_handled) return;
-            iframe.style.display = '';
-            container.innerHTML = '';
-            container.appendChild(iframe);
-            container.insertAdjacentHTML('beforeend', shields);
-            _errTimer = setTimeout(function() {
-                window.removeEventListener('message', _onYTMsg);
-            }, 5000);
-        };
-
-        iframe.onerror = function() {
-            if (!_handled) { _handled = true; window._showEmbedError(container, embedUrl); }
-        };
-
-        iframe.src = playUrl;
-        container.appendChild(iframe);
-    };
-
-    window._showEmbedError = function(container, embedUrl) {
-        var m = (embedUrl || '').match(/embed\/([A-Za-z0-9_-]{11})/);
-        var ytId = m ? m[1] : '';
-        container.innerHTML =
-            '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;' +
-            'background:linear-gradient(135deg,#0f0f0f,#1a1a2e);border-radius:14px;padding:32px;text-align:center;gap:16px;">' +
-            '<div style="font-size:3rem;">&#127910;</div>' +
-            '<h3 style="color:#fff;margin:0;font-size:1.1rem;font-weight:800;">Video unavailable for embedding</h3>' +
-            '<p style="color:rgba(255,255,255,0.5);margin:0;font-size:0.85rem;max-width:320px;line-height:1.6;">' +
-            'The video owner must enable embedding in YouTube Studio.</p>' +
-            '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:14px 20px;font-size:0.82rem;' +
-            'color:rgba(255,255,255,0.65);max-width:360px;text-align:right;direction:rtl;line-height:2;">' +
-            '<strong style="color:#F59E0B;">&#128272; للمدرس/المسؤول:</strong><br>' +
-            '&#9312; افتح YouTube Studio<br>' +
-            '&#9313; اختر الفيديو &larr; Edit<br>' +
-            '&#9314; More Options &larr; فعّل <strong>Allow embedding &#9989;</strong><br>' +
-            '&#9315; احفظ وانتظر دقيقتين' +
-            '</div>' +
-            '</div>';
-    };
-
-
-
     // ── Page Renderer ───────────────────────────────────────────
+    // <script> tags inserted via innerHTML are NOT executed by the browser.
+    // The quiz page ships its whole logic (select answer, next/prev, submit, grading) in an inline <script>,
+    // so we re-create those tags to make them run.
+    function runInlineScripts(root) {
+        if (!root) return;
+        root.querySelectorAll('script').forEach(function (old) {
+            var fresh = document.createElement('script');
+            for (var i = 0; i < old.attributes.length; i++) {
+                fresh.setAttribute(old.attributes[i].name, old.attributes[i].value);
+            }
+            fresh.text = old.textContent;
+            old.parentNode.replaceChild(fresh, old);
+        });
+    }
+
     function renderPage(page, params) {
         const content = document.getElementById('app-content');
         const footer = document.getElementById('main-footer');
@@ -211,6 +137,8 @@
                 content.innerHTML = renderLessonPage(params[0], params[1]);
                 footer.style.display = 'none';
                 initLessonPage();
+                initLessonVideoPlayer();
+                scrollToPendingLessonSection();
                 break;
             case 'license':
                 content.innerHTML = renderLicensePage(params[0]);
@@ -252,6 +180,7 @@
             case 'test':
                 // test/quizId/courseId/lessonId
                 content.innerHTML = renderTestPage(params[0], params[1], params[2]);
+                runInlineScripts(content);
                 footer.style.display = 'none';
                 window.scrollTo(0, 0);
                 break;
@@ -1844,6 +1773,15 @@
         const hasQuiz = Boolean(lesson.quizId != null && lesson.quizId !== '');
         const segments = sanitizeLessonSegments(lesson.segments);
 
+        // Build each section once. Video is hidden when the lesson has only a PDF / quiz;
+        // PDF and quiz are shown directly under the video (no hidden tabs).
+        window._lessonPageCtx = { lesson: lesson, courseId: courseId };
+        const videoHTML = renderLessonVideoBlock(lesson, hasPdf || hasQuiz);
+        const hasVideo = videoHTML !== '';
+        const pdfHTML = hasPdf ? renderLessonPdfBlock(lesson) : '';
+        const quizHTML = hasQuiz ? renderQuizContent(lesson, courseId) : '';
+        const firstTab = hasVideo ? 'video' : (pdfHTML ? 'pdf' : (quizHTML ? 'quiz' : 'overview'));
+
         // استرجاع ملاحظات الطالب المحفوظة للدرس
         const noteKey = 'iraqi_note_' + courseId + '_' + (lesson.id || lesson.lessonId);
         const savedNote = localStorage.getItem(noteKey) || '';
@@ -1893,6 +1831,7 @@
                                         <span class="sl-duration">${l.duration || ''}</span>
                                     </div>`;
         }).join('')}
+                                ${renderPackageExtraRows(pkg, pi, courseId, 'sidebar')}
                             </div>
                         </div>
                     `).join('')}
@@ -1914,7 +1853,7 @@
                         <div>
                             <h1 class="lesson-title" style="margin:0 0 8px;">${lesson.title}</h1>
                             <div class="lesson-meta-row">
-                                <span class="badge badge-primary">🎥 Video Lecture</span>
+                                ${hasVideo ? `<span class="badge badge-primary">🎥 Video Lecture</span>` : ''}
                                 ${lesson.duration ? `<span class="lesson-duration">⏱️ ${lesson.duration}</span>` : ''}
                                 ${hasPdf ? `<span class="badge badge-danger" style="cursor:pointer;" onclick="switchLessonTab('pdf')">📄 PDF Notes</span>` : ''}
                                 ${hasQuiz ? `<span class="badge badge-accent" style="cursor:pointer;" onclick="switchLessonTab('quiz')">📝 Quiz Available</span>` : ''}
@@ -1923,42 +1862,43 @@
                     </div>
                 </div>
 
-                <!-- ═══════════ LESSON TABS BAR ═══════════ -->
+                <!-- ═══════════ LESSON TABS BAR (jump links) ═══════════ -->
                 <div class="lesson-tabs-nav" id="lessonTabsNav">
-                    <button class="lesson-tab-btn active" id="ltab-btn-video" onclick="switchLessonTab('video')">
+                    ${hasVideo ? `
+                    <button class="lesson-tab-btn ${firstTab === 'video' ? 'active' : ''}" id="ltab-btn-video" onclick="switchLessonTab('video')">
                         <span class="lt-icon">🎥</span> Video Lecture
-                    </button>
-                    ${hasPdf ? `
-                    <button class="lesson-tab-btn" id="ltab-btn-pdf" onclick="switchLessonTab('pdf')">
+                    </button>` : ''}
+                    ${pdfHTML ? `
+                    <button class="lesson-tab-btn ${firstTab === 'pdf' ? 'active' : ''}" id="ltab-btn-pdf" onclick="switchLessonTab('pdf')">
                         <span class="lt-icon">📄</span> Notes &amp; PDF
                     </button>` : ''}
-                    ${hasQuiz ? `
-                    <button class="lesson-tab-btn" id="ltab-btn-quiz" onclick="switchLessonTab('quiz')">
+                    ${quizHTML ? `
+                    <button class="lesson-tab-btn ${firstTab === 'quiz' ? 'active' : ''}" id="ltab-btn-quiz" onclick="switchLessonTab('quiz')">
                         <span class="lt-icon">📝</span> Quiz &amp; Practice
                     </button>` : ''}
-                    <button class="lesson-tab-btn" id="ltab-btn-overview" onclick="switchLessonTab('overview')">
+                    <button class="lesson-tab-btn ${firstTab === 'overview' ? 'active' : ''}" id="ltab-btn-overview" onclick="switchLessonTab('overview')">
                         <span class="lt-icon">ℹ️</span> Overview &amp; Notes
                     </button>
                 </div>
 
-                <!-- ═══════════ TAB PANES ═══════════ -->
-                <!-- Tab 1: Video Player -->
+                <!-- ═══════════ LESSON SECTIONS (all visible, stacked: video → PDF → quiz → notes) ═══════════ -->
+                ${hasVideo ? `
                 <div class="lesson-tab-pane active" id="ltab-pane-video">
-                    ${renderLessonVideoBlock(lesson)}
-                </div>
+                    ${videoHTML}
+                </div>` : ''}
 
-                <!-- Tab 2: PDF Viewer -->
-                <div class="lesson-tab-pane" id="ltab-pane-pdf" style="display:none;">
-                    ${renderLessonPdfBlock(lesson)}
-                </div>
+                ${pdfHTML ? `
+                <div class="lesson-tab-pane active" id="ltab-pane-pdf">
+                    ${pdfHTML}
+                </div>` : ''}
 
-                <!-- Tab 3: Quiz -->
-                <div class="lesson-tab-pane" id="ltab-pane-quiz" style="display:none;">
-                    ${renderQuizContent(lesson, courseId)}
-                </div>
+                ${quizHTML ? `
+                <div class="lesson-tab-pane active" id="ltab-pane-quiz">
+                    ${quizHTML}
+                </div>` : ''}
 
                 <!-- Tab 4: Overview & Notes -->
-                <div class="lesson-tab-pane" id="ltab-pane-overview" style="display:none;">
+                <div class="lesson-tab-pane active" id="ltab-pane-overview">
                     <div class="card card-flat" style="padding:24px;border-radius:18px;border:1px solid var(--border);background:var(--bg-surface);margin-bottom:20px;">
                         <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
                             <span>📖</span> Lesson Details &amp; Summary
@@ -2095,6 +2035,7 @@
                                             </div>
                                         </div>`;
             }).join('')}
+                                    ${renderPackageExtraRows(pkg, pi, courseId, 'curriculum')}
                                 </div>
                             </div>`;
         }).join('')}
@@ -2107,272 +2048,523 @@
             <span style="font-size:1.15rem;">📚</span>
             <span>Lessons (${allLessons.length})</span>
         </button>`;
-        // ── التبديل السلس بين تبويبات الدرس ─────────────────────────
-        window.switchLessonTab = function (tabId) {
-            document.querySelectorAll('.lesson-tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.lesson-tab-pane').forEach(p => {
-                p.style.display = 'none';
-                p.classList.remove('active');
-            });
+    }
 
-            const activeBtn = document.getElementById('ltab-btn-' + tabId);
-            const activePane = document.getElementById('ltab-pane-' + tabId);
-            if (activeBtn) activeBtn.classList.add('active');
-            if (activePane) {
-                activePane.style.display = 'block';
-                activePane.classList.add('active');
-            }
-        };
+    // ═══════════════════════════════════════════════════════════
+    // LESSON PAGE HELPERS (module level)
+    // NOTE: everything below used to sit AFTER the `return` of
+    // renderLessonPage(), so the window.* handlers (switchLessonTab,
+    // saveLessonNote, playLessonSegment) were never registered and the
+    // PDF / Quiz tabs could never be opened.
+    // ═══════════════════════════════════════════════════════════
 
-        // ── حفظ ملاحظات الطالب للدرس ────────────────────────────────
-        window.saveLessonNote = function (courseId, lessonId) {
-            const textarea = document.getElementById('lessonStudentNote');
-            const status = document.getElementById('noteSavedStatus');
-            if (!textarea) return;
-            const key = 'iraqi_note_' + courseId + '_' + lessonId;
-            localStorage.setItem(key, textarea.value);
-            if (status) {
-                status.style.display = 'inline';
-                clearTimeout(window._noteTimer);
-                window._noteTimer = setTimeout(() => { status.style.display = 'none'; }, 2000);
-            }
-        };
+    function _escHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
 
-        // ── تشغيل مقطع فيديو محدد داخل الدرس (Multi-Segment Video) ───
-        window.playLessonSegment = function (videoUrl, title, btnEl) {
-            if (!videoUrl) return;
-            var iframeContainer = document.getElementById('lessonVideoEmbedContainer');
-            if (iframeContainer) {
-                var isDirectVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(videoUrl);
-                var embedSrc = toSafeEmbedUrl(videoUrl);
-                if (isDirectVideo) {
-                    iframeContainer.innerHTML = [
-                        '<video controls style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;" preload="metadata">',
-                        '<source src="' + videoUrl + '">Your browser does not support HTML5 video.</video>'
-                    ].join('');
-                } else {
-                    // Load directly (segment switch = user intent to play)
-                    var playUrl = embedSrc + (embedSrc.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1';
-                    iframeContainer.innerHTML = [
-                        '<iframe src="' + playUrl + '" frameborder="0" allowfullscreen',
-                        ' allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"',
-                        ' sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups"',
-                        ' referrerpolicy="strict-origin-when-cross-origin"',
-                        ' style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;z-index:1;"></iframe>',
-                        '<div class="yt-shield yt-shield-top" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                        '<div class="yt-shield yt-shield-tr" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                        '<div class="yt-shield yt-shield-tl" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                        '<div class="yt-shield yt-shield-br" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                        '<div class="yt-shield yt-shield-bl" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>'
-                    ].join('');
-                }
-            }
-            document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl) btnEl.classList.add('active');
-            showToast('Now Playing: ' + (title || 'Segment'), 'info');
-        };
+    // Transparent overlays that hide the YouTube title / channel / share area.
+    // Bottom shields were removed on purpose: they sat on top of the play,
+    // volume, settings and fullscreen buttons and made the player unusable.
+    function ytShieldsHTML() {
+        return ['top', 'tr', 'tl'].map(function (pos) {
+            return '<div class="yt-shield yt-shield-' + pos + '" ' +
+                'onclick="event.stopPropagation();event.preventDefault();return false;" ' +
+                'oncontextmenu="return false;"></div>';
+        }).join('');
+    }
 
-        // ── تحويل الرابط إلى Embed آمن يدعم كل صيغ الفيديو ─────────
-        function toSafeEmbedUrl(u) {
-            if (!u) return '';
-            u = String(u).trim();
-            // Bunny / mediadelivery
-            if (u.includes('iframe.mediadelivery.net') || u.includes('video.bunnycdn.com')) {
-                return u;
-            }
-            // YouTube Embed ID Parser
-            let ytId = null;
-            try {
-                const parsed = new URL(u);
-                if (parsed.hostname === 'youtu.be') {
-                    ytId = parsed.pathname.replace(/^\//, '').split('?')[0];
-                } else if (parsed.hostname.includes('youtube.com')) {
-                    ytId = parsed.searchParams.get('v') || parsed.pathname.replace(/^\/(embed|shorts|live)\//, '').split('/')[0];
-                }
-            } catch (e) {
-                const m = u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
-                if (m) ytId = m[1];
-            }
-            if (ytId && /^[A-Za-z0-9_-]{11}$/.test(ytId)) {
-                return 'https://www.youtube-nocookie.com/embed/' + ytId + '?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1';
-            }
-            if (u.includes('youtube.com/embed/')) return u;
-            // Vimeo
-            const vm = u.match(/vimeo\.com\/(\d+)/);
-            if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
-            return u;
+    // ── التبديل بين أقسام الدرس (الأقسام كلها ظاهرة، والتاب بيعمل scroll للقسم) ──
+    window.switchLessonTab = function (tabId) {
+        var pane = document.getElementById('ltab-pane-' + tabId);
+        if (!pane) return;
+        document.querySelectorAll('.lesson-tab-btn').forEach(function (b) { b.classList.remove('active'); });
+        var btn = document.getElementById('ltab-btn-' + tabId);
+        if (btn) btn.classList.add('active');
+        try { pane.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        catch (e) { pane.scrollIntoView(); }
+    };
+
+    // ── حفظ ملاحظات الطالب للدرس ────────────────────────────────
+    window.saveLessonNote = function (courseId, lessonId) {
+        const textarea = document.getElementById('lessonStudentNote');
+        const status = document.getElementById('noteSavedStatus');
+        if (!textarea) return;
+        const key = 'iraqi_note_' + courseId + '_' + lessonId;
+        localStorage.setItem(key, textarea.value);
+        if (status) {
+            status.style.display = 'inline';
+            clearTimeout(window._noteTimer);
+            window._noteTimer = setTimeout(() => { status.style.display = 'none'; }, 2000);
+        }
+    };
+
+    // ── YouTube helpers ──────────────────────────────────────────
+    function extractYouTubeId(u) {
+        u = String(u || '').trim();
+        if (!u) return null;
+        var m = u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:[^#]*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
+        if (m) return m[1];
+        try {
+            var parsed = new URL(/^https?:\/\//i.test(u) ? u : 'https://' + u);
+            var v = parsed.searchParams.get('v');
+            if (v && /^[A-Za-z0-9_-]{11}$/.test(v)) return v;
+        } catch (e) { /* not a URL */ }
+        return null;
+    }
+
+    // ── تحويل الرابط إلى Embed آمن يدعم كل صيغ الفيديو ─────────
+    function toSafeEmbedUrl(u) {
+        if (!u) return '';
+        u = String(u).trim();
+        // Bunny / mediadelivery
+        if (u.includes('iframe.mediadelivery.net') || u.includes('video.bunnycdn.com')) return u;
+        // YouTube (watch / youtu.be / shorts / live / embed)
+        var ytId = extractYouTubeId(u);
+        if (ytId) {
+            var origin = (window.location.origin && /^https?:/i.test(window.location.origin)) ? window.location.origin : '';
+            return 'https://www.youtube-nocookie.com/embed/' + ytId +
+                '?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1' +
+                (origin ? '&origin=' + encodeURIComponent(origin) : '');
+        }
+        // Vimeo
+        var vm = u.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        if (vm) return 'https://player.vimeo.com/video/' + vm[1];
+        return u;
+    }
+
+    function _iframeHTML(src, extraAttrs) {
+        return '<iframe src="' + _escHtml(src) + '" frameborder="0" allowfullscreen ' +
+            'allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; clipboard-write" ' +
+            'sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups allow-popups-to-escape-sandbox" ' +
+            'referrerpolicy="strict-origin-when-cross-origin" ' + (extraAttrs || '') +
+            'style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;z-index:1;"></iframe>';
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // PROTECTED LESSON VIDEO PLAYER
+    // - YouTube is driven through the official IFrame Player API (controls=0).
+    // - A transparent "guard" sits on top of the whole player, so a click can never reach
+    //   YouTube's own UI (logo, channel avatar, title, "Watch on YouTube", end-screen links).
+    // - Playback controls are drawn by the platform itself (play, seek, volume, speed, fullscreen).
+    // - The video URL is never written into the page as text/link/data-attribute.
+    // NOTE: a student who opens DevTools can still see the video id in the network tab
+    // (true for ANY YouTube embed). For real protection use a private host (e.g. Bunny Stream).
+    // ═══════════════════════════════════════════════════════════
+
+    var _lessonVideoCtx = { url: '', segments: [] };
+    var _lessonPlayer = null;
+    var _ytApiPromise = null;
+
+    function loadYouTubeApi() {
+        if (window.YT && window.YT.Player) return Promise.resolve(window.YT);
+        if (_ytApiPromise) return _ytApiPromise;
+        _ytApiPromise = new Promise(function (resolve, reject) {
+            var prev = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = function () {
+                try { if (typeof prev === 'function') prev(); } catch (e) { /* ignore */ }
+                resolve(window.YT);
+            };
+            var s = document.createElement('script');
+            s.src = 'https://www.youtube.com/iframe_api';
+            s.async = true;
+            s.onerror = function () { _ytApiPromise = null; reject(new Error('YouTube API blocked')); };
+            document.head.appendChild(s);
+            setTimeout(function () {
+                if (!(window.YT && window.YT.Player)) { _ytApiPromise = null; reject(new Error('YouTube API timeout')); }
+            }, 15000);
+        });
+        return _ytApiPromise;
+    }
+
+    function lpFmt(sec) {
+        sec = Math.max(0, Math.floor(sec || 0));
+        var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+        return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function lpDestroy() {
+        var st = _lessonPlayer;
+        _lessonPlayer = null;
+        if (!st) return;
+        try { clearInterval(st.timer); } catch (e) { /* ignore */ }
+        try { clearTimeout(st.bootTimer); } catch (e) { /* ignore */ }
+        try { if (st.yt && typeof st.yt.destroy === 'function') st.yt.destroy(); } catch (e) { /* ignore */ }
+    }
+
+    function lpEl(id) { return document.getElementById(id); }
+
+    function mountYouTubePlayer(wrap, ytId, autoplay) {
+        lpDestroy();
+        var pageOrigin = (window.location.origin && /^https?:/i.test(window.location.origin)) ? window.location.origin : '';
+
+        wrap.innerHTML =
+            '<div class="lp-stage" id="lessonPlayerStage">' +
+                '<div class="lp-host" id="lessonPlayerHost"></div>' +
+                '<div class="lp-overlay lp-loading" id="lpLoading"><div class="lp-spinner"></div></div>' +
+                '<div class="lp-guard" id="lpGuard"></div>' +
+                '<div class="lp-overlay lp-msg" id="lpMsg" style="display:none;"></div>' +
+                '<div class="lp-controls" id="lpControls">' +
+                    '<button type="button" class="lp-btn" id="lpPlay" aria-label="Play / Pause">&#9654;</button>' +
+                    '<span class="lp-time" id="lpTime">0:00 / 0:00</span>' +
+                    '<input type="range" class="lp-seek" id="lpSeek" min="0" max="1000" value="0" step="1" aria-label="Seek">' +
+                    '<button type="button" class="lp-btn" id="lpMute" aria-label="Mute">&#128266;</button>' +
+                    '<input type="range" class="lp-vol" id="lpVol" min="0" max="100" value="100" aria-label="Volume">' +
+                    '<button type="button" class="lp-btn lp-speed" id="lpSpeed" aria-label="Playback speed">1x</button>' +
+                    '<button type="button" class="lp-btn" id="lpFs" aria-label="Fullscreen">&#9974;</button>' +
+                '</div>' +
+            '</div>';
+
+        var stage = lpEl('lessonPlayerStage');
+        var state = { yt: null, ready: false, dragging: false, timer: null, bootTimer: null, lastMove: Date.now(), ytId: ytId, wrap: wrap };
+        _lessonPlayer = state;
+
+        // The iframe is built by us (not by YT.Player) so we control referrer policy / sandbox:
+        // no `sandbox` attribute and an explicit referrer are what YouTube expects (error 153 = no valid referrer).
+        var params = [
+            'enablejsapi=1', 'controls=0', 'disablekb=1', 'fs=0', 'rel=0', 'modestbranding=1',
+            'playsinline=1', 'iv_load_policy=3', 'cc_load_policy=0'
+        ];
+        if (autoplay) params.push('autoplay=1');
+        if (pageOrigin) {
+            params.push('origin=' + encodeURIComponent(pageOrigin));
+            params.push('widget_referrer=' + encodeURIComponent(window.location.href.split('#')[0]));
+        }
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('src', 'https://www.youtube.com/embed/' + ytId + '?' + params.join('&'));
+        iframe.setAttribute('title', 'Lesson video');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        iframe.setAttribute('tabindex', '-1');                   // keyboard can't focus YouTube's own buttons
+        lpEl('lessonPlayerHost').appendChild(iframe);
+
+        function showMsg(html) {
+            var m = lpEl('lpMsg'); if (!m) return;
+            m.innerHTML = html; m.style.display = 'flex';
+            var l = lpEl('lpLoading'); if (l) l.style.display = 'none';
+        }
+        function showError(code) {
+            try { console.warn('[Lesson video] YouTube error', code); } catch (e) { /* ignore */ }
+            var c = lpEl('lpControls'); if (c) c.style.display = 'none';
+            var isAdm = (typeof isAdmin === 'function') && isAdmin();
+            showMsg(
+                '<div style="font-size:2.4rem;">&#127916;</div>' +
+                '<h3 style="margin:0;font-size:1.05rem;font-weight:800;">This video can\'t be played right now</h3>' +
+                '<p style="margin:0;font-size:0.85rem;opacity:0.7;max-width:340px;line-height:1.6;">Please refresh the page and try again. If it keeps happening, let your teacher know.</p>' +
+                (code ? '<span style="font-size:0.72rem;opacity:0.45;">Error ' + code + '</span>' : '') +
+                (isAdm ? '<div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:10px 16px;font-size:0.8rem;color:rgba(255,255,255,0.7);max-width:380px;direction:rtl;line-height:1.9;">' +
+                    '<strong style="color:#F59E0B;">للمدرس:</strong> تأكد إن الفيديو <strong>Public أو Unlisted</strong> ومفعّل عليه <strong>Allow embedding</strong> في YouTube Studio، وإنه مش Private.</div>' : '') +
+                '<button type="button" class="btn btn-primary btn-sm" id="lpRetry">Try again</button>'
+            );
+            var r = lpEl('lpRetry');
+            if (r) r.addEventListener('click', function () { mountYouTubePlayer(wrap, ytId, false); });
+        }
+        function toggle() {
+            if (!state.ready || !state.yt) return;
+            var s = state.yt.getPlayerState();
+            if (s === 1 || s === 3) state.yt.pauseVideo(); else state.yt.playVideo();
+        }
+        function fullscreen() {
+            var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+            var req = stage.requestFullscreen || stage.webkitRequestFullscreen;
+            if (fsEl) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+            else if (req) { try { req.call(stage); } catch (e) { stage.classList.toggle('lp-pseudo-fs'); } }
+            else { stage.classList.toggle('lp-pseudo-fs'); }          // iPhone Safari has no element fullscreen
+        }
+        function tick() {
+            if (_lessonPlayer !== state || !document.body.contains(stage)) { if (_lessonPlayer === state) lpDestroy(); else clearInterval(state.timer); return; }
+            if (!state.ready || !state.yt || typeof state.yt.getCurrentTime !== 'function') return;
+            var cur = state.yt.getCurrentTime() || 0, dur = state.yt.getDuration() || 0;
+            lpEl('lpTime').textContent = lpFmt(cur) + ' / ' + lpFmt(dur);
+            if (!state.dragging && dur > 0) lpEl('lpSeek').value = Math.round(cur / dur * 1000);
+            var ps = state.yt.getPlayerState();
+            lpEl('lpPlay').innerHTML = (ps === 1 || ps === 3) ? '&#10074;&#10074;' : '&#9654;';
+            stage.classList.toggle('lp-idle', ps === 1 && (Date.now() - state.lastMove > 3000));
         }
 
-        // ── تشغيل فيديو الدرس (YouTube, Vimeo, Bunny, MP4) ──────────
-        function renderLessonVideoBlock(lesson) {
-            var segments = sanitizeLessonSegments(lesson.segments);
-            var url = lesson.videoUrl || lesson.content || lesson.url || lesson.video || '';
+        // ── our own controls ──
+        lpEl('lpGuard').addEventListener('click', toggle);
+        lpEl('lpGuard').addEventListener('dblclick', fullscreen);
+        lpEl('lpGuard').addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        stage.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+        ['mousemove', 'touchstart', 'pointermove'].forEach(function (ev) {
+            stage.addEventListener(ev, function () { state.lastMove = Date.now(); stage.classList.remove('lp-idle'); }, { passive: true });
+        });
+        lpEl('lpPlay').addEventListener('click', toggle);
+        lpEl('lpFs').addEventListener('click', fullscreen);
+        lpEl('lpMute').addEventListener('click', function () {
+            if (!state.ready) return;
+            if (state.yt.isMuted()) { state.yt.unMute(); this.innerHTML = '&#128266;'; }
+            else { state.yt.mute(); this.innerHTML = '&#128263;'; }
+        });
+        lpEl('lpVol').addEventListener('input', function () {
+            if (!state.ready) return;
+            state.yt.setVolume(Number(this.value));
+            if (Number(this.value) > 0 && state.yt.isMuted()) { state.yt.unMute(); lpEl('lpMute').innerHTML = '&#128266;'; }
+        });
+        var speeds = [1, 1.25, 1.5, 1.75, 2, 0.75], speedIdx = 0;
+        lpEl('lpSpeed').addEventListener('click', function () {
+            if (!state.ready) return;
+            speedIdx = (speedIdx + 1) % speeds.length;
+            state.yt.setPlaybackRate(speeds[speedIdx]);
+            this.textContent = speeds[speedIdx] + 'x';
+        });
+        var seek = lpEl('lpSeek');
+        seek.addEventListener('input', function () {
+            state.dragging = true;
+            var dur = (state.ready && state.yt.getDuration()) || 0;
+            lpEl('lpTime').textContent = lpFmt(dur * Number(seek.value) / 1000) + ' / ' + lpFmt(dur);
+        });
+        seek.addEventListener('change', function () {
+            var dur = (state.ready && state.yt.getDuration()) || 0;
+            if (dur > 0) state.yt.seekTo(dur * Number(seek.value) / 1000, true);
+            state.dragging = false;
+        });
 
-            if (!url && segments.length > 0) {
-                var s0 = segments[0];
-                url = s0.bunnyVideoId
-                    ? ('https://iframe.mediadelivery.net/embed/691851/' + s0.bunnyVideoId + '?autoplay=false')
-                    : (s0.videoUrl || '');
-            }
+        // if YouTube never answers (blocked / offline / config error) show a clean message instead of its own error screen
+        state.bootTimer = setTimeout(function () { if (_lessonPlayer === state && !state.ready) showError(''); }, 15000);
 
-            if (!url) {
-                for (var key of Object.keys(lesson || {})) {
-                    var val = lesson[key];
-                    if (typeof val === 'string' && val.length > 10 &&
-                        (val.includes('youtube') || val.includes('youtu.be') ||
-                            val.includes('vimeo') || val.includes('bunny') ||
-                            val.includes('mediadelivery') || /\.(mp4|webm|ogg)/i.test(val))) {
-                        url = val;
-                        break;
-                    }
+        loadYouTubeApi().then(function (YT) {
+            if (_lessonPlayer !== state) return;
+            state.yt = new YT.Player(iframe, {
+                events: {
+                    onReady: function (e) {
+                        if (_lessonPlayer !== state) return;
+                        state.ready = true;
+                        clearTimeout(state.bootTimer);
+                        var l = lpEl('lpLoading'); if (l) l.style.display = 'none';
+                        if (autoplay) { try { e.target.playVideo(); } catch (err) { /* ignore */ } }
+                        state.timer = setInterval(tick, 250);
+                        tick();
+                    },
+                    onStateChange: function (e) {
+                        if (_lessonPlayer !== state) return;
+                        if (e.data === 0) {                     // ended → hide YouTube's end screen / suggestions
+                            showMsg('<div style="font-size:2.4rem;">&#9989;</div><h3 style="margin:0;font-size:1.05rem;font-weight:800;">Lesson video finished</h3>' +
+                                '<button type="button" class="btn btn-primary btn-sm" id="lpReplay">&#8635; Replay</button>');
+                            var rp = lpEl('lpReplay');
+                            if (rp) rp.addEventListener('click', function () {
+                                lpEl('lpMsg').style.display = 'none';
+                                state.yt.seekTo(0, true); state.yt.playVideo();
+                            });
+                        } else if (e.data === 1 || e.data === 3) {
+                            var m = lpEl('lpMsg'); if (m && !lpEl('lpRetry')) m.style.display = 'none';
+                        }
+                    },
+                    onError: function (e) { if (_lessonPlayer === state) showError(e && e.data); }
                 }
-            }
+            });
+        }).catch(function () { if (_lessonPlayer === state) showError(''); });
+    }
 
-            if (!url && segments.length === 0) {
-                return `
+    // Decides how to play a given lesson video url. YouTube → protected player; Bunny/Vimeo → iframe; mp4 → <video>.
+    function mountLessonVideo(url, autoplay) {
+        var wrap = document.getElementById('lessonVideoEmbedContainer');
+        if (!wrap) return;
+        lpDestroy();
+        url = String(url || '').trim();
+        if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+            wrap.innerHTML = '<video controls controlsList="nodownload" disablePictureInPicture playsinline preload="metadata" ' +
+                'oncontextmenu="return false;" src="' + _escHtml(url) + '" ' +
+                'style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;"' + (autoplay ? ' autoplay' : '') + '></video>';
+            return;
+        }
+        var ytId = extractYouTubeId(url);
+        if (ytId) { mountYouTubePlayer(wrap, ytId, !!autoplay); return; }
+        var embedSrc = toSafeEmbedUrl(url);
+        var src = autoplay ? embedSrc + (embedSrc.indexOf('?') > -1 ? '&' : '?') + 'autoplay=1' : embedSrc;
+        wrap.innerHTML = _iframeHTML(src) + ytShieldsHTML();
+    }
+
+    // Called right after the lesson page HTML is in the DOM.
+    function initLessonVideoPlayer() {
+        var wrap = document.getElementById('lessonVideoEmbedContainer');
+        if (!wrap) { lpDestroy(); return; }
+        mountLessonVideo(_lessonVideoCtx.url, false);
+    }
+
+    // ── تشغيل مقطع فيديو محدد داخل الدرس (Multi-Segment Video) ───
+    window.playLessonSegment = function (idx, btnEl) {
+        var seg = _lessonVideoCtx.segments[idx];
+        if (!seg || !seg.url) return;
+        mountLessonVideo(seg.url, true);
+        document.querySelectorAll('.segment-btn').forEach(function (b) { b.classList.remove('active'); });
+        if (btnEl) btnEl.classList.add('active');
+        showToast('Now Playing: ' + (seg.title || 'Segment'), 'info');
+    };
+
+    // ── فيديو الدرس: بيرجّع الهيكل بس — الـ URL مش بيتكتب في الصفحة ──────────
+    // Returns '' when the lesson has no video but has a PDF/quiz (so the page can hide the video section).
+    function renderLessonVideoBlock(lesson, hasOtherContent) {
+        var segments = sanitizeLessonSegments(lesson.segments);
+
+        function looksLikeVideo(v) {
+            return typeof v === 'string' &&
+                /youtu\.?be|vimeo\.com|mediadelivery\.net|bunnycdn|\.(mp4|webm|ogg)(\?|#|$)/i.test(v);
+        }
+        function segUrl(seg) {
+            return seg.bunnyVideoId
+                ? ('https://iframe.mediadelivery.net/embed/691851/' + seg.bunnyVideoId + '?autoplay=false')
+                : (seg.videoUrl || '');
+        }
+
+        // 1) the lesson's own video field (trusted)  2) content only if it really is a video URL
+        // 3) first segment  4) a few legacy field names.
+        // NOTE: lesson.content is NOT used blindly — for PDF-only / quiz-only lessons it holds the Drive link / quiz id.
+        var url = (typeof lesson.videoUrl === 'string' && lesson.videoUrl.trim()) ? lesson.videoUrl.trim() : '';
+        if (!url && looksLikeVideo(lesson.content)) url = lesson.content.trim();
+        if (!url && segments.length > 0) url = segUrl(segments[0]);
+        if (!url) {
+            var legacyKeys = ['url', 'video', 'youtubeUrl', 'youtube', 'link'];
+            for (var k = 0; k < legacyKeys.length; k++) {
+                var v = lesson[legacyKeys[k]];
+                if (looksLikeVideo(v)) { url = v.trim(); break; }
+            }
+        }
+
+        if (!url && segments.length === 0) {
+            _lessonVideoCtx = { url: '', segments: [] };
+            if (hasOtherContent) return '';
+            return `
             <div class="video-player-wrap">
                 <div class="video-placeholder">
                     <div class="play-btn-big">▶</div>
                     <span style="font-weight:700;font-size:1rem;color:rgba(255,255,255,0.85);">No recorded video available for this lesson yet</span>
-                    <span style="font-size:0.85rem;color:rgba(255,255,255,0.5);">You can check the attached PDF notes or online quiz above</span>
                 </div>
             </div>`;
-            }
+        }
 
-            var segmentsHTML = '';
-            if (segments.length > 1) {
-                segmentsHTML = `
+        // Keep the urls in memory only (never in HTML attributes) — buttons refer to them by index.
+        _lessonVideoCtx = {
+            url: url,
+            segments: segments.map(function (s, i) { return { url: segUrl(s), title: s.title || ('Segment ' + (i + 1)) }; })
+        };
+
+        var segmentsHTML = '';
+        if (segments.length > 1) {
+            var norm = function (x) { return String(x || '').replace(/[?&]autoplay=false\b/g, '').replace(/\/$/, '').toLowerCase(); };
+            var activeIdx = _lessonVideoCtx.segments.findIndex(function (s) { return norm(s.url) === norm(url); });
+            if (activeIdx < 0) activeIdx = 0;
+            segmentsHTML = `
             <div class="segments-playlist" style="margin-bottom:16px;background:var(--bg-surface);padding:14px 18px;border-radius:16px;border:1px solid var(--border);">
                 <div style="font-weight:800;font-size:0.9rem;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
                     <span>🎬</span> Lecture Segments (${segments.length} segments):
                 </div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    ${segments.map((seg, si) => {
-                    const sUrl = seg.bunnyVideoId
-                        ? (`https://iframe.mediadelivery.net/embed/691851/${seg.bunnyVideoId}?autoplay=false`)
-                        : (seg.videoUrl || '');
-                    const isActive = si === 0;
-                    return `
-                        <button class="segment-btn ${isActive ? 'active' : ''}"
-                                onclick="playLessonSegment('${sUrl}', '${seg.title || ('Segment ' + (si + 1))}', this)">
-                            <span>▶ ${seg.title || ('Segment ' + (si + 1))}</span>
-                            ${seg.duration ? `<small style="opacity:0.7;">(${seg.duration})</small>` : ''}
-                        </button>`;
-                }).join('')}
+                    ${segments.map((seg, si) => `
+                        <button class="segment-btn ${si === activeIdx ? 'active' : ''}" onclick="playLessonSegment(${si}, this)">
+                            <span>▶ ${_escHtml(_lessonVideoCtx.segments[si].title)}</span>
+                            ${seg.duration ? `<small style="opacity:0.7;">(${_escHtml(seg.duration)})</small>` : ''}
+                        </button>`).join('')}
                 </div>
             </div>`;
-            }
-
-            var embedUrl = toSafeEmbedUrl(url);
-            var isDirectVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
-
-            // Extract YouTube Video ID for Thumbnail
-            var ytId = null;
-            if (!isDirectVideo) {
-                var _m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
-                if (_m) ytId = _m[1];
-            }
-
-            var videoInnerHTML;
-            if (isDirectVideo) {
-                videoInnerHTML = [
-                    '<video controls style="position:absolute;top:0;left:0;width:100%;height:100%;background:#000;" preload="metadata">',
-                    '<source src="' + url + '">Your browser does not support HTML5 video.</video>'
-                ].join('');
-            } else if (ytId) {
-                // Thumbnail-first: student clicks to play inside the platform
-                var thumbUrl = 'https://img.youtube.com/vi/' + ytId + '/maxresdefault.jpg';
-                var hqUrl    = 'https://img.youtube.com/vi/' + ytId + '/hqdefault.jpg';
-                videoInnerHTML = [
-                    '<div id="yt-thumb-overlay" data-embed="' + encodeURIComponent(embedUrl) + '" style="position:absolute;top:0;left:0;width:100%;height:100%;',
-                    'cursor:pointer;z-index:5;background:#000;border-radius:14px;overflow:hidden;"',
-                    ' onclick="window.loadLessonIframe(decodeURIComponent(this.dataset.embed), this)">',
-                    '<img src="' + thumbUrl + '" onerror="this.src=\'' + hqUrl + '\'"',
-                    ' style="width:100%;height:100%;object-fit:cover;display:block;opacity:0.82;" loading="lazy" alt="">',
-                    '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;">',
-                    '<div style="width:76px;height:76px;border-radius:50%;',
-                    'background:linear-gradient(135deg,#B45309,#D97706,#F59E0B);',
-                    'box-shadow:0 0 36px rgba(217,119,6,0.7);display:flex;align-items:center;justify-content:center;',
-                    'font-size:2.2rem;color:#fff;">&#9654;</div>',
-                    '<span style="color:#fff;font-size:0.95rem;font-weight:800;text-shadow:0 2px 8px rgba(0,0,0,0.8);',
-                    'background:rgba(0,0,0,0.45);padding:4px 18px;border-radius:20px;">Click to play</span>',
-                    '</div></div>'
-                ].join('');
-            } else {
-                // Non-YouTube (Vimeo, Bunny, etc.) - load directly with shields
-                videoInnerHTML = [
-                    '<iframe src="' + embedUrl + '" frameborder="0" allowfullscreen',
-                    ' allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"',
-                    ' sandbox="allow-scripts allow-same-origin allow-presentation allow-forms allow-popups"',
-                    ' referrerpolicy="strict-origin-when-cross-origin"',
-                    ' style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:14px;z-index:1;"></iframe>',
-                    '<div class="yt-shield yt-shield-top" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                    '<div class="yt-shield yt-shield-tr" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>',
-                    '<div class="yt-shield yt-shield-br" onclick="event.stopPropagation();event.preventDefault();return false;" oncontextmenu="return false;"></div>'
-                ].join('');
-            }
-
-            return (
-                '<div>' + segmentsHTML +
-                '<div class="video-player-wrap">' +
-                '<div class="video-responsive-wrap" id="lessonVideoEmbedContainer">' +
-                videoInnerHTML +
-                '</div></div></div>'
-            );
         }
 
-        // loadLessonIframe defined at module level below
+        return '<div>' + segmentsHTML +
+            '<div class="video-player-wrap"><div class="video-responsive-wrap" id="lessonVideoEmbedContainer">' +
+            '<div class="lp-boot"><div class="lp-spinner"></div></div></div></div></div>';
+    }
 
-        // ── عرض ملف PDF ──────────────────────────────────────────────
-        function renderLessonPdfBlock(lesson) {
-            var url = lesson.pdfUrl || lesson.content || '';
-            if (!url) {
-                return `
-            <div class="card card-flat" style="padding:var(--space-2xl);text-align:center;border-radius:18px;border:1px solid var(--border);background:var(--bg-surface);">
-                <div style="font-size:3.5rem;margin-bottom:var(--space-sm);">📄</div>
-                <h3 style="margin-bottom:var(--space-xs);">${lesson.pdfName || lesson.title || 'PDF File'}</h3>
-                <p style="color:var(--text-secondary);">No PDF file available for this lesson currently.</p>
-            </div>`;
+    // ── Google Drive / PDF link handling ─────────────────────────
+    function getPdfLinks(rawUrl) {
+        var u = String(rawUrl || '').trim();
+        var out = { kind: '', open: '', download: '', embed: '' };
+        if (!u) return out;
+
+        if (/^data:application\/pdf/i.test(u)) {           // PDF uploaded straight from the dashboard
+            out.kind = 'data'; out.download = u; out.embed = u;
+            return out;
+        }
+        if (!/^https?:\/\//i.test(u)) u = 'https://' + u.replace(/^\/+/, '');
+
+        var host = '';
+        try { host = new URL(u).hostname.toLowerCase(); } catch (e) { /* ignore */ }
+
+        if (host === 'drive.google.com') {
+            if (/\/drive\/(?:u\/\d+\/)?folders\//i.test(u)) {   // a folder, can't be previewed/downloaded as one file
+                out.kind = 'drive-folder'; out.open = u;
+                return out;
             }
+            var m = u.match(/\/file\/d\/([A-Za-z0-9_-]{10,})/) ||
+                    u.match(/[?&]id=([A-Za-z0-9_-]{10,})/) ||
+                    u.match(/\/d\/([A-Za-z0-9_-]{10,})/);
+            if (m) {
+                var id = m[1];
+                out.kind = 'drive';
+                out.open = 'https://drive.google.com/file/d/' + id + '/view';
+                out.download = 'https://drive.google.com/uc?export=download&id=' + id;
+                out.embed = 'https://drive.google.com/file/d/' + id + '/preview';
+                return out;
+            }
+        }
+        out.kind = 'direct'; out.open = u; out.download = u; out.embed = u;
+        return out;
+    }
+
+    // ── عرض ملف PDF (تحت الفيديو مباشرة) ─────────────────────────
+    function renderLessonPdfBlock(lesson) {
+        var raw = (lesson && typeof lesson.pdfUrl === 'string') ? lesson.pdfUrl.trim() : '';
+        if (!raw) return '';
+        var links = getPdfLinks(raw);
+        var title = _escHtml((lesson.pdfName && String(lesson.pdfName).trim()) ||
+            (lesson.title ? lesson.title + ' — PDF Notes' : 'Lesson PDF Notes'));
+        var openHref = links.open || links.download;
+
+        var titleHTML = openHref
+            ? '<a href="' + _escHtml(openHref) + '" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;">📄 ' + title + '</a>'
+            : '<span>📄 ' + title + '</span>';
+
+        var buttons = '';
+        if (links.open) {
+            buttons += '<a href="' + _escHtml(links.open) + '" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">🔍 Open PDF</a>';
+        }
+        if (links.download) {
+            buttons += (links.kind === 'data')
+                ? '<a href="' + _escHtml(links.download) + '" download="' + title.replace(/[\\/:*?"<>|]/g, '') + '.pdf" class="btn btn-outline btn-sm">⬇️ Download PDF</a>'
+                : '<a href="' + _escHtml(links.download) + '" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">⬇️ Download PDF</a>';
+        }
+
+        var preview = links.embed
+            ? '<iframe src="' + _escHtml(links.embed) + '" title="' + title + '" loading="lazy" allow="fullscreen"></iframe>' +
+              '<div style="padding:10px 16px;font-size:0.78rem;color:var(--text-muted);border-top:1px solid var(--border);">' +
+              'Preview not showing? Use <strong>Open PDF</strong> or <strong>Download PDF</strong> above.</div>'
+            : '';
+
+        return '<div class="pdf-viewer-block">' +
+            '<div class="pdf-actions"><div class="pdf-title">' + titleHTML + '</div>' +
+            '<div style="display:flex;gap:8px;flex-wrap:wrap;">' + buttons + '</div></div>' +
+            preview + '</div>';
+    }
+
+    // ── عرض الاختبار داخل الدرس — يقرأ من iraqiplatform_quizzes / alsaqr_quizzes ──
+    // Returns '' when the lesson has no quiz attached.
+    function renderQuizContent(lesson, courseId) {
+        var quizId = (lesson && lesson.quizId != null) ? String(lesson.quizId).trim() : '';
+        if (!quizId) return '';
+        var quiz = (typeof window.getQuizById === 'function') ? window.getQuizById(quizId) : null;
+
+        if (!quiz) {
             return `
-        <div class="pdf-viewer-block">
-            <div class="pdf-actions">
-                <div class="pdf-title">📄 ${lesson.pdfName || lesson.title || 'Lesson Notes &amp; Summary'}</div>
-                <div style="display:flex;gap:8px;">
-                    <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">🔍 Open in New Tab</a>
-                    <a href="${url}" download class="btn btn-outline btn-sm">⬇️ Download PDF</a>
-                </div>
-            </div>
-            <iframe src="${url}" title="${lesson.title || 'PDF'}"></iframe>
-        </div>`;
-        }
-
-        // ── عرض الاختبار داخل الدرس — يقرأ من alsaqr_quizzes ──────────
-        function renderQuizContent(lesson, courseId) {
-            var quizId = lesson.quizId || lesson.id || null;
-            var quiz = (typeof window.getQuizById === 'function') ? window.getQuizById(quizId) : null;
-
-            if (!quiz) {
-                return `
-            <div class="quiz-section" style="text-align:center;padding:var(--space-2xl);background:var(--bg-surface);border-radius:18px;border:1px solid var(--border);">
+            <div class="quiz-section" id="lessonQuizPending" style="text-align:center;padding:var(--space-2xl);background:var(--bg-surface);border-radius:18px;border:1px solid var(--border);">
                 <div style="font-size:3.5rem;margin-bottom:var(--space-sm);">📝</div>
-                <h3 style="margin-bottom:var(--space-xs);">${lesson.title || 'Lesson Quiz'}</h3>
-                <p style="color:var(--text-secondary);margin-bottom:var(--space-lg);">
-                    ${quizId ? 'The quiz is being prepared by the teacher.' : 'No quiz attached to this lesson yet.'}
-                </p>
+                <h3 style="margin-bottom:var(--space-xs);">${_escHtml(lesson.title || 'Lesson Quiz')}</h3>
+                <p style="color:var(--text-secondary);margin:0;">Loading the quiz… If it doesn't appear in a moment, the teacher is still preparing it.</p>
             </div>`;
-            }
+        }
 
-            var qCount = (quiz.questionsList || quiz.questions || []).length;
-            var timeLabel = quiz.time ? quiz.time + ' mins' : '—';
-            var prevAttempt = (typeof window.getQuizAttempt === 'function' && currentUser)
-                ? window.getQuizAttempt(currentUser.id, quizId) : null;
+        var qCount = (quiz.questionsList || quiz.questions || []).length;
+        var timeLabel = quiz.time ? quiz.time + ' mins' : '—';
+        var prevAttempt = (typeof window.getQuizAttempt === 'function' && currentUser)
+            ? window.getQuizAttempt(currentUser.id, quizId) : null;
+        var go = "navigate('test/" + quizId + "/" + courseId + "/" + (lesson.id || '') + "')";
 
-            return `
+        return `
         <div class="quiz-preview-card" style="background:var(--bg-surface);padding:32px;border-radius:20px;border:1.5px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.05);text-align:center;">
             <div style="font-size:3.5rem;margin-bottom:12px;">📝</div>
-            <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:6px;color:var(--text-primary);">${quiz.title || 'Lesson Quiz'}</h2>
-            ${quiz.subject ? `<p style="color:var(--text-secondary);margin-bottom:20px;font-weight:600;">${quiz.subject}</p>` : ''}
+            <h2 style="font-size:1.4rem;font-weight:900;margin-bottom:6px;color:var(--text-primary);">${_escHtml(quiz.title || 'Lesson Quiz')}</h2>
+            ${quiz.subject ? `<p style="color:var(--text-secondary);margin-bottom:20px;font-weight:600;">${_escHtml(quiz.subject)}</p>` : ''}
 
             <div style="display:flex;justify-content:center;gap:24px;margin:20px 0;flex-wrap:wrap;">
                 <div style="background:var(--bg-alt);padding:12px 20px;border-radius:12px;border:1px solid var(--border);">
@@ -2391,34 +2583,114 @@
             </div>
 
             <div style="margin-top:24px;">
-                <button class="btn btn-primary btn-lg" onclick="navigate('test/${quizId}/${courseId}/${lesson.id || ''}')" style="padding:14px 36px;font-size:1.05rem;font-weight:900;">
-                    ⚡ ${prevAttempt ? 'Retake Quiz' : 'Start Quiz Now'}
+                <button class="btn btn-primary btn-lg" onclick="${_escHtml(go)}" ${qCount ? '' : 'disabled'} style="padding:14px 36px;font-size:1.05rem;font-weight:900;">
+                    ⚡ ${prevAttempt ? 'Retake Quiz' : 'Start Quiz'}
                 </button>
+                ${qCount ? '' : '<p style="margin:12px 0 0;color:var(--text-muted);font-size:0.85rem;">This quiz has no questions yet.</p>'}
             </div>
         </div>`;
-        }
+    }
 
-        // ── أنماط صفحة معاينة الاختبار (تُحقن مرة واحدة في <head>) ──────
-        (function injectQuizPreviewStyles() {
-            if (document.getElementById('quiz-preview-styles')) return;
-            var s = document.createElement('style');
-            s.id = 'quiz-preview-styles';
-            s.textContent = [
-                '.quiz-preview-card{background:var(--bg-surface,#fff);border:2px solid var(--primary-200,#bfdbfe);border-radius:24px;padding:40px 32px;text-align:center;max-width:540px;margin:0 auto;box-shadow:0 8px 32px rgba(30,64,175,.08);}',
-                '.qp-icon{font-size:3.5rem;margin-bottom:12px;}',
-                '.qp-title{font-size:1.4rem;font-weight:900;margin-bottom:6px;color:var(--text-primary,#0f172a);}',
-                '.qp-subject{color:var(--text-secondary,#64748b);font-size:.9rem;margin-bottom:20px;}',
-                '.qp-stats{display:flex;gap:20px;justify-content:center;background:var(--bg-alt,#f8fafc);border-radius:14px;padding:16px 20px;margin-bottom:24px;}',
-                '.qp-stat{display:flex;flex-direction:column;align-items:center;gap:3px;}',
-                '.qp-stat-num{font-size:1.3rem;font-weight:900;color:var(--primary-600,#2563eb);}',
-                '.qp-stat-lbl{font-size:.78rem;color:var(--text-secondary,#64748b);font-weight:600;}',
-                '.qp-prev-result{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:10px 16px;margin-bottom:20px;display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;font-size:.9rem;}',
-                '.qp-actions{margin-bottom:16px;}',
-                '.qp-hint{font-size:.82rem;color:var(--text-muted,#94a3b8);}'
-            ].join('');
-            document.head.appendChild(s);
-        })();
-    } // end renderQuizContent (was closed by orphaned block in original)
+    // ═══════════════════════════════════════════════════════════
+    // PDF + QUIZ ROWS INSIDE THE PACKAGE (curriculum list + sidebar)
+    // Each package already lists its videos; the attached PDF and quiz are listed right after them.
+    // ═══════════════════════════════════════════════════════════
+    function getPackageExtras(pkg) {
+        var out = [], seenPdf = {}, seenQuiz = {};
+        (pkg.lessons || []).forEach(function (l) {
+            var pdf = (typeof l.pdfUrl === 'string') ? l.pdfUrl.trim() : '';
+            // a lesson whose own row already IS the PDF (type 'pdf') doesn't need a second row
+            if (pdf && l.type !== 'pdf' && !seenPdf[pdf]) { seenPdf[pdf] = true; out.push({ kind: 'pdf', lesson: l }); }
+        });
+        (pkg.lessons || []).forEach(function (l) {
+            var qid = (l.quizId != null && String(l.quizId).trim() !== '') ? String(l.quizId).trim() : '';
+            if (qid && l.type !== 'quiz' && !seenQuiz[qid]) { seenQuiz[qid] = true; out.push({ kind: 'quiz', lesson: l, quizId: qid }); }
+        });
+        return out;      // PDFs first, then quizzes
+    }
+
+    // variant: 'curriculum' (bottom accordion) | 'sidebar'
+    function renderPackageExtraRows(pkg, pi, courseId, variant) {
+        var extras = getPackageExtras(pkg);
+        if (!extras.length) return '';
+        var base = (pkg.lessons || []).length;
+
+        return extras.map(function (ex, ei) {
+            var l = ex.lesson, isPdf = ex.kind === 'pdf', locked = !!l.isLocked;
+            var section = isPdf ? 'pdf' : 'quiz';
+            var quiz = isPdf ? null : ((typeof window.getQuizById === 'function') ? window.getQuizById(ex.quizId) : null);
+            var attempt = (!isPdf && typeof window.getQuizAttempt === 'function' && currentUser)
+                ? window.getQuizAttempt(currentUser.id, ex.quizId) : null;
+            var title = isPdf
+                ? _escHtml((l.pdfName && String(l.pdfName).trim()) || ((pkg.title ? pkg.title + ' — ' : '') + 'PDF Notes'))
+                : _escHtml((quiz && quiz.title) || ((pkg.title ? pkg.title + ' — ' : '') + 'Quiz'));
+            var icon = locked ? '🔒' : (isPdf ? '📄' : '📝');
+            var click = locked
+                ? "showToast('This content is locked', 'error')"
+                : "openLessonSection('" + courseId + "','" + l.id + "','" + section + "')";
+            var num = base + ei + 1;
+
+            if (variant === 'sidebar') {
+                return `
+                                    <div class="sidebar-lesson-item ${locked ? 'locked' : ''}"
+                                         onclick="${_escHtml(click)}; if(window.innerWidth<=768) toggleLessonSidebar(false)">
+                                        <span class="sl-num">${num}</span>
+                                        <span class="sl-icon">${icon}</span>
+                                        <span class="sl-title">${title}</span>
+                                        <span class="sl-duration">${isPdf ? 'PDF' : 'Quiz'}</span>
+                                    </div>`;
+            }
+
+            var badge = locked
+                ? '<span class="badge" style="font-size:0.75rem;background:rgba(100,116,139,0.1);color:#64748b;border:1px solid rgba(100,116,139,0.2);">🔒 Locked</span>'
+                : (attempt
+                    ? '<span class="badge badge-success" style="font-size:0.75rem;">✓ ' + attempt.score + ' / ' + attempt.total + '</span>'
+                    : '<span class="badge" style="font-size:0.75rem;background:rgba(37,99,235,0.1);color:#2563eb;border:1px solid rgba(37,99,235,0.2);">' + (isPdf ? 'Open' : 'Available') + '</span>');
+            return `
+                                        <div class="accordion-lesson-item ${locked ? 'locked' : ''}" onclick="${_escHtml(click)}">
+                                            <div class="accordion-lesson-left" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+                                                <span class="accordion-lesson-num" style="font-weight:800;font-size:0.8rem;color:var(--text-muted);min-width:24px;">${pi + 1}.${num}</span>
+                                                <div class="accordion-lesson-icon" style="font-size:1.1rem;flex-shrink:0;">${icon}</div>
+                                                <div style="min-width:0;flex:1;">
+                                                    <div class="accordion-lesson-title" style="font-weight:700;font-size:0.95rem;color:var(--text-primary);">${title}</div>
+                                                    <div class="accordion-lesson-meta" style="font-size:0.78rem;color:var(--text-muted);display:flex;gap:6px;align-items:center;margin-top:2px;">
+                                                        <span>${isPdf ? '📄 PDF Note' : '📝 Quiz'}</span>
+                                                        ${(!isPdf && quiz) ? '<span>•</span><span>' + (quiz.questionsList || []).length + ' Questions</span>' : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="accordion-lesson-right" style="flex-shrink:0;margin-left:8px;">${badge}</div>
+                                        </div>`;
+        }).join('');
+    }
+
+    // Go to a lesson and jump to its PDF / quiz section (or just scroll if we're already on that lesson).
+    window.openLessonSection = function (courseId, lessonId, section) {
+        var hash = 'lesson/' + courseId + '/' + lessonId;
+        var cur = (window.location.hash || '').replace(/^#/, '');
+        if (cur === hash && document.getElementById('ltab-pane-' + section)) {
+            window.switchLessonTab(section);
+            return;
+        }
+        try { sessionStorage.setItem('iraqi_lesson_section', section); } catch (e) { /* ignore */ }
+        navigate(hash);
+    };
+
+    function scrollToPendingLessonSection() {
+        var sec = null;
+        try { sec = sessionStorage.getItem('iraqi_lesson_section'); sessionStorage.removeItem('iraqi_lesson_section'); } catch (e) { /* ignore */ }
+        if (!sec) return;
+        setTimeout(function () { if (document.getElementById('ltab-pane-' + sec)) window.switchLessonTab(sec); }, 350);
+    }
+
+    // When the quizzes arrive from Firestore after the lesson page was drawn, fill in the quiz card.
+    window.addEventListener('iraqiQuizzesUpdated', function () {
+        var ctx = window._lessonPageCtx;
+        var pane = document.getElementById('ltab-pane-quiz');
+        if (!ctx || !pane || !document.getElementById('lessonQuizPending')) return;
+        pane.innerHTML = renderQuizContent(ctx.lesson, ctx.courseId);
+    });
+
 
     // ═══════════════════════════════════════════════════════════
     // TEST PAGE — صفحة الاختبار الكاملة والاحترافية
@@ -4834,7 +5106,7 @@
                     const [page, ...params] = hash.split('/');
                     if (page === 'lesson') {
                         const content = document.getElementById('app-content');
-                        if (content) content.innerHTML = renderLessonPage(params[0], params[1]);
+                        if (content) { content.innerHTML = renderLessonPage(params[0], params[1]); initLessonVideoPlayer(); }
                     }
                 }
             } catch (e) { console.warn('[initLessonPage] auto-refresh:', e.message); }

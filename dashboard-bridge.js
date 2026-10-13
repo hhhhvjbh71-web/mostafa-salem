@@ -239,6 +239,7 @@
                         bunnyVideoId: seg.bunnyVideoId || '',
                         segments: validSegs,
                         pdfUrl: l.pdfUrl || '',
+                        pdfName: l.pdfName || '',
                         quizId: l.quizId || null,
                         isCompleted: false,
                         isLocked: false
@@ -263,6 +264,7 @@
                     bunnyVideoId: l.bunnyVideoId || (validSegs[0] ? validSegs[0].bunnyVideoId : ''),
                     segments: validSegs,
                     pdfUrl: l.pdfUrl || '',
+                    pdfName: l.pdfName || '',
                     quizId: l.quizId || null,
                     isCompleted: false,
                     isLocked: false
